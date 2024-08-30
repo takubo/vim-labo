@@ -454,7 +454,7 @@ augroup MyVimrc_Cursor
   au WinEnter,BufEnter * setl cursorline "cursorcolumn
   au WinLeave          * setl nocursorline nocursorcolumn
 
-  if 0
+  if 1
     au CursorHold  * setl nocursorcolumn
     au CursorMoved * setl cursorcolumn
   endif
@@ -1974,6 +1974,8 @@ com! -nargs=? -complete=customlist,s:CompletionTabline Tabline call <SID>ToggleT
 " TabLine Timer
 
 function! UpdateTabline(dummy)
+  redrawtabline
+  return
   set tabline=%!TabLineStr()
 endfunction
 
@@ -3751,10 +3753,10 @@ imap <Plug>(Completion-Yes-And-InsertLeave) <Plug>(Completion-Yes)<Plug>(InsertL
 
 
 " 候補選択
-inoremap <expr> j pumvisible() ? Complete_jk("\<C-n>") : TriggerCompleteDefault('j')
-inoremap <expr> k pumvisible() ? Complete_jk("\<C-p>") : TriggerCompleteDefault('k')
-inoremap <expr> J pumvisible() ? Complete_jk("\<C-n>") : TriggerCompleteDefault('j')
-inoremap <expr> K pumvisible() ? Complete_jk("\<C-p>") : TriggerCompleteDefault('k')
+"inoremap <expr> j pumvisible() ? Complete_jk("\<C-n>") : TriggerCompleteDefault('j')
+"inoremap <expr> k pumvisible() ? Complete_jk("\<C-p>") : TriggerCompleteDefault('k')
+"inoremap <expr> J pumvisible() ? Complete_jk("\<C-n>") : TriggerCompleteDefault('j')
+"inoremap <expr> K pumvisible() ? Complete_jk("\<C-p>") : TriggerCompleteDefault('k')
 
 " 日本語入力時用 + 強制補完開始
 inoremap <expr> <C-j> pumvisible() ? Complete_jk("\<C-n>") : TriggerCompleteDefault('')
@@ -6359,9 +6361,9 @@ onoremap <expr> <silent> U search('^\s\+\%#\S\?', 'bcn') ? '0' : '^'
 "nnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^' <CR>
 
 "nnoremap U ^
-nnoremap : $
+"nnoremap : $
 "vnoremap U ^
-vnoremap : $
+"vnoremap : $
 
 
 " 補償
@@ -6517,4 +6519,3 @@ nnoremap <Leader><C-s> :<C-u>wind %s/<C-r>//<C-r><C-w>/g<CR>:wind up<CR><C-w>t
 
 
 "---------------------------------------------------------------------------------------------
-
