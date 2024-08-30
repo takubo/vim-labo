@@ -3699,7 +3699,7 @@ function! SetCpmplKey(str)
 endfunction
 call SetCpmplKey('_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 "inoremap <expr> <BS> pumvisible() ? (search('\k\k\k\k\%#', 'bcn') ? '<BS>' : "\<BS>") : (search('\k\k\k\%#', 'bcn') ? TriggerCompleteDefault("\<BS>") : "\<BS>")
-inoremap <expr> <BS> pumvisible() ? "\<BS>" : (search('\k\k\k\%#', 'bcn') ? TriggerCompleteDefault("\<BS>") : "\<BS>")
+inoremap <expr> <BS> pumvisible() ? "\<BS>" : (search('\k\k\k\%#', 'bcn') && !search('[あ-ん][あ-ん][あ-ん]\%#', 'bcn')) ? TriggerCompleteDefault("\<BS>") : "\<BS>")
 
 
 " 補完を開始する
