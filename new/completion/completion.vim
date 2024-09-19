@@ -15,7 +15,6 @@ set complete=.,w,b,u,i,t
 set completeopt=menuone,noselect # TODO ,fuzzy
 set pumheight=30
 
-
 # こうしないと、「イベントグループが存在しない」というエラーになる。
 augroup JKComplete | au! | augroup end
 
@@ -68,8 +67,6 @@ inoremap <expr> <A-j>  pumvisible() ? "\<C-n>" : StartComplete('')
 inoremap <expr> <A-k>  pumvisible() ? "\<C-p>" : StartComplete('')
 inoremap <expr> <Down> pumvisible() ? "\<C-n>" : StartComplete('')
 inoremap <expr> <Up>   pumvisible() ? "\<C-p>" : StartComplete('')
-inoremap <expr> <C-j>  pumvisible() ? "\<C-n>" : StartComplete('')
-inoremap <expr> <C-k>  pumvisible() ? "\<C-p>" : StartComplete('')
 inoremap <expr> ｊｊ pumvisible() ? '<C-N><C-N>' : '<cmd>update<CR>'
 inoremap <expr>   ｊ pumvisible() ? '<C-N><C-N>' : '<cmd>update<CR>'
 inoremap <expr> っｊ pumvisible() ? '<C-N><C-N>' : '<cmd>update<CR>'
@@ -86,17 +83,10 @@ def StartComplete(insert_char: string): string
 enddef
 
 augroup JKComplete
-  # TODO なぜか効かない
-  #au InsertEnter,CompleteDone * if mapcheck('gg', 'i') != '' | iunmap gg| endif
-  # E31 : そのようなマッピングはありません
-  au InsertEnter,CompleteDone * try | iunmap gg| catch /^Vim\%((\a\+)\)\=:E31:/ | finally | endtry
-
-  au ModeChanged *:i[cx]* try | iunmap jj| catch /^Vim\%((\a\+)\)\=:E31:/ | finally | endtry
-  # TODO なぜかuを入力したら落ちる
-  #au ModeChanged *:i[cx]* if mapcheck('jj', 'i') != '' | iunmap jj| endif
+  au InsertEnter,CompleteDone * if maparg('gg', 'i') != '' | iunmap gg| endif
+  au ModeChanged *:i[cx]*       if maparg('jj', 'i') != '' | iunmap jj| endif
 
   au ModeChanged *:i[cx]* inoremap j <C-n>
-
   au ModeChanged *:i[cx]* imap gg <Plug>(JK-Complete-GG)
 augroup end
 
@@ -113,9 +103,7 @@ augroup JKComplete
 augroup end
 
 def DeleteDuplicateString()
-  # TODO 重複部分を消す
   # TODO メタ文字 兼 キーワードのエスケープ
-  # TODO gg以外の場合
   if search('\%#\k\+', 'cnz') != 0
     const compl_word = v:completed_item['word']
 
@@ -128,12 +116,7 @@ def DeleteDuplicateString()
     if len(right_word) > 1  # 念のため
       const left_left_word  = substitute(left_word, '\V' .. right_word .. '\$', '', 'g')
       const erace_num = len(left_word) - len(left_left_word)
-      #let key = repeat("\<Del>", erace_num)
-      #call feedkeys(repeat("\<Del>", erace_num), 'ni')
-      # Delじゃなく、BSにしておかないと、ドットリピート時に意図しないことになる。
-      #   例: 下記で、DefをXyzに変える場合。
-      #       Abc_Def_ghi0
-      #       Abc_Def_ghi1
+      # <Del>じゃなく、<BS>にしておかないと、ドットリピート時に意図しないことになる。
       feedkeys(repeat("\<BS>", erace_num) .. repeat("\<Right>", erace_num), 'ni')
 
       # 中間補完のとき、カーソルが補完位置にとどまるようにようにする。
