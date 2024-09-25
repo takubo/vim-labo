@@ -13,19 +13,8 @@ augroup end
 
 nnoremap v <C-v>
 
-# nr2char(22) は "<C-V>"
-const Ctrl_V = nr2char(22)
-
-vnoremap <expr> v mode() == 'v' ? Ctrl_V : 'v'
-vnoremap <expr> v mode() == 'v' ? "\<C-V>" : 'v'
-vnoremap <expr> v mode() == 'v' ? '<C-V>' : 'v'
-
-#let s:Ctrl_v = function('nr2char', [22])
-#vnoremap <expr> v mode() == 'v' ? <SID>Ctrl_v() : 'v'
-
-#vnoremap <expr> v mode() == 'v' ? nr2char(22) : 'v'
-
-vnoremap <expr> V mode() ==# 'V' ? '' : 'V'
+vnoremap <expr> v mode() !=# '<C-v>' ? '<C-V>' : 'v'
+vnoremap <expr> V mode() !=# 'V'     ? 'V'     : ''
 
 
 #----------------------------------------------------------------------------------------
@@ -42,7 +31,7 @@ augroup MyVimrc_Visual
   au ModeChanged [\x16]*:* au! MyVimrc_Visual_V
 augroup end
 
-# 念のための削除処理と、グループループの生成。
+# 念のための削除処理と、グループの生成。
 augroup MyVimrc_Visual_V
   au!
 augroup end
@@ -58,81 +47,6 @@ def Visual_A()
   au MyVimrc_Visual_V CursorMoved * ++once vmap <buffer> <nowait> a <Cmd>call <SID>Visual_A()<CR>
   (line('v') != line('.') ? 'A' : 'a')->feedkeys()
 enddef
-
-### Test ###
-vnoremap ia i(
-
-
-##? nnoremap v <C-v>
-##? 
-##? augroup MyVimrc_Visual
-##?   au!
-##?   # <buffer>と<nowait>により、各omapより優先させる。
-##?   au ModeChanged *:[vV\x16]* vmap <expr> <buffer> <nowait> i mode() == "\x16" ? '<Cmd>call g:Visual_I()<CR>' : 'i'
-##?   au ModeChanged *:[vV\x16]* vmap <expr> <buffer> <nowait> a mode() == "\x16" ? '<Cmd>call g:Visual_A()<CR>' : 'a'
-##? 
-##?   au ModeChanged [vV\x16]*:[^vV\x16]* au! MyVimrc_Visual_V
-##?   au ModeChanged [vV\x16]*:[^vV\x16]* au! MyVimrc_Visual_V
-##? augroup end
-##? 
-##? augroup MyVimrc_Visual_V
-##?   au!
-##? augroup end
-##? 
-##? def g:Visual_I()
-##?   vunmap <buffer> i
-##?   au MyVimrc_Visual_V CursorMoved * ++once vmap <expr> <buffer> <nowait> i mode() == "\x16" ? '<Cmd>call g:Visual_I()<CR>' : 'i'
-##?   call feedkeys(line('v') != line('.') ? 'I' : 'i')
-##? enddef
-##? 
-##? def g:Visual_A() 
-##?   unmap <buffer> a
-##?   au MyVimrc_Visual_V CursorMoved * ++once vmap <expr> <buffer> <nowait> a mode() == "\x16" ? '<Cmd>call g:Visual_A()<CR>' : 'a'
-##?   call feedkeys(line('v') != line('.') ? 'A' : 'a')
-##? enddef
-##? 
-##? ### Test ###
-##? vnoremap ia i(
-
-
-##? nnoremap v <C-v>
-##? 
-##? augroup MyVimrc_Visual
-##?   au!
-##?   # <buffer>と<nowait>により、各omapより優先させる。
-##?   au ModeChanged *:[vV\x16]* vmap <buffer> <nowait> i <Plug>(Visual-I)
-##?   au ModeChanged *:[vV\x16]* vmap <buffer> <nowait> a <Plug>(Visual-A)
-##? augroup end
-##? 
-##? vnoremap <Plug>(Visual-I) <Cmd>if mode() == "\x16" && line('v') != line('.')<Bar>vunmap <buffer> i<Bar>call feedkeys('I')<Bar>else<Bar>call feedkeys('i')<Bar>endif<CR>
-##? vnoremap <Plug>(Visual-A) <Cmd>if mode() == "\x16" && line('v') != line('.')<Bar>vunmap <buffer> a<Bar>call feedkeys('A')<Bar>else<Bar>call feedkeys('a')<Bar>endif<CR>
-##? 
-##? #vmap <expr> <nowait> i (mode() == "\x16" && line('v') != line('.')) ? 'Ia' : 'Io'
-##? #vmap <expr> <nowait> i (mode() == "\x16" && line('v') != line('.')) ? 'I' : 'i'
-##? #vmap <expr>          i (mode() == "\x16" && line('v') != line('.')) ? 'I' : 'i'
-##? 
-##? ### Test ###
-##? vnoremap ia i(
-
-
-##? nnoremap v <C-v>
-##? 
-##? augroup MyVimrc_Visual
-##?   au!
-##?   # <buffer>と<nowait>により、各omapより優先させる。
-##?   au ModeChanged *:[vV\x16]* vmap <expr> <buffer> <nowait> i mode() == "\x16" && line('v') != line('.') ? '<Plug>(Visual-I)' : 'i'
-##?   au ModeChanged *:[vV\x16]* vmap <expr> <buffer> <nowait> a mode() == "\x16" && line('v') != line('.') ? '<Plug>(Visual-A)' : 'a'
-##? augroup end
-##? 
-##? vnoremap <Plug>(Visual-I) <Cmd>vunmap <buffer> i<Bar>call feedkeys( ? 'I' : 'i', 'i')<CR>
-##? vnoremap <Plug>(Visual-A) <Cmd>vunmap <buffer> a<Bar>call feedkeys( ? 'A' : 'a', 'i')<CR>
-##? 
-##? #vmap <expr> <nowait> i (mode() == "\x16" && line('v') != line('.')) ? 'Ia' : 'Io'
-##? #vmap <expr> <nowait> i (mode() == "\x16" && line('v') != line('.')) ? 'I' : 'i'
-##? #vmap <expr>          i (mode() == "\x16" && line('v') != line('.')) ? 'I' : 'i'
-##? 
-##? ### Test ###
-##? vnoremap ia i(
 
 
 #----------------------------------------------------------------------------------------
@@ -150,9 +64,10 @@ vnoremap <expr> <C-O> mode() == '<C-V>' ? 'Oo' : 'o'
 vnoremap zd zygv"_d
 vnoremap zc zygv"_c
 
-#vnoremap Y zy
-#vnoremap D zygv"_d
-#vnoremap C zygv"_c
+# 大文字で、押しやすくする。
+vnoremap Y zy
+vnoremap D zygv"_d
+vnoremap C zygv"_c
 
 
 #----------------------------------------------------------------------------------------
@@ -160,11 +75,11 @@ vnoremap zc zygv"_c
 
 augroup MyVimrc_Visual
   # virtualeditが有効だと、タブ文字上を移動するのが面倒。
-  au ModeChanged *:[vV\x16]* set virtualedit-=block
+  au ModeChanged [^vV\x16]*:[\x16]* set virtualedit-=block
 augroup end
 
-vnoremap . <Cmd>exe 'set virtualedit' .. (stridx(&virtualedit, 'block') < 0 ? '+=' : '-=') ..'block'<CR>
+# Visualモード中の、virtualedit=blockのためのトグル。
+vnoremap . <Cmd>exe 'set virtualedit' .. (stridx(&virtualedit, 'block') < 0 ? '+=' : '-=') .. 'block'<CR>
 
 # 行右端で、なお右に進もうとしたら、virtualeditにblockを追加して、何事もなかったかのように右へ移動する。
-vnoremap <expr> l (&virtualedit !~# 'block' && !!search('\%#$', 'bcn')) ?
-		\ ('<Cmd>set virtualedit+=block<CR>' .. 'l') : 'l'
+vnoremap <expr> l (mode() == '<C-V>' && !!search('\%#$', 'bcn') ? '<Cmd>set virtualedit+=block<CR>' : '') .. 'l'
