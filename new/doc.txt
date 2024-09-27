@@ -1,0 +1,113 @@
+#----------------------------------------------------------------------------------------
+# Doc
+
+
+# 複雑化
+#  補完
+#  CWordSearch
+#  Tag
+#  Window Focus
+#  Visual, Stl, Tabline
+#
+
+
+# Grep
+#   2 grep vimgrep
+#   2 new add
+#   2 qfix location
+#   3 指定拡張子 同じ拡張子 git下
+#   3 プロジェクト全体 カレントディレクトリのみ カレントディレクトリと下
+#   6 文字列入力 カーソル下単語 カーソル下文字列 検索文字列 レジスタ 単語境界で自由入力
+#   72 * 6 = 432
+
+
+# 重点実施
+#
+#    1. Window
+#    2. Completion
+#    3. CWord Search
+#
+#    4. Tag & Browse
+#    5. Clever-f
+#    6. Block Visual
+#
+
+
+# packages
+#
+#  begin        vimrc内で呼び出すプラグイン
+#  lib          ライブラリ
+#  util         細かいユーティリティ
+#  dev          vim scriptのデバッグ用
+#  mypackage    submodule化しないプラグイン
+#  default      必須のプラグイン
+#  plugin       なくてもよいプラグイン
+#
+#
+
+
+#	 1	Basic
+#	 2	Battery
+#	 3	Buffer
+#	 4	Clever-f
+#	 5	Completion
+#	 6	Configuration
+#	 7	Cursor Move, CursorLine, CursorColumn, and Scroll
+#	 8	Diff
+#	 9	EasyMotionn
+#	10	Emacs
+#	11	EscEsc
+#	12	FuncName
+#	13	Grep
+#	14	i_Esc
+#	15	Mru
+#	16	NERDTree
+#	17	Other Key-Maps
+#	18	Quickfix & Locationlist
+#	19	Search
+#	20	SetPath
+#	21	Snippets
+#	22	Statusline
+#	23	Substitute
+#	24	Swap Exists
+#	25	Tab
+#	26	Tabline
+#	27	Tag, Jump, and Unified CR
+#	28	Terminal
+#	29	Text_Objects
+#	30	Transparency
+#	31	Undo Redo
+#	32	Unified_Space
+#	33	Util
+#	34	Util Commands
+#	35	Util Functions
+#	36	Vertical-f
+#	37	Visual_Mode
+#	38	Window
+#	
+#	39	BlockMove
+#	40	CursorJumped
+#	41	Circle Number
+#	42	mode popup
+#	43	Numbers
+#	
+#	
+#	1	submode
+#	2	cfi
+#	3	PrettyPrint
+#	4	clever-f
+#	5	Rainbow Parentheses
+#	6	fugitive
+
+
+#  lib          ライブラリ
+#	1. PushposPopPos
+#	2. CursorJumped
+#	3. WindowRatio
+#	4. submode
+#
+#	5. popup
+#	6. func name
+
+
+
