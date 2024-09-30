@@ -39,13 +39,13 @@ augroup end
 def Visual_I()
   vunmap <buffer> i
   au MyVimrc_Visual_V CursorMoved * ++once vmap <buffer> <nowait> i <Cmd>call <SID>Visual_I()<CR>
-  (line('v') != line('.') ? 'I' : 'i')->feedkeys()
+  feedkeys(line('v') != line('.') ? 'I' : 'i')
 enddef
 
 def Visual_A() 
   unmap <buffer> a
   au MyVimrc_Visual_V CursorMoved * ++once vmap <buffer> <nowait> a <Cmd>call <SID>Visual_A()<CR>
-  (line('v') != line('.') ? 'A' : 'a')->feedkeys()
+  feedkeys(line('v') != line('.') ? 'A' : 'a')
 enddef
 
 
