@@ -239,7 +239,7 @@ com! -nargs=0 -bar AllWinOptimalWidthRev {
 
 # 横長なほど、大きい値が返る。
 # 正方形は、 w:h = 178:78 の想定
-def WindowRatio(): number
+export def WindowRatio(): float
   const h = winheight(0) + 0.0
   const w =  winwidth(0) + 0.0
   return (w / h - 178.0 / 78.0)
@@ -247,13 +247,13 @@ enddef
 
 #       Vert Split すべきとき、正数が返る。
 # Horizontal Split すべきとき、負数が返る。
-export def BestSplitDirection(): number
+export def SplitDirection(): number
   return ( winwidth(0) > (&columns * 7 / 10) && <SID>WindowRatio() >= 0 ) ? 9999 : -9999
 enddef
 
 #       Vert Split すべきとき、'v'が返る。
 # Horizontal Split すべきとき、's'が返る。
-export def SplitDirection(): string
+export def SplitDirectionStr(): string
   return ( winwidth(0) > (&columns * 7 / 10) && <SID>WindowRatio() >= 0 ) ? 'v' : 's'
 enddef
 
@@ -340,6 +340,36 @@ nnoremap g<Space> <ScriptCmd>call ToggleTypewriterScroll(v:false)<CR>
 #----------------------------------------------------------------------------------------
 # RC
 #----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
+
+# Focus Wrap Move
+# Optimal Window Width
+# Optimal Window Height
+
+# Trigger
+# Split & New
+# Close
+# Focus
+# Resize
+# Move
+
+# Reopen as Tab
+# Tab (New, Open)
+# Tab (close)
+# Tab (focus)
+# Tab (move)
+
+# Tab (Window Container)
+
+# Window Ratio
+
+# Best Scrolloff
+# Typewriter Scroll
+
+# WinCmd <Plug>
+
+
+import autoload '../impauto/window_ratio.vim' as wr
 
 
 #----------------------------------------------------------------------------------------
@@ -355,6 +385,38 @@ set noequalalways
 
 nmap <BS> <C-W>
 nmap <C-J> <C-W>
+
+
+#----------------------------------------------------------------------------------------
+# Split & New
+
+nnoremap  _     <C-W>s<Cmd>diffoff <Bar> setl noscrollbind<CR>
+nnoremap g_     <C-W>n
+
+nnoremap  <Bar> <C-W>v<Cmd>diffoff <Bar> setl noscrollbind<CR>
+nnoremap g<Bar> <Cmd>vnew<CR>
+
+# Auto Optimal Ratio Split
+#nnoremap <expr> <Plug>(MyVimrc-Window-AutoSplit)     ( wr.WindowRatio() >= 0 ? '<C-W>v' : '<C-W>s' ) .. '<Cmd>diffoff<CR>'
+#nnoremap <expr> <Plug>(MyVimrc-Window-AutoSplit-Rev) ( wr.WindowRatio() <  0 ? '<C-W>v' : '<C-W>s' ) .. '<Cmd>diffoff<CR>'
+
+#nmap <BS><BS>         <Plug>(MyVimrc-Window-AutoSplit)
+#nmap <Leader><Leader> <Plug>(MyVimrc-Window-AutoSplit)
+
+nnoremap <expr> <Plug>(MyVimrc-Window-AutoSplit)          ( '<C-W>' .. wr.SplitDirectionStr() >= 0 ? ) .. '<Cmd>diffoff <Bar> setl noscrollbind<CR>'
+nnoremap <expr> <Plug>(MyVimrc-Window-AutoSplit-Rev)      ( '<C-W>' .. wr.SplitDirectionStr() <  0 ? ) .. '<Cmd>diffoff <Bar> setl noscrollbind<CR>'
+
+nnoremap <expr> <Plug>(MyVimrc-Window-AutoSplit-Dumb)     ( wr.WindowRatio() >= 0 ? '<C-W>v' : '<C-W>s' ) .. '<Cmd>diffoff <Bar> setl noscrollbind<CR>'
+nnoremap <expr> <Plug>(MyVimrc-Window-AutoSplit-Rev-Dumb) ( wr.WindowRatio() <  0 ? '<C-W>v' : '<C-W>s' ) .. '<Cmd>diffoff <Bar> setl noscrollbind<CR>'
+
+nmap <BS><BS>         <Plug>(MyVimrc-Window-AutoSplit-Dumb)
+#nmap <Leader><Leader> <Plug>(MyVimrc-Window-AutoSplit-Rev-Dumb)
+
+# Auto Optimal Ratio New
+nnoremap <expr> <Plug>(MyVimrc-Window-AutoNew) (winwidth(0) > (&columns * 7 / 10) && wr.WindowRatio() >=  0) ? '<Cmd>vnew<CR>' : '<C-W>n'
+nmap M <Plug>(MyVimrc-Window-AutoNew)
+#nmap U <Plug>(MyVimrc-Window-AutoNew)
+
 
 #----------------------------------------------------------------------------------------
 # Close
@@ -377,6 +439,7 @@ nnoremap <C-q>; q:
 #----------------------------------------------------------------------------------------
 # Focus
 
+# Direction Focus
 nmap <Left>  <Plug>(Window-Focus-WrapMove-h)
 nmap <Down>  <Plug>(Window-Focus-WrapMove-j)
 nmap <Up>    <Plug>(Window-Focus-WrapMove-k)
@@ -386,6 +449,56 @@ nmap H <Plug>(Window-Focus-WrapMove-h)
 nmap J <Plug>(Window-Focus-WrapMove-j)
 nmap K <Plug>(Window-Focus-WrapMove-k)
 nmap L <Plug>(Window-Focus-WrapMove-l)
+
+# vnoremap H <C-W>h
+# vnoremap J <C-W>j
+# vnoremap K <C-W>k
+# vnoremap L <C-W>l
+
+# 便利化
+#let g:WinFocusThresh = 5
+#nmap <expr> J winnr('$') >= g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-j)' : '<Plug>(Window-Focus-SkipTerm-Inc)'
+#nmap <expr> K winnr('$') >= g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-k)' : '<Plug>(Window-Focus-SkipTerm-Dec)'
+
+# 便利化 (数値指定対応)
+#nmap <expr> J v:prevcount ? '<Esc>' . v:prevcount . '<C-w>w' : winnr('$') > g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-j)' : '<Plug>(Window-Focus-SkipTerm-Inc)'
+#nmap <expr> K v:prevcount ? '<Esc>' . v:prevcount . '<C-w>w' : winnr('$') > g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-k)' : '<Plug>(Window-Focus-SkipTerm-Dec)'
+
+
+#----------------------------------------------------------------------------------------
+# Focus (補償)
+
+#--------------------------------------------
+# Join
+
+nnoremap m   J
+nnoremap gm gJ
+vnoremap m   J
+vnoremap gm gJ
+
+# noremap M   J
+# noremap gM gJ
+
+# nnoremap U   J
+# nnoremap gU gJ
+
+# nnoremap  <C-J>  J
+# nnoremap g<C-J> gJ
+
+#--------------------------------------------
+# H, M, L
+
+nnoremap <Leader>H H
+nnoremap <Leader>M M
+nnoremap <Leader>L L
+
+# nnoremap gM M
+# nnoremap gH H
+# nnoremap gL L
+
+# noremap zH H
+# noremap zL L
+# noremap zM M
 
 
 #----------------------------------------------------------------------------------------
@@ -428,52 +541,6 @@ nmap <C-W>J <Plug>(MyVimrc-Window-Move-J)
 nmap <C-W>K <Plug>(MyVimrc-Window-Move-K)
 nmap <C-W>L <Plug>(MyVimrc-Window-Move-L)
 
-#nnoremap <A-h> <C-W>H
-#nnoremap <A-j> <Cmd>horizontal wincmd J<CR><Cmd>vertical wincmd =<CR>
-#nnoremap <A-k> <Cmd>horizontal wincmd K<CR><Cmd>vertical wincmd =<CR>
-#nnoremap <A-l> <C-W>L
-
-#nnoremap <Left>  <C-W>H
-#nnoremap <Down>  <C-W>J<Cmd>vertical wincmd =<CR> 
-#nnoremap <Up>    <C-W>K<Cmd>vertical wincmd =<CR> 
-#nnoremap <Right> <C-W>L
-
-#nnoremap <C-W>h <C-W>H
-#nnoremap <C-W>j <C-W>J<Cmd>vertical wincmd =<CR>
-#nnoremap <C-W>k <C-W>K<Cmd>vertical wincmd =<CR>
-#nnoremap <C-W>l <C-W>L
-
-
-## ウィンドウを上端、下端に動かすと、ウィンドウ高さが最大になってしまうことの対策。
-#var wfw: list<bool>
-#
-#def Wmv(dir: string)
-#  const old_ww = winwidth(0)
-#  exe 'wincmd' dir
-#  const new_ww = winwidth(0)
-#  if old_ww != new_ww
-#    #wfw = (winnr('$') + 1)->range()->map('v:val >= 0')
-#    # TODO 型キャストが使えない
-#    wfw = (winnr('$') + 1)->range()->map((_, v) => v >= 0)
-#    PushPos
-#    windo wfw[winnr()] = &l:winfixwidth
-#    windo &l:winfixwidth = true
-#    wincmd =
-#    windo &l:winfixwidth = wfw[winnr()]
-#    PopPos
-#  endif
-#enddef
-
-
-#nnoremap        <Plug>(MyVimrc-Window-Move-H)  <C-W>H<CR>
-##nnoremap <expr> <Plug>(MyVimrc-Window-Move-J) '<C-W>J' .. '<Cmd> if winwidth(0) != ' .. winwidth(0) .. ' <Bar> wincmd = <Bar> endif <CR>'
-##nnoremap <Plug>(MyVimrc-Window-Move-J) <ScriptCmd>call Wmv('J')<CR>
-#nnoremap        <Plug>(MyVimrc-Window-Move-J) <C-W>J<Cmd>vertical wincmd =<CR>
-##nnoremap <expr> <Plug>(MyVimrc-Window-Move-K) '<C-W>K' .. '<Cmd> if winwidth(0) != ' .. winwidth(0) .. ' <Bar> wincmd = <Bar> endif <CR>'
-##nnoremap <Plug>(MyVimrc-Window-Move-K) <ScriptCmd>call Wmv('K')<CR>
-#nnoremap        <Plug>(MyVimrc-Window-Move-K) <C-W>K<Cmd>vertical wincmd =<CR>
-#nnoremap        <Plug>(MyVimrc-Window-Move-L)  <C-W>L<CR>
-
 
 #----------------------------------------------------------------------------------------
 # Resize
@@ -485,12 +552,6 @@ nnoremap <C-H> <C-W>+
 nnoremap <C-L> <C-W>-
 nnoremap (     <C-W>3<
 nnoremap )     <C-W>3>
-
-# terminal
-tnoremap <C-Up>    <C-W>+
-tnoremap <C-Down>  <C-W>-
-tnoremap <C-Left>  <C-W><
-tnoremap <C-Right> <C-W>>
 
 #--------------------------------------------
 # 補償
@@ -547,6 +608,25 @@ nnoremap <Plug>(MyVimrc-WinCmd-p) <C-w>p
 
 
 #----------------------------------------------------------------------------------------
+# Reopen as Tab
+
+# TODO diffのバッファも再現する。
+
+# nnoremap <C-w><C-w> :<C-u>tab split<CR>
+
+nnoremap <Plug>(MyVimrc-Window-TabSplit) <Cmd>tab split <Bar> diffoff<CR>
+nmap     <C-W><C-W> <Plug>(MyVimrc-Window-TabSplit)
+# nmap     <Leader><Leader> <Plug>(MyVimrc-Window-TabSplit)
+# nmap     <C-T> <Plug>(MyVimrc-Window-TabSplit)
+
+nnoremap <C-W><C-T> <C-W>T
+nnoremap <C-W>T     <C-W>T
+
+# nmap     t <Plug>(MyVimrc-Window-TabSplit)
+# nnoremap T <C-w>T
+
+
+#----------------------------------------------------------------------------------------
 # Tab (Window Container)
 
 nnoremap  <C-T> <Cmd>tabnew<CR>
@@ -568,286 +648,28 @@ nnoremap <A-B>  <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove 
 nnoremap gt <Cmd>tabs<CR>:tabnext<Space>
 
 
-
-
-
-finish
-
-
-
-
-
-
 #----------------------------------------------------------------------------------------
+# Terminal
+
+# Escape Terminal
+# Windowから抜ける。 (Windowが１つしかないなら、Tabから抜ける。)
+tnoremap <expr> <C-Tab>    winnr('$') == 1 ? '<C-W>:tabNext<CR>' : '<C-W>p'
+tnoremap <expr> <C-T>      winnr('$') == 1 ? '<C-W>:tabNext<CR>' : '<C-W>p'
+tnoremap <expr> <C-W><C-W> winnr('$') == 1 ? '<C-W>:tabNext<CR>' : '<C-W>p'
+tnoremap <expr> <C-W><C-T> winnr('$') == 1 ? '<C-W>:tabNext<CR>' : '<C-W>p'
+
+# Direction Focus (Terminal)
+#tnoremap <S-Left>  <C-w>h
+#tnoremap <S-Down>  <C-w>j
+#tnoremap <S-Up>    <C-w>k
+#tnoremap <S-Right> <C-w>l
+
 # Reopen as Tab
-# TODO diffのバッファも再現する。
-
-nnoremap <C-w><C-w> :<C-u>tab split<CR>
-
-nnoremap <silent> <Plug>(TabSplit) :<C-u>tab split <Bar> diffoff<CR>
-nmap     <C-w><C-w> <Plug>(TabSplit)
-nnoremap <C-w><C-t> <C-w>T
-
-tnoremap <C-w><C-t> <C-w>T
-
-"---------------------------------------------------------------------------------------------
-
-"nmap <C-t> <Plug>(TabSplit)
-nmap     t <Plug>(TabSplit)
-nnoremap T <C-w>T
-
-" <c-t> g<c-t> T gT
-nmap gt <Plug>(Window-Resize-OptimalWidth)
-nmap gT <C-w>=
-" nmap <Leader><Leader> <C-w>=
-
-
-
-"nmap <C-t> <Plug>(TabSplit)
-nnoremap T <C-w>T
-
-" <c-t> g<c-t> T gT
-nmap gt <Plug>(Window-Resize-OptimalWidth)
-nmap gT <C-w>=
-" nmap <Leader><Leader> <C-w>=
-nnoremap t gt
-nnoremap T gT
-
-
-
-nmap     t <Plug>(TabSplit)
-nnoremap T <C-w>T
-"nmap     <Leader><Leader> <Plug>(TabSplit)
-
-
-
-
-
-
-
-
-
-
-
-#----------------------------------------------------------------------------------------
-# Tmp
-# TODO WrapMove -> Wrap
-#----------------------------------------------------------------------------------------
-
-# Focus Wrap Move
-# Optimal Window Width
-# Optimal Window Height
-
-# " Trigger
-# " Split & New
-# " Close
-# Focus
-# Resize
-" Move
-
-# " Reopen as Tab
-# Tab (New, Open)
-# Tab (close)
-# Tab (focus)
-# Tab (move)
-
-# Tab (Window Container)
-
-# Window Ratio
-
-# Best Scrolloff
-# Typewriter Scroll
-# OK
-# Tmp
-
-# " WinCmd <Plug>
-
-
-
-" Window {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-
-
-
-
-"----------------------------------------------------------------------------------------
-" Split & New
-
-" Auto Split
-nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoSplit)     ( <SID>WindowRatio() >= 0 ? "\<C-w>v" : "\<C-w>s" ) . ':diffoff<CR>'
-nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoSplit-Rev) ( <SID>WindowRatio() <  0 ? "\<C-w>v" : "\<C-w>s" ) . ':diffoff<CR>'
-
-nmap <BS><BS>         <Plug>(MyVimrc-Window-AutoSplit)
-nmap <Leader><Leader> <Plug>(MyVimrc-Window-AutoSplit-Rev)
-
-" Auto Split
-nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoSplit)
-      \ ( <SID>SplitDirection() >= 0 ? "\<C-w>v" : "\<C-w>s" ) . ':diffoff<CR>'
-nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoSplit-Rev)
-      \ ( <SID>SplitDirection() <  0 ? "\<C-w>v" : "\<C-w>s" ) . ':diffoff<CR>'
-
-nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoSplit-Dumb)
-      \ ( <SID>WindowRatio() >= 0 ? "\<C-w>v" : "\<C-w>s" ) . ':diffoff<CR>'
-nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoSplit-Rev-Dumb)
-      \ ( <SID>WindowRatio() <  0 ? "\<C-w>v" : "\<C-w>s" ) . ':diffoff<CR>'
-
-nmap <BS><BS>         <Plug>(MyVimrc-Window-AutoSplit-Dumb)
-nmap m                <Plug>(MyVimrc-Window-AutoSplit-Dumb)
-nmap <Leader><Leader> <Plug>(MyVimrc-Window-AutoSplit-Rev-Dumb)
-
-" Tag, Jump, and Unified CR を参照。
-
-" Manual
-nnoremap <silent> _                <C-w>s:setl noscrollbind<CR>
-nnoremap <silent> _                <C-w>s:diffoff<CR>
-nnoremap <silent> g_               <C-w>n
-"nnoremap <silent> U                :<C-u>new<CR>
-nnoremap <silent> <Bar>            <C-w>v:setl noscrollbind<CR>
-nnoremap <silent> <Bar>            <C-w>v:diffoff<CR>
-nnoremap <silent> g<Bar>           :<C-u>vnew<CR>
-
-" Auto New
-nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoNew) ( winwidth(0) > (&columns * 7 / 10) && <SID>WindowRatio() >=  0 ) ? ':<C-u>vnew<CR>' : '<C-w>n'
-
-" Auto New
-nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoNew)
-      \ ( winwidth(0) > (&columns * 7 / 10) && <SID>WindowRatio() >=  0 ) ? ':<C-u>vnew<CR>' : '<C-w>n'
-
-
-"----------------------------------------------------------------------------------------
-" Focus
-
-" Basic
-"nmap t <Plug>(Window-Focus-SkipTerm-Inc)
-"nmap T <Plug>(Window-Focus-SkipTerm-Dec)
-" Unified_Spaceを参照。
-
-" Direction Focus
-nmap H <Plug>(Window-Focus-WrapMove-h)
-"nmap J <Plug>(Window-Focus-WrapMove-j)
-"nmap K <Plug>(Window-Focus-WrapMove-k)
-nmap L <Plug>(Window-Focus-WrapMove-l)
-
-vnoremap H <C-w>h
-vnoremap J <C-w>j
-vnoremap K <C-w>k
-vnoremap L <C-w>l
-
-" 便利化
-let g:WinFocusThresh = 5
-"nmap <expr> J winnr('$') >= g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-j)' : '<Plug>(Window-Focus-SkipTerm-Inc)'
-"nmap <expr> K winnr('$') >= g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-k)' : '<Plug>(Window-Focus-SkipTerm-Dec)'
-
-" 数値指定対応
-nmap <expr> J v:prevcount ? '<Esc>' . v:prevcount . '<C-w>w' : winnr('$') > g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-j)' : '<Plug>(Window-Focus-SkipTerm-Inc)'
-nmap <expr> K v:prevcount ? '<Esc>' . v:prevcount . '<C-w>w' : winnr('$') > g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-k)' : '<Plug>(Window-Focus-SkipTerm-Dec)'
-
-if 0
- "nmap J <Plug>(Window-Focus-SkipTerm-Inc)
- "nmap K <Plug>(Window-Focus-SkipTerm-Dec)
-  nmap <expr> J v:prevcount ? '<Esc>' . v:prevcount . '<C-w>w' : '<Plug>(Window-Focus-SkipTerm-Inc)'
-  nmap <expr> K v:prevcount ? '<Esc>' . v:prevcount . '<C-w>w' : '<Plug>(Window-Focus-SkipTerm-Dec)'
-  if 0
-    nunmap H
-    nunmap L
-  endif
-endif
-
-" 補償
-nnoremap gM M
-nnoremap gH H
-nnoremap gL L
-if 0
-  noremap m   J
-  noremap gm gJ
-elseif 0
-  noremap M   J
-  noremap gM gJ
-elseif 0
-  nnoremap U   J
-  nnoremap gU gJ
-else
-  nnoremap  <C-j>  J
-  nnoremap g<C-j> gJ
-endif
-
-" Direction Focus (Terminal)
-tnoremap <S-Left>  <C-w>h
-tnoremap <S-Down>  <C-w>j
-tnoremap <S-Up>    <C-w>k
-tnoremap <S-Right> <C-w>l
-
-" Terminal Windowから抜ける。 (Windowが１つしかないなら、Tabから抜ける。)
-tnoremap <expr> <C-Tab>    winnr('$') == 1 ? '<C-w>:tabNext<CR>' : '<C-w>p'
-tnoremap <expr> <C-t>      winnr('$') == 1 ? '<C-w>:tabNext<CR>' : '<C-w>p'
-tnoremap <expr> <C-w><C-w> winnr('$') == 1 ? '<C-w>:tabNext<CR>' : '<C-w>p'
-
-
-
-
-
-" Window }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-
-
-" Window Temp {{{{{{{{{{{{{{{{{{{{{{{
-
-
-" Window Wrap Focus 補償 {{{
-
-"noremap zh H
-"noremap zl L
-"noremap zm M
-"noremap zk H
-"noremap zj L
-
-"nnoremap <C-h> H
-"nnoremap <C-l> L
-"nnoremap <C-j> M
-
-
-nnoremap M <C-w>n
-"nmap U *
-nmap M <Plug>(MyVimrc-Window-AutoNew)
-
-
-" Window Wrap Focus 補償 }}}
-
-
-
-" Window Temp }}}}}}}}}}}}}}}}}}}}}}}
-
-
-
-nmap M <Plug>(MyVimrc-Window-AutoNew)
-nmap U <Plug>(MyVimrc-Window-AutoNew)
-
-
-
-
-
-
-# nnoremap <Leader>H H
-# nnoremap <Leader>M M
-# nnoremap <Leader>L L
-
-# nnoremap gH H
-# nnoremap gM M
-# nnoremap gL L
-
-
-
-
-
-
-
-
-"====================================================================================================================================================
-
-"---------------------------------------------------------------------------------------------
-
-nnoremap m J
-vnoremap m J
-nnoremap gm gJ
-vnoremap gm gJ
-nmap M <Plug>(MyVimrc-Window-AutoNew)
-nmap U <Plug>(MyVimrc-Window-AutoNew)
+tnoremap <C-W><C-T> <C-W>T
+tnoremap <C-W>T     <C-W>T
+
+# terminal
+tnoremap <C-Up>    <C-W>+
+tnoremap <C-Down>  <C-W>-
+tnoremap <C-Left>  <C-W><
+tnoremap <C-Right> <C-W>>
