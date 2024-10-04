@@ -189,77 +189,47 @@ export const WindowResizeOptimalHeightBuf        = () => OptimalHeightBuf()->Win
 # Plugin
 #----------------------------------------------------------------------------------------
 
-
+# Wrap Focus
 nnoremap <Plug>(Window-Focus-WrapMove-h) <cmd>call <SID>WindowFocus_WrapMove('h', v:count1)<CR>
 nnoremap <Plug>(Window-Focus-WrapMove-j) <cmd>call <SID>WindowFocus_WrapMove('j', v:count1)<CR>
 nnoremap <Plug>(Window-Focus-WrapMove-k) <cmd>call <SID>WindowFocus_WrapMove('k', v:count1)<CR>
 nnoremap <Plug>(Window-Focus-WrapMove-l) <cmd>call <SID>WindowFocus_WrapMove('l', v:count1)<CR>
 
 
+# Optimal Width
 com! -nargs=0 -bar WindowResizeOptimalWidth call <SID>WindowResizeOptimalWidth()
-
 nnoremap <Plug>(Window-Resize-OptimalWidth) <cmd>>WindowResizeOptimalWidth<CR>
 
-
+# Toggle `Optimal Width' <=> `Equal Width'
 com! -nargs=0 -bar WindowResizeToggleOptimalWidthEqual call <SID>WindowResizeToggleOptimalWidthEqual()
-
 nnoremap <Plug>(Window-Resize-Toggle-OptimalWidth-Equal) <Cmd>WindowResizeToggleOptimalWidthEqual<CR>
 
-
+# Optimal Height (Buf)
 com! -nargs=0 -bar OptimalHeightBuf call WindowResizeOptimalHeightBuf()
-
 nnoremap <Plug>(Window-Resize-OptimalHeight-Buf) <cmd>OptimalHeightBuf<CR>
 
 
+# Equal Only Height
+com! -nargs=0 -bar WindowSizeEqualOnlyHeight vertical wincmd =
+nnoremap <Plug>(Window-Resize-EqualOnlyHeight) <Cmd>vertical   wincdmd =<CR>
+
+# Equal Only Width
+com! -nargs=0 -bar OptimalWindowWidth horizontal wincmd =
+nnoremap <Plug>(Window-Resize-EqualOnlyWidth)  <Cmd>horizontal wincdmd =<CR>
 
 
-#----------------------------------------------------------------------------------------
-# RC
-#----------------------------------------------------------------------------------------
+# All Windows wOptimal Width
+com! -nargs=0 -bar AllWinOptimalWidth    {
+      var cur_win = winnr()
+      windo WindowResizeOptimalWidth
+      exe ':' cur_win 'wincmd w'
+    }
 
-
-#----------------------------------------------------------------------------------------
-# Focus
-
-nmap <Left>  <Plug>(Window-Focus-WrapMove-h)
-nmap <Down>  <Plug>(Window-Focus-WrapMove-j)
-nmap <Up>    <Plug>(Window-Focus-WrapMove-k)
-nmap <Right> <Plug>(Window-Focus-WrapMove-l)
-
-nmap H <Plug>(Window-Focus-WrapMove-h)
-nmap J <Plug>(Window-Focus-WrapMove-j)
-nmap K <Plug>(Window-Focus-WrapMove-k)
-nmap L <Plug>(Window-Focus-WrapMove-l)
-
-
-#----------------------------------------------------------------------------------------
-# Resize
-
-nmap <Space><Space> <Plug>(Window-Resize-Toggle-OptimalWidth-Equal)
-# nmap <Space><Space> <Plug>(Window-Resize-OptimalHeight-Buf)
-
-
-#----------------------------------------------------------------------------------------
-# Window Container (Tab)
-
-nnoremap  <C-T> <Cmd>tabnew<CR>
-nnoremap g<C-T> :<C-U>tabnew<Space>
-#nnoremap <silent>  <C-t> <Cmd>tabnew<Bar>SetpathSilent<CR>
-# nnoremap <silent> z<C-t> <Cmd>tab split<CR>
-
-nnoremap <C-f> gt
-nnoremap <C-b> gT
-# nnoremap t gt
-# nnoremap T gT
-
-nnoremap g<C-F> <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>
-nnoremap g<C-B> <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
-
-nnoremap <A-F>  <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>
-nnoremap <A-B>  <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
-
-nnoremap gt <Cmd>tabs<CR>:tabnext<Space>
-
+com! -nargs=0 -bar AllWinOptimalWidthRev {
+      var cur_win = winnr()
+      for i in reverse(range(1, winnr('$'))) | exe ':' i 'wincmd w' | WindowResizeOptimalWidth | endfor
+      exe ':' cur_win 'wincmd w'
+    }
 
 
 
@@ -366,59 +336,337 @@ nnoremap g<Space> <ScriptCmd>call ToggleTypewriterScroll(v:false)<CR>
 
 
 
-# nnoremap <Leader>H H
-# nnoremap <Leader>M M
-# nnoremap <Leader>L L
 
-# nnoremap gH H
-# nnoremap gM M
-# nnoremap gL L
+#----------------------------------------------------------------------------------------
+# RC
+#----------------------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------------------
+# Initialize
+
+set noequalalways
+
+#set tabclose=uselast,left
+
+
+#----------------------------------------------------------------------------------------
+# Trigger
+
+nmap <BS> <C-W>
+nmap <C-J> <C-W>
+
+#----------------------------------------------------------------------------------------
+# Close
+
+# TODO NERDTreeも閉じられるようにする。
+# nnoremap q  <C-W>c
+nnoremap gq <C-W>c
+
+# 補償
+nnoremap <C-q> q
+# <C-q>: => q
+# <C-q>: => q:
+# <C-q>/ => q/
+# <C-q>? => q?
+
+# コマンドラインへの遷移に合わせる
+nnoremap <C-q>; q:
+
+
+#----------------------------------------------------------------------------------------
+# Focus
+
+nmap <Left>  <Plug>(Window-Focus-WrapMove-h)
+nmap <Down>  <Plug>(Window-Focus-WrapMove-j)
+nmap <Up>    <Plug>(Window-Focus-WrapMove-k)
+nmap <Right> <Plug>(Window-Focus-WrapMove-l)
+
+nmap H <Plug>(Window-Focus-WrapMove-h)
+nmap J <Plug>(Window-Focus-WrapMove-j)
+nmap K <Plug>(Window-Focus-WrapMove-k)
+nmap L <Plug>(Window-Focus-WrapMove-l)
+
+
+#----------------------------------------------------------------------------------------
+# Window Move
+
+# ウィンドウを上端、下端に動かすと、ウィンドウ高さが最大になってしまうことの対策を入れている。
+# <C-W>J, <C-K>で、'horizontal wincmd ='が走ってしまうことの対策にもなっている。
+# これらの挙動はhelpの記述tと食い違うので、バグかもしれない？ TODO 
+#
+# 対策方法としては、ウィンドウを移動させるのではなく、
+#   ・「splitiで開き直して、旧ウィンドウを閉じる」
+# ということをしている。
+
+#nnoremap <expr> <Plug>(MyVimrc-Window-Move-H) '<Cmd>vert topleft  split<Bar>exe win_id2win(' .. win_getid() .. ') "wincmd c"<CR>'
+nnoremap        <Plug>(MyVimrc-Window-Move-H)  <C-W>H<CR>
+nnoremap <expr> <Plug>(MyVimrc-Window-Move-J) '<Cmd>botright split<Bar>exe win_id2win(' .. win_getid() .. ') "wincmd c"<CR>'
+#nnoremap <expr> <Plug>(MyVimrc-Window-Move-J) '<Cmd>botright split<Bar>exe win_id2win(' .. win_getid() .. ') "wincmd c"<CR>' .. '<Cmd>vertical wincmd =<CR>'
+nnoremap <expr> <Plug>(MyVimrc-Window-Move-K) '<Cmd>topleft  split<Bar>exe win_id2win(' .. win_getid() .. ') "wincmd c"<CR>'
+#nnoremap <expr> <Plug>(MyVimrc-Window-Move-K) '<Cmd>topleft  split<Bar>exe win_id2win(' .. win_getid() .. ') "wincmd c"<CR>' .. '<Cmd>vertical wincmd =<CR>'
+#nnoremap <expr> <Plug>(MyVimrc-Window-Move-L) '<Cmd>vert botright split<Bar>exe win_id2win(' .. win_getid() .. ') "wincmd c"<CR>'
+nnoremap        <Plug>(MyVimrc-Window-Move-L)  <C-W>L<CR>
+
+nmap <A-h> <Plug>(MyVimrc-Window-Move-H)
+nmap <A-j> <Plug>(MyVimrc-Window-Move-J)
+nmap <A-k> <Plug>(MyVimrc-Window-Move-K)
+nmap <A-l> <Plug>(MyVimrc-Window-Move-L)
+
+nmap <Left>  <Plug>(MyVimrc-Window-Move-H)
+nmap <Down>  <Plug>(MyVimrc-Window-Move-J)
+nmap <Up>    <Plug>(MyVimrc-Window-Move-K)
+nmap <Right> <Plug>(MyVimrc-Window-Move-L)
+
+nmap <C-W>h <Plug>(MyVimrc-Window-Move-H)
+nmap <C-W>j <Plug>(MyVimrc-Window-Move-J)
+nmap <C-W>k <Plug>(MyVimrc-Window-Move-K)
+nmap <C-W>l <Plug>(MyVimrc-Window-Move-L)
+
+nmap <C-W>H <Plug>(MyVimrc-Window-Move-H)
+nmap <C-W>J <Plug>(MyVimrc-Window-Move-J)
+nmap <C-W>K <Plug>(MyVimrc-Window-Move-K)
+nmap <C-W>L <Plug>(MyVimrc-Window-Move-L)
+
+#nnoremap <A-h> <C-W>H
+#nnoremap <A-j> <Cmd>horizontal wincmd J<CR><Cmd>vertical wincmd =<CR>
+#nnoremap <A-k> <Cmd>horizontal wincmd K<CR><Cmd>vertical wincmd =<CR>
+#nnoremap <A-l> <C-W>L
+
+#nnoremap <Left>  <C-W>H
+#nnoremap <Down>  <C-W>J<Cmd>vertical wincmd =<CR> 
+#nnoremap <Up>    <C-W>K<Cmd>vertical wincmd =<CR> 
+#nnoremap <Right> <C-W>L
+
+#nnoremap <C-W>h <C-W>H
+#nnoremap <C-W>j <C-W>J<Cmd>vertical wincmd =<CR>
+#nnoremap <C-W>k <C-W>K<Cmd>vertical wincmd =<CR>
+#nnoremap <C-W>l <C-W>L
+
+
+## ウィンドウを上端、下端に動かすと、ウィンドウ高さが最大になってしまうことの対策。
+#var wfw: list<bool>
+#
+#def Wmv(dir: string)
+#  const old_ww = winwidth(0)
+#  exe 'wincmd' dir
+#  const new_ww = winwidth(0)
+#  if old_ww != new_ww
+#    #wfw = (winnr('$') + 1)->range()->map('v:val >= 0')
+#    # TODO 型キャストが使えない
+#    wfw = (winnr('$') + 1)->range()->map((_, v) => v >= 0)
+#    PushPos
+#    windo wfw[winnr()] = &l:winfixwidth
+#    windo &l:winfixwidth = true
+#    wincmd =
+#    windo &l:winfixwidth = wfw[winnr()]
+#    PopPos
+#  endif
+#enddef
+
+
+#nnoremap        <Plug>(MyVimrc-Window-Move-H)  <C-W>H<CR>
+##nnoremap <expr> <Plug>(MyVimrc-Window-Move-J) '<C-W>J' .. '<Cmd> if winwidth(0) != ' .. winwidth(0) .. ' <Bar> wincmd = <Bar> endif <CR>'
+##nnoremap <Plug>(MyVimrc-Window-Move-J) <ScriptCmd>call Wmv('J')<CR>
+#nnoremap        <Plug>(MyVimrc-Window-Move-J) <C-W>J<Cmd>vertical wincmd =<CR>
+##nnoremap <expr> <Plug>(MyVimrc-Window-Move-K) '<C-W>K' .. '<Cmd> if winwidth(0) != ' .. winwidth(0) .. ' <Bar> wincmd = <Bar> endif <CR>'
+##nnoremap <Plug>(MyVimrc-Window-Move-K) <ScriptCmd>call Wmv('K')<CR>
+#nnoremap        <Plug>(MyVimrc-Window-Move-K) <C-W>K<Cmd>vertical wincmd =<CR>
+#nnoremap        <Plug>(MyVimrc-Window-Move-L)  <C-W>L<CR>
+
+
+#----------------------------------------------------------------------------------------
+# Resize
+
+#--------------------------------------------
+# 漸次
+
+nnoremap <C-H> <C-W>+
+nnoremap <C-L> <C-W>-
+nnoremap (     <C-W>3<
+nnoremap )     <C-W>3>
+
+# terminal
+tnoremap <C-Up>    <C-W>+
+tnoremap <C-Down>  <C-W>-
+tnoremap <C-Left>  <C-W><
+tnoremap <C-Right> <C-W>>
+
+#--------------------------------------------
+# 補償
+nnoremap <silent> <A-o> <C-l>
+
+#--------------------------------------------
+# 最大化・最小化・最適化
+
+# 最大高さ
+nnoremap g<C-h> <C-w>_
+# 最小最適高さ
+nmap     g<C-l> <Plug>(Window-Resize-OptimalHeight-Buf)
+# 最大幅
+nnoremap g)     <C-w>|
+# 最小最適幅
+nmap     g(     <Plug>(Window-Resize-OptimalWidth)
+
+# 最大高さ
+#nnoremap g<C-j> <C-W>_
+# 最小高さ
+#nnoremap g<C-k> 1<C-W>_
+# 最小幅
+#nnoremap g<C-h> 1<C-W>|
+# 最大幅
+#nnoremap g<C-l> <C-W>|
+
+#nmap @ <Plug>(Window-Resize-EqualOnlyWidth)
+#nmap @ <Plug>(Window-Resize-EqualOnlyHeight)
+
+nmap <Leader><Leader> <Plug>(Window-Resize-Toggle-OptimalWidth-Equal)
+nmap <Leader><BS>     <Plug>(Window-Resize-OptimalHeight-Buf)
+
+#--------------------------------------------
+# Submode Window Resize
+if 0
+  call submode#enter_with('WinResize', 'n', '', '<Space>l', '<C-w>>')
+  call submode#enter_with('WinResize', 'n', '', '<Space>h', '<C-w><')
+  call submode#enter_with('WinResize', 'n', '', '<Space>j', '<C-w>+')
+  call submode#enter_with('WinResize', 'n', '', '<Space>k', '<C-w>-')
+
+  call submode#map(       'WinResize', 'n', '', 'l', '<C-w>>')
+  call submode#map(       'WinResize', 'n', '', 'h', '<C-w><')
+  call submode#map(       'WinResize', 'n', '', 'j', '<C-w>+')
+  call submode#map(       'WinResize', 'n', '', 'k', '<C-w>-')
+
+  legacy let g:submode_timeoutlen = 5000
+endif
+
+
+#----------------------------------------------------------------------------------------
+# <Plug> (他機能での再帰マップ用)
+
+nnoremap <Plug>(MyVimrc-WinCmd-p) <C-w>p
+
+
+#----------------------------------------------------------------------------------------
+# Tab (Window Container)
+
+nnoremap  <C-T> <Cmd>tabnew<CR>
+nnoremap g<C-T> :<C-U>tabnew<Space>
+#nnoremap <silent>  <C-t> <Cmd>tabnew<Bar>SetpathSilent<CR>
+# nnoremap <silent> z<C-t> <Cmd>tab split<CR>
+
+nnoremap <C-f> gt
+nnoremap <C-b> gT
+# nnoremap t gt
+# nnoremap T gT
+
+nnoremap g<C-F> <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>
+nnoremap g<C-B> <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
+
+nnoremap <A-F>  <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>
+nnoremap <A-B>  <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
+
+nnoremap gt <Cmd>tabs<CR>:tabnext<Space>
+
+
+
 
 
 finish
 
-#----------------------------------------------------------------------------------------
-# OK
-#----------------------------------------------------------------------------------------
 
-set noequalalways
 
-set tabclose=uselast,left
+
+
+
+#----------------------------------------------------------------------------------------
+# Reopen as Tab
+# TODO diffのバッファも再現する。
+
+nnoremap <C-w><C-w> :<C-u>tab split<CR>
+
+nnoremap <silent> <Plug>(TabSplit) :<C-u>tab split <Bar> diffoff<CR>
+nmap     <C-w><C-w> <Plug>(TabSplit)
+nnoremap <C-w><C-t> <C-w>T
+
+tnoremap <C-w><C-t> <C-w>T
+
+"---------------------------------------------------------------------------------------------
+
+"nmap <C-t> <Plug>(TabSplit)
+nmap     t <Plug>(TabSplit)
+nnoremap T <C-w>T
+
+" <c-t> g<c-t> T gT
+nmap gt <Plug>(Window-Resize-OptimalWidth)
+nmap gT <C-w>=
+" nmap <Leader><Leader> <C-w>=
+
+
+
+"nmap <C-t> <Plug>(TabSplit)
+nnoremap T <C-w>T
+
+" <c-t> g<c-t> T gT
+nmap gt <Plug>(Window-Resize-OptimalWidth)
+nmap gT <C-w>=
+" nmap <Leader><Leader> <C-w>=
+nnoremap t gt
+nnoremap T gT
+
+
+
+nmap     t <Plug>(TabSplit)
+nnoremap T <C-w>T
+"nmap     <Leader><Leader> <Plug>(TabSplit)
+
+
+
+
+
+
+
+
+
+
 
 #----------------------------------------------------------------------------------------
 # Tmp
+# TODO WrapMove -> Wrap
 #----------------------------------------------------------------------------------------
 
+# Focus Wrap Move
+# Optimal Window Width
+# Optimal Window Height
+
+# " Trigger
+# " Split & New
+# " Close
+# Focus
+# Resize
+" Move
+
+# " Reopen as Tab
+# Tab (New, Open)
+# Tab (close)
+# Tab (focus)
+# Tab (move)
+
+# Tab (Window Container)
+
+# Window Ratio
+
+# Best Scrolloff
+# Typewriter Scroll
+# OK
+# Tmp
+
+# " WinCmd <Plug>
 
 
 
 " Window {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 
 
-
-
-"----------------------------------------------------------------------------------------
-" Window Ratio
-"
-"   正方形 w:h = 178:78
-"   横長なほど、大きい値が返る。
-function! s:WindowRatio()
-  let h = winheight(0) + 0.0
-  let w = winwidth(0) + 0.0
-  return (w / h - 178.0 / 78.0)
-endfunction
-
-" Vert       Split すべきとき、正数が返る。
-" Horizontal Split すべきとき、負数が返る。
-function! s:SplitDirection()
-  return ( winwidth(0) > (&columns * 7 / 10) && <SID>WindowRatio() >=  0 ) ? '9999' : '-9999'
-endfunction
-
-
-"----------------------------------------------------------------------------------------
-" Trigger
-
-nmap <BS> <C-w>
 
 
 "----------------------------------------------------------------------------------------
@@ -463,24 +711,6 @@ nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoNew) ( winwidth(0) > (&column
 " Auto New
 nnoremap <silent> <expr> <Plug>(MyVimrc-Window-AutoNew)
       \ ( winwidth(0) > (&columns * 7 / 10) && <SID>WindowRatio() >=  0 ) ? ':<C-u>vnew<CR>' : '<C-w>n'
-
-
-"----------------------------------------------------------------------------------------
-" Close
-
-" TODO NERDTreeも閉じられるようにする。
-nnoremap <silent> q         <C-w><C-c>
-nnoremap <silent> <Leader>q :<C-u>q<CR>
-
-" 補償
-nnoremap <C-q>  q
-nnoremap <C-q>: q:
-nnoremap <C-q>; q:
-nnoremap <C-q>/ q/
-nnoremap <C-q>? q?
-
-" ウィンドウレイアウトを崩さないでバッファを閉じる   (http://nanasi.jp/articles/vim/kwbd_vim.html)
-com! CloseWindow let s:kwbd_bn = bufnr('%') | enew | exe 'bdel '. s:kwbd_bn | unlet s:kwbd_bn
 
 
 "----------------------------------------------------------------------------------------
@@ -552,116 +782,7 @@ tnoremap <expr> <C-t>      winnr('$') == 1 ? '<C-w>:tabNext<CR>' : '<C-w>p'
 tnoremap <expr> <C-w><C-w> winnr('$') == 1 ? '<C-w>:tabNext<CR>' : '<C-w>p'
 
 
-"----------------------------------------------------------------------------------------
-" Resize
 
-" 漸次
-nnoremap <silent> <C-h>  <Esc><C-w>+:call <SID>best_scrolloff()<CR>
-nnoremap <silent> <C-l>  <Esc><C-w>-:call <SID>best_scrolloff()<CR>
-"nnoremap <silent> t  <Esc><C-w>+:call <SID>best_scrolloff()<CR>
-"nnoremap <silent> T  <Esc><C-w>-:call <SID>best_scrolloff()<CR>
-nnoremap <silent> <S-BS> <Esc><C-w>+:call <SID>best_scrolloff()<CR>
-nnoremap <silent> <C-BS> <Esc><C-w>-:call <SID>best_scrolloff()<CR>
-nnoremap <silent> (      <Esc><C-w>3<
-nnoremap <silent> )      <Esc><C-w>3>
-
-tnoremap <silent> <C-up>    <C-w>+:call <SID>best_scrolloff()<CR>
-tnoremap <silent> <C-down>  <C-w>-:call <SID>best_scrolloff()<CR>
-tnoremap <silent> <C-left>  <C-w><
-tnoremap <silent> <C-right> <C-w>>
-
-" 補償
-nnoremap <silent> <A-o> <C-l>
-
-" 最大高さ
-nnoremap <silent> g<C-h> <esc><C-w>_:call <SID>best_scrolloff()<CR>
-" 最小最適高さ
-nmap              g<C-l> <Plug>(Window-Resize-OptimalHeight)
-
-" 最小化・最大化
-"nnoremap <silent> g<C-j> <esc><C-w>_:call <SID>best_scrolloff()<CR>
-"nnoremap <silent> g<C-k> <esc>1<C-w>_:call <SID>best_scrolloff()<CR>
-"nnoremap <silent> g<C-h> <esc>1<C-w>|
-"nnoremap <silent> g<C-l> <esc><C-w>|
-
-"? macro nmap @  <Plug>(Window-Resize-EqualOnlyWidth)
-"? macro nmap g@ <Plug>(Window-Resize-EqualOnlyHeight)
-
-nmap <Leader><Leader> <Plug>(Window-Resize-OptimalWidth)
-nmap <Leader><BS>     <Plug>(Window-Resize-OptimalHeight)
-
-" Submode
-call submode#enter_with('WinSize', 'n', 's', '<C-w>+', '<C-w>+:call BestScrolloff()<CR>')
-call submode#enter_with('WinSize', 'n', 's', '<C-w>-', '<C-w>-:call BestScrolloff()<CR>')
-call submode#enter_with('WinSize', 'n', 's', '<C-w>>', '<C-w>>')
-call submode#enter_with('WinSize', 'n', 's', '<C-w><', '<C-w><')
-call submode#map(       'WinSize', 'n', 's', '+', '<C-w>+:call BestScrolloff()<CR>')
-call submode#map(       'WinSize', 'n', 's', '=', '<C-w>+:call BestScrolloff()<CR>') " Typo対策
-call submode#map(       'WinSize', 'n', 's', '-', '<C-w>-:call BestScrolloff()<CR>')
-call submode#map(       'WinSize', 'n', 's', '>', '<C-w>>')
-call submode#map(       'WinSize', 'n', 's', '<', '<C-w><')
-if 1
-  call submode#enter_with('WinSize', 'n', 's', '<C-w>h', '<C-w><')
-  call submode#enter_with('WinSize', 'n', 's', '<C-w>j', '<C-w>+:call BestScrolloff()<CR>')
-  call submode#enter_with('WinSize', 'n', 's', '<C-w>k', '<C-w>-:call BestScrolloff()<CR>')
-  call submode#enter_with('WinSize', 'n', 's', '<C-w>l', '<C-w>>')
-endif
-if 0
-  call submode#map(       'WinSize', 'n', 's', 'h', '<C-w>h')
-  call submode#map(       'WinSize', 'n', 's', 'j', '<C-w>j')
-  call submode#map(       'WinSize', 'n', 's', 'k', '<C-w>k')
-  call submode#map(       'WinSize', 'n', 's', 'l', '<C-w>l')
-else
-  call submode#map(       'WinSize', 'n', 's', 'h', '<C-w><')
-  call submode#map(       'WinSize', 'n', 's', 'j', '<C-w>+:call BestScrolloff()<CR>')
-  call submode#map(       'WinSize', 'n', 's', 'k', '<C-w>-:call BestScrolloff()<CR>')
-  call submode#map(       'WinSize', 'n', 's', 'l', '<C-w>>')
-endif
-
-
-"----------------------------------------------------------------------------------------
-" Window Move
-
-nnoremap <silent> <A-h> <C-w>H:call <SID>best_scrolloff()<CR>
-nnoremap <silent> <A-j> <C-w>J:call <SID>best_scrolloff()<CR>
-nnoremap <silent> <A-k> <C-w>K:call <SID>best_scrolloff()<CR>
-nnoremap <silent> <A-l> <C-w>L:call <SID>best_scrolloff()<CR>
-
-if g:UseHHKB
-  nnoremap <silent> <Left>  <C-w>H:call <SID>best_scrolloff()<CR>
-  nnoremap <silent> <Down>  :<C-u>let WinMove_WinWidth = winwidth(0)<CR><C-w>J:exe WinMove_WinWidth != winwidth(0) ? 'wincmd =' : ''<CR>:call <SID>best_scrolloff()<CR>
-  nnoremap <silent> <Up>    :<C-u>let WinMove_WinWidth = winwidth(0)<CR><C-w>K:exe WinMove_WinWidth != winwidth(0) ? 'wincmd =' : ''<CR>:call <SID>best_scrolloff()<CR>
-  nnoremap <silent> <Right> <C-w>L:call <SID>best_scrolloff()<CR>
-else
-  nnoremap <silent> <A-h> <C-w>H:call <SID>best_scrolloff()<CR>
-  nnoremap <silent> <A-j> :<C-u>let WinMove_WinWidth = winwidth(0)<CR><C-w>J:exe WinMove_WinWidth != winwidth(0) ? 'wincmd =' : ''<CR>:call <SID>best_scrolloff()<CR>
-  nnoremap <silent> <A-k> :<C-u>let WinMove_WinWidth = winwidth(0)<CR><C-w>K:exe WinMove_WinWidth != winwidth(0) ? 'wincmd =' : ''<CR>:call <SID>best_scrolloff()<CR>
-  nnoremap <silent> <A-l> <C-w>L:call <SID>best_scrolloff()<CR>
-endif
-
-tnoremap <silent> <A-left>  <C-w>H:call <SID>best_scrolloff()<CR>
-tnoremap <silent> <A-down>  <C-w>J:call <SID>best_scrolloff()<CR>
-tnoremap <silent> <A-up>    <C-w>K:call <SID>best_scrolloff()<CR>
-tnoremap <silent> <A-right> <C-w>L:call <SID>best_scrolloff()<CR>
-
-
-"----------------------------------------------------------------------------------------
-" Reopen as Tab
-" TODO diffのバッファも再現する。
-
-nnoremap <C-w><C-w> :<C-u>tab split<CR>
-
-nnoremap <silent> <Plug>(TabSplit) :<C-u>tab split <Bar> diffoff<CR>
-nmap     <C-w><C-w> <Plug>(TabSplit)
-nnoremap <C-w><C-t> <C-w>T
-
-tnoremap <C-w><C-t> <C-w>T
-
-
-"----------------------------------------------------------------------------------------
-" WinCmd <Plug>
-
-nnoremap <Plug>(MyVimrc-WinCmd-p) <C-w>p
 
 
 " Window }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
@@ -669,26 +790,6 @@ nnoremap <Plug>(MyVimrc-WinCmd-p) <C-w>p
 
 
 " Window Temp {{{{{{{{{{{{{{{{{{{{{{{
-
-
-" Submode Window Size {{{
-
-if 0
-  call submode#enter_with('WinSize', 'n', '', '<Space>l', '<C-w>>')
-  call submode#enter_with('WinSize', 'n', '', '<Space>h', '<C-w><')
-  call submode#enter_with('WinSize', 'n', '', '<Space>j', '<C-w>+')
-  call submode#enter_with('WinSize', 'n', '', '<Space>k', '<C-w>-')
-  call submode#map(       'WinSize', 'n', '', 'l', '<C-w>>')
-  call submode#map(       'WinSize', 'n', '', 'h', '<C-w><')
-  call submode#map(       'WinSize', 'n', '', 'j', '<C-w>+')
-  call submode#map(       'WinSize', 'n', '', 'k', '<C-w>-')
-
-  let g:submode_timeoutlen = 5000
-endif
-
-let g:submode_timeoutlen = 5000
-
-" Submode Window Size }}}
 
 
 " Window Wrap Focus 補償 {{{
@@ -717,17 +818,21 @@ nmap M <Plug>(MyVimrc-Window-AutoNew)
 
 
 
-com! WinOptimalWidth PushPosAll | exe 'silent windo call Window#Resize#SetOptimalWidth()' | PopPosAll
-
-com! WinOptimalWidthRev PushPosAll | for i in reverse(range(1, winnr('$'))) | exe i 'wincmd w' | sile call Window#Resize#SetOptimalWidth() | endfor | PopPosAll
-
-
 nmap M <Plug>(MyVimrc-Window-AutoNew)
 nmap U <Plug>(MyVimrc-Window-AutoNew)
 
 
 
 
+
+
+# nnoremap <Leader>H H
+# nnoremap <Leader>M M
+# nnoremap <Leader>L L
+
+# nnoremap gH H
+# nnoremap gM M
+# nnoremap gL L
 
 
 
@@ -737,49 +842,6 @@ nmap U <Plug>(MyVimrc-Window-AutoNew)
 
 
 "====================================================================================================================================================
-"---------------------------------------------------------------------------------------------
-
-com! NoWrap PushPosAll | exe 'windo set nowrap' | PopPosAll
-com! WinNoWrap PushPosAll | exe 'windo set nowrap' | PopPosAll
-com! AllNoWrap PushPosAll | exe 'windo set nowrap' | PopPosAll
-
-com! Wrap PushPosAll | exe 'windo set wrap' | PopPosAll
-com! WinWrap PushPosAll | exe 'windo set wrap' | PopPosAll
-com! AllWrap PushPosAll | exe 'windo set wrap' | PopPosAll
-
-
-
-"---------------------------------------------------------------------------------------------
-
-"nmap <C-t> <Plug>(TabSplit)
-nmap     t <Plug>(TabSplit)
-nnoremap T <C-w>T
-
-" <c-t> g<c-t> T gT
-nmap gt <Plug>(Window-Resize-OptimalWidth)
-nmap gT <C-w>=
-" nmap <Leader><Leader> <C-w>=
-
-
-
-"nmap <C-t> <Plug>(TabSplit)
-nnoremap T <C-w>T
-
-" <c-t> g<c-t> T gT
-nmap gt <Plug>(Window-Resize-OptimalWidth)
-nmap gT <C-w>=
-" nmap <Leader><Leader> <C-w>=
-nnoremap t gt
-nnoremap T gT
-
-
-
-nmap     t <Plug>(TabSplit)
-nnoremap T <C-w>T
-"nmap     <Leader><Leader> <Plug>(TabSplit)
-
-
-
 
 "---------------------------------------------------------------------------------------------
 
