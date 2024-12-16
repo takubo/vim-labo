@@ -13,9 +13,6 @@ scriptencoding utf-8
 # Search Cursor Word
 #----------------------------------------------------------------------------------------
 
-# import autoload './multihighlight.vim' as mh
-import autoload '../impauto/multihighlight.vim' as mh
-
 # 検索の成否を返すことで、呼び出し元が`set hlsearch'の実行要否を判断できる。
 def SearchCWord(whole_wword: bool = true, add: bool = false): bool
   const cword = expand('<cword>')
@@ -55,17 +52,6 @@ def SearchCWord(whole_wword: bool = true, add: bool = false): bool
   endif
 
   @/ = (add ? (@/ .. '\|') : '') .. pattern
-
-  # multihighlight
-  if add
-    mh.Add(pattern)
-  else
-    mh.Reset()
-  endif
-  #? if !add
-  #?   mh.Reset()
-  #? endif
-  #? mh.Add(pattern)
 
   # 検索履歴に残すための処理
   histadd('/', @/)
@@ -111,8 +97,8 @@ nnoremap g* <Cmd> if <SID>SearchCWord(v:false, v:false) <Bar> set hlsearch <Bar>
 nnoremap g# <Cmd> if <SID>SearchCWord(v:false, v:true ) <Bar> set hlsearch <Bar> endif <CR>
 
 # normalを使わないと、検索対象がない場合に、SearchCountが発動しない。
-nnoremap n <Cmd>normal! n<CR><ScriptCmd>call mh.Resume()<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
-nnoremap N <Cmd>normal! N<CR><ScriptCmd>call mh.Resume()<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
+nnoremap n <Cmd>normal! n<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
+nnoremap N <Cmd>normal! N<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
 
 nnoremap <Leader>n <Cmd>SearchCount<CR>
 
@@ -120,18 +106,11 @@ nnoremap <Leader>n <Cmd>SearchCount<CR>
 augroup SearchCR
   au!
   au CmdlineLeave,CmdwinLeave * {
-       if expand('<afile>') == '/'
-         # <Esc>または<C-C>でコマンドライン・モード抜けたときは、SearchCountStr()がエラーとなるので、tryで囲んでいる。
-         # なお、エラー終了した場合は、onceでイベントが消されない。
-         # エラーとなることで、PopUpは表示されないので、<Esc>や<C-C>で抜けたときはPopUpが表示されないことになり、都合がよい。
-         #exe 'au SearchCR SafeState * ++once CursorJumped | try | SearchCountAuto | catch | endtry'
-         exe 'au SearchCR SafeState * ++once try | SearchCountAuto | catch | endtry'
-         exe 'au SearchCR SafeState * ++once CursorJumped'
-         exe 'au SearchCR SafeState * ++once call mh.Reset()'
-       endif
-     }
+            if expand('<afile>') == '/'
+              # <Esc>または<C-C>でコマンドライン・モード抜けたときは、SearchCountStr()がエラーとなるので、tryで囲んでいる。
+              # なお、エラー終了した場合は、onceでイベントが消されない。
+              # エラーとなることで、PopUpは表示されないので、<Esc>や<C-C>で抜けたときはPopUpが表示されないことになり、都合がよい。
+              exe 'au SearchCR SafeState * ++once CursorJumped | try | SearchCountAuto | catch | endtry'
+            endif
+          }
 augroup end
-
-
-nnoremap <silent> <Plug>(EscEsc) <ScriptCmd> mh.Suspend() <Bar> noh  <Bar> echon <CR>
-nmap <Esc><Esc> <Plug>(EscEsc)
