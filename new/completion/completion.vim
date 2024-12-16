@@ -11,34 +11,33 @@ scriptencoding utf-8
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------
 # Initialize
 
-set complete=.,w,b,u,i,t
+set complete=.,w,i,t,b,u
 set completeopt=menuone,noselect # TODO ,fuzzy
 set pumheight=30
 
 # こうしないと、「イベントグループが存在しない」というエラーになる。
 augroup JKComplete | au! | augroup end
 
-
-# -----------------------------------------
-# Basic
-
 augroup JKComplete
   au InsertLeave * normal! l
 augroup end
 
-#   <Esc>
-inoremap <expr> <Esc> pumvisible() ? '<C-e>' : '<Esc>'
 
-#   jj
+# -----------------------------------------
+# Basic
+
+# <Esc>
+inoremap <expr> <Esc> pumvisible() ? '<C-E>' : '<Esc>'
+
+# jj
 augroup JKComplete
   au InsertEnter,CompleteDone * inoremap jj <Esc><Cmd>update<CR>
 augroup end
 
-
-#   <CR> 短縮入力を展開 & Hook発動 & 行ごとにUndo & 改行
+# <CR> 短縮入力を展開 & Hook発動 & 行ごとにUndo & 改行
 inoremap <expr> <CR>  pumvisible() ? '<C-Y>' : '<C-]>' .. '<C-G>u' .. '<CR>'
 
-#   gg
+# gg
 inoremap <expr> <Plug>(JK-Complete-GG) (pumvisible() ? '<C-Y>' : '') .. '<Esc>' .. (bufname('') == '' ? '' : ":update\<CR>")
 
 
@@ -60,33 +59,40 @@ map('ァアィイゥウェエォオカガキギクグケゲコゴサザシジス
 augroup JKComplete
   au InsertEnter,CompleteDone * inoremap <expr> j search('\k\{1\}\%#', 'bcn') != 0 ? StartComplete('j') : 'j'
 augroup end
-inoremap <expr> k <bool>pumvisible() ? "\<C-p>" : search('\k\{1\}\%#', 'bcn') != 0 ? StartComplete('k') : 'k'
+inoremap <expr> k <bool>pumvisible() ? "\<C-P>" : search('\k\{1\}\%#', 'bcn') != 0 ? StartComplete('k') : 'k'
 
 # 日本語入力時用 + 強制補完開始
-inoremap <expr> <A-j>  pumvisible() ? "\<C-n>" : StartComplete('')
-inoremap <expr> <A-k>  pumvisible() ? "\<C-p>" : StartComplete('')
-inoremap <expr> <Down> pumvisible() ? "\<C-n>" : StartComplete('')
-inoremap <expr> <Up>   pumvisible() ? "\<C-p>" : StartComplete('')
-inoremap <expr> ｊｊ pumvisible() ? '<C-N><C-N>' : '<cmd>update<CR>'
-inoremap <expr>   ｊ pumvisible() ? '<C-N><C-N>' : '<cmd>update<CR>'
-inoremap <expr> っｊ pumvisible() ? '<C-N><C-N>' : '<cmd>update<CR>'
+inoremap <expr> <A-j>  pumvisible() ? "\<C-N>" : StartComplete('')
+inoremap <expr> <A-k>  pumvisible() ? "\<C-P>" : StartComplete('')
+inoremap <expr> <Down> pumvisible() ? "\<C-N>" : StartComplete('')
+inoremap <expr> <Up>   pumvisible() ? "\<C-P>" : StartComplete('')
+inoremap <expr> ｊｊ pumvisible() ? '<C-N><C-N>' : '<Esc><Cmd>update<CR>'
+inoremap <expr>   ｊ pumvisible() ? '<C-N>'      : '<Esc><Cmd>update<CR>'
+inoremap <expr> っｊ pumvisible() ? '<C-N><C-N>' : '<Esc><Cmd>update<CR>'
 
 # 日本語入力時の補完確定
-imap <C-g> <Plug>(JK-Complete-GG)
+imap <C-G> <Plug>(JK-Complete-GG)
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------
 # Start Completion
 
 def StartComplete(insert_char: string): string
-  return "\<C-n>" .. insert_char
+  # TODO
+  sleep 10m
+  #if pumvisible()
+  #  # こうしないと、負荷が高いとき、MS-IMEの予測変換を確定した時の挙動がおかしくなる。
+  #  # TODO 同事例のURLを貼る、
+  #  return insert_char
+  #endif
+  return "\<C-N>" .. insert_char
 enddef
 
 augroup JKComplete
   au InsertEnter,CompleteDone * if maparg('gg', 'i') != '' | iunmap gg| endif
   au ModeChanged *:i[cx]*       if maparg('jj', 'i') != '' | iunmap jj| endif
 
-  au ModeChanged *:i[cx]* inoremap j <C-n>
+  au ModeChanged *:i[cx]* inoremap j <C-N>
   au ModeChanged *:i[cx]* imap gg <Plug>(JK-Complete-GG)
 augroup end
 
@@ -139,24 +145,25 @@ enddef
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------
 #  改行フック、インサートモード終了フック
 
-#? def AutoSemicolon(): string
-#?   # if &ft == 'c' || &ft == 'cpp'
-#?   #   # TODO semicolon
-#?   #   # enumなどの中なら、セミコロンではなく、カンマとする。
-#?   #   return ''
-#?   # endif
-#?   return ''
-#? enddef
-#? 
-#? #   <CR> 短縮入力を展開 & Hook発動 & 行ごとにUndo & 改行
-#? inoremap <expr> <CR>  pumvisible() ? '<C-Y>' : '<C-]>' .. AutoSemicolon() .. '<C-G>u' .. '<CR>'
-#? 
-#? #   gg
-#? inoremap <expr> <Plug>(JK-Complete-GG) (pumvisible() ? '<C-Y>' : '') .. <SID>AutoSemicolon() .. '<Esc>' .. (bufname('') == '' ? '' : ":update\<CR>")
+# def AutoSemicolon(): string
+#   # if &ft == 'c' || &ft == 'cpp'
+#   #   # TODO semicolon
+#   #   # enumなどの中なら、セミコロンではなく、カンマとする。
+#   #   return ''
+#   # endif
+#   return ''
+# enddef
+# 
+# #   <CR> 短縮入力を展開 & Hook発動 & 行ごとにUndo & 改行
+# inoremap <expr> <CR>  pumvisible() ? '<C-Y>' : '<C-]>' .. AutoSemicolon() .. '<C-G>u' .. '<CR>'
+# 
+# #   gg
+# inoremap <expr> <Plug>(JK-Complete-GG) (pumvisible() ? '<C-Y>' : '') .. <SID>AutoSemicolon() .. '<Esc>' .. (bufname('') == '' ? '' : ":update\<CR>")
 
 
 # -----------------------------------------------------------------------------
 # ファイル名補完
 
-#? inoremap <expr> <C-l>                                            StartComplete('<C-x><C-f>', '', 'f')
-#? inoremap <expr> <C-l> "\<C-o>:cd " .. GetPrjRoot() .. "\<CR>" .. StartComplete('<C-x><C-f>', '', 'f')
+inoremap <C-F> <C-X><C-F>
+# プロジェクトルートに移動してから補完
+inoremap <expr> <C-K> '<Cmd>cd ' .. GetPrjRoot() .. '\<CR>' .. '<C-X><C-F>'
