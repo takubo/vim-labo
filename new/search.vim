@@ -3,6 +3,11 @@ vim9script
 scriptencoding utf-8
 
 
+import autoload "./PopUpInfo.vim" as pui
+# import autoload "../impauto/Search.vim" as s
+# import autoload "../impauto/Search_MultiHilight.vim" as smh
+
+
 # Extar
 # Asterisk
 # Extarisk
@@ -13,18 +18,17 @@ scriptencoding utf-8
 # Search Cursor Word
 #----------------------------------------------------------------------------------------
 
-# 検索の成否を返すことで、呼び出し元が`set hlsearch'の実行要否を判断できる。
 def SearchCWord(whole_wword: bool = true, add: bool = false): bool
-  const cword = expand('<cword>')
+  const cword = expand("<cword>")
 
   if cword == ''
     return false
   endif
 
-  var pattern: string
+  var search: string
 
   if cword[0] =~# '\k'
-    pattern = whole_wword ? ('\<' .. cword .. '\>') : cword
+    search = whole_wword ? ('\<' .. cword .. '\>') : cword
 
     # カーソルを、検索文字列の先頭に持って行く。
     #   キーワードの先頭
@@ -37,7 +41,7 @@ def SearchCWord(whole_wword: bool = true, add: bool = false): bool
       exe 'normal! f' .. cword[0]
     endif
   else
-    pattern = escape(cword, '*^$.~[\')
+    search = escape(cword, '*^$.~[\')
 
     # カーソルを、検索文字列の先頭に持って行く。
     #   非キーワードの先頭
@@ -51,7 +55,7 @@ def SearchCWord(whole_wword: bool = true, add: bool = false): bool
     endif
   endif
 
-  @/ = (add ? (@/ .. '\|') : '') .. pattern
+  @/ = (add ? (@/ .. '\|') : '') .. search
 
   # 検索履歴に残すための処理
   histadd('/', @/)
@@ -59,10 +63,11 @@ def SearchCWord(whole_wword: bool = true, add: bool = false): bool
   # 自前でechoしないと、前の検索文字列表示が残っていることがある。
   echo '/' .. @/
 
+  #SearchCountPopup()
   SearchCountAuto
   CursorJumped
 
-  return true
+  return v:true
 enddef
 
 
@@ -70,13 +75,9 @@ enddef
 # Search Count
 #----------------------------------------------------------------------------------------
 
-import autoload './PopUpInfo.vim' as pui
-# import autoload '../impauto/Search.vim' as s
-# import autoload '../impauto/Search_MultiHilight.vim' as smh
-
 def SearchCountStr(): string
-  const sc = searchcount({'maxcount': 99999, 'timeout': 250})
-  return sc.current .. (sc.exact_match || (sc.total == 0) ? '' : ' +') .. ' / ' .. sc.total .. (sc.incomplete ? '+' : '')
+  const count = searchcount({"maxcount": 99999, "timeout": 250})
+  return count.current .. (count.exact_match || (count.total == 0) ? "" : " +") .. " / " ..  count.total .. (count.incomplete ? "+" : "")
 enddef
 
 def SearchCountPopup(display_time: number = 2000)
@@ -91,26 +92,54 @@ com! -bar -nargs=0 SearchCountAuto call SearchCountPopup()    # 一定時間で�
 # Mapping
 #----------------------------------------------------------------------------------------
 
-nnoremap  * <Cmd> if <SID>SearchCWord(v:true,  v:false) <Bar> set hlsearch <Bar> endif <CR>
-nnoremap  # <Cmd> if <SID>SearchCWord(v:true,  v:true ) <Bar> set hlsearch <Bar> endif <CR>
-nnoremap g* <Cmd> if <SID>SearchCWord(v:false, v:false) <Bar> set hlsearch <Bar> endif <CR>
-nnoremap g# <Cmd> if <SID>SearchCWord(v:false, v:true ) <Bar> set hlsearch <Bar> endif <CR>
+nnoremap  * <cmd>if <SID>SearchCWord(v:true,  v:false) <Bar> set hlsearch <Bar> endif<CR>
+nnoremap  # <cmd>if <SID>SearchCWord(v:true,  v:true ) <Bar> set hlsearch <Bar> endif<CR>
+nnoremap g* <cmd>if <SID>SearchCWord(v:false, v:false) <Bar> set hlsearch <Bar> endif<CR>
+nnoremap g# <cmd>if <SID>SearchCWord(v:false, v:true ) <Bar> set hlsearch <Bar> endif<CR>
 
-# normalを使わないと、検索対象がない場合に、SearchCountが発動しない。
-nnoremap n <Cmd>normal! n<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
-nnoremap N <Cmd>normal! N<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
+nnoremap  * <cmd>if <SID>SearchCWord(v:true,  v:false) <Bar> set hlsearch <Bar> endif<CR>
+nnoremap  # <cmd>if <SID>SearchCWord(v:true,  v:true ) <Bar> set hlsearch <Bar> endif<CR>
+nnoremap g* <cmd>if <SID>SearchCWord(v:false, v:false) <Bar> set hlsearch <Bar> endif<CR>
+nnoremap g# <cmd>if <SID>SearchCWord(v:false, v:true ) <Bar> set hlsearch <Bar> endif<CR>
+
+# normalにしないと、検索対象がないときに、SearchCountが発動しない。
+nnoremap n <cmd>normal! n<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
+nnoremap N <cmd>normal! N<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
+
+#cnoremap <silent> <Plug>(CommandlineCR-Colon) <CR>
+#cnoremap <silent> <Plug>(CommandlineCR-Debug) <CR>
+#cnoremap <silent> <Plug>(CommandlineCR-Input) <CR>
+#cnoremap <silent> <Plug>(CommandlineCR-InApp) <CR>
+#cnoremap <silent> <Plug>(CommandlineCR-Equal) <CR>
+cnoremap <silent> <Plug>(CommandlineCR) <CR>
+cmap <expr> <CR> getcmdtype() == '/' ? '<Plug>(CommandlineCR-Slash)' : '<Plug>(CommandlineCR)'
+
+# TODO cmdwinから検索開始したとき。
 
 nnoremap <Leader>n <Cmd>SearchCount<CR>
 
-# /, ? で検索したとき (`cnoremap <CR>'の代替)
+
+
+# TODO C_<CRC>で検索対象がないとき、エラーになり、サーチカウントも表示されない。
+# C_<CRC>で検索対象がないとき、エラーになり、サーチカウントも表示されない。の対策でfeedkeys()化。
+cnoremap <silent> <Plug>(CommandlineCR-Slash) <Cmd>call feedkeys("\<lt>CR>:SearchCountAuto\<lt>CR>", 'ntx')<CR>
+cnoremap <silent> <Plug>(CommandlineCR-Slash) <Cmd>call feedkeys("\<lt>CR>", 'nit')<CR><Cmd>SearchCountAuto<CR>
+cnoremap <silent> <Plug>(CommandlineCR-Slash) <CR><Cmd>SearchCountAuto<CR>
+
+
+
+cnoremap <silent> <Plug>(CommandlineCR-Slash) <CR>
 augroup SearchCR
-  au!
-  au CmdlineLeave,CmdwinLeave * {
-            if expand('<afile>') == '/'
-              # <Esc>または<C-C>でコマンドライン・モード抜けたときは、SearchCountStr()がエラーとなるので、tryで囲んでいる。
-              # なお、エラー終了した場合は、onceでイベントが消されない。
-              # エラーとなることで、PopUpは表示されないので、<Esc>や<C-C>で抜けたときはPopUpが表示されないことになり、都合がよい。
-              exe 'au SearchCR SafeState * ++once CursorJumped | try | SearchCountAuto | catch | endtry'
-            endif
-          }
+	au!
+	au CmdlineLeave * {
+		if expand("<afile>") == '/'
+			# <esc>, <C-C>で抜けたとき、SearchCountAutoがエラーとなるので、tryで囲む。
+			# エラー終了したままだと、onceでイベントは消えない。
+			# エラーとなることで、PopUpは表示されないので、escやc-cのときpopupが表示されず、都合がよい。
+			exe 'au SearchCR SafeState * ++once CursorJumped | try | SearchCountAuto | catch | endtry'
+
+			# @/ = getcmdline()
+			#exe 'au SearchCR ModeChanged c:n ++once CursorJumped | try | SearchCountAuto | catch | endtry'
+		endif
+	}
 augroup end
