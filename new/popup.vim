@@ -201,7 +201,7 @@ augroup MyVimrc_ModeShow
 
   "?? au ModeChanged [^i]*:[i]* call PopUp()
   "?? au ModeChanged [^R]*:[Rv]* call PopUp()
-  au ModeChanged *:[vV]* call PopUp()
+  "????  au ModeChanged *:[vV]* call PopUp()
   " au ModeChanged [^iR]*:[iRvV]* call PopUp()
 
   " CommandLineに入ったときは、redrawしないとPopUpが表示されない。
@@ -498,8 +498,6 @@ augroup end
 
 
 
-
-
 augroup MyCmdLineEnter
   au!
   "au CmdlineLeave * echo "Leac"
@@ -507,44 +505,3 @@ augroup MyCmdLineEnter
   "au CmdlineEnter * echo "PopUp()"
   "au CmdlineEnter * let g:test = "PopUp()"
 augroup end
-
-
-
-def s:BestScrolloff()
-  # Quickfixでは、なぜかWinNewが発火しないので、exists()で変数の存在を確認せねばならない。
-  &l:scrolloff = (g:TypewriterScroll || (exists('w:TypewriterScroll') && w:TypewriterScroll)) ? 99999 : ( winheight(0) < 10 ? 0 : winheight(0) < 20 ? 2 : 5 )
-enddef
-
-let g:TypewriterScroll = v:false
-
-augroup MyBestScrollOff
-  au!
-  "au WinNew * let w:BrowsingScroll = v:false
-  "au WinResized * echo v:event
-  "au WinResized * echo 'Window ID:' win_getid()
-  " -o, -Oオプション付きで起動したWindowでは、WinNew, WinEnterが発火しないので、別途設定。
-  " TODO au VimEnter * PushPosAll | exe 'tabdo windo let w:BrowsingScroll = v:false | call <SID>best_scrolloff()' | PopPosAll
-augroup end
-
-nnoremap <expr> <silent> <Leader>w bufname() == '' ? '<Cmd>pwd<CR>' : '<Cmd>update<CR>'
-
-nnoremap <expr> <silent> <Leader>w '<Cmd>' . (bufname() == '' ? 'pwd' : 'update') . '<CR>'
-
-
-
-
-"----------------------------------------------------------------------------------------
-" Optimal Width
-
-def Window_Resize_SetOptimalWidth()
-  # const top = line('w0')
-  # const bot = line('w$')
-  #const max_len: number = getline(line('w0'), line('w$')) -> map((_, val) => len(val)) -> max()
-  const max_len: number = range(line('w0'), line('w$')) -> map((_, val) => virtcol([val, '$'])) -> max()
-
-  const off: number = (bufname(0) =~ '^NERD_tree' ? -2 : 0) + (&number || &l:number || &relativenumber || &l:relativenumber ? 5 : 0) + &l:foldcolumn
-
-  exe max_len + off .. ' wincmd |'
-enddef
-
-
