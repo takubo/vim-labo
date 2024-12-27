@@ -117,6 +117,7 @@ hi StatusLineNC		guifg=#5c5a4f	guibg=#300a03	gui=none
 hi StatusLineNC		guifg=#5c5a4f	guibg=#101010	gui=none
 hi SLNoNameDir		guifg=#5c5a4f	guibg=#000000	gui=none
 hi SLFileName		guifg=#EF4123	guibg=#000000
+hi SLFileName		guifg=#dF2103	guibg=#000000
 hi SLFileName		guifg=#cf302d	guibg=#000000
 "hi SLFileName		guifg=#cf302d	guibg=#170A00
 "hi SLFileName		guifg=#EF4123	guibg=#000000
@@ -180,6 +181,10 @@ endif
 hi VertSplit		guifg=#1a1a1a	guibg=#d0c589	gui=none	" guibgは色を錯覚するので#d0c589から補正
 hi VertSplit		guifg=#dfc3a8	guibg=#d0c589	gui=none	" guibgは色を錯覚するので#d0c589から補正
 hi VertSplit		guifg=#7f1f1a	guibg=#d0c589	gui=none	" guibgは色を錯覚するので#d0c589から補正
+
+
+"hi VertSplit	guifg=#282828	guibg=#000000	gui=none
+hi VertSplit2	guifg=#7f1f1a	guibg=#d0c589	gui=none	" guibgは色を錯覚するので#d0c589から補正
 
 hi StlGold		guifg=#1a1a1a	guibg=#d0c589	gui=none
 
@@ -474,6 +479,66 @@ augroup end
 
 silent! let s:slhlcmdd = 'highlight ' . s:GetHighlight('CursorLineNr')
 
+
+
+"""""""""""""""""""""""""""""""挿入モード時、ステータスラインの色を変更""""""""""""""""""""""""""""""
+
+augroup InsertModeStlColor
+  au!
+  au InsertEnter * call s:SetStatusLineColor('Insert')
+  au InsertLeave * call s:SetStatusLineColor('Normal')
+augroup END
+
+function! s:SetStatusLineColor(mode)
+  if a:mode == 'Insert'
+    "silent highlight	StatusLine	guifg=white	guibg=#1a1f7f		gui=NONE	ctermfg=blue	ctermbg=yellow	cterm=NONE
+    silent highlight	StatusLine	guifg=#efd3b8	guibg=#d0330b	gui=NONE
+  "elseif a:mode == 'Command'
+    "silent highlight	StatusLine	guifg=darkblue	guibg=darkyellow	gui=NONE	ctermfg=blue	ctermbg=yellow	cterm=NONE
+  else
+    highlight clear StatusLine
+    silent exec s:slhlcmd
+  endif
+endfunction
+
+let s:sss = 1
+
+if s:sss
+function! s:SetStatusLineColor(mode)
+  if a:mode == 'Insert'
+    "silent highlight	CursorLineNr	guifg=White	guibg=#1a1f7f	gui=NONE	ctermfg=Blue			cterm=bold,underline
+    "silent highlight	CursorLineNr	guifg=#aaccff	guibg=#1a1f7f	gui=NONE	ctermfg=Blue			cterm=bold,underline
+    "silent highlight	CursorLineNr	guifg=black	guibg=darkyellow	gui=NONE	ctermfg=Blue			cterm=bold,underline
+    "? silent highlight	CursorLineNr	guifg=#aaccff	guibg=#0000ff	gui=NONE	ctermfg=Blue			cterm=bold,underline
+
+    silent highlight	CursorLineNr	guifg=#efd3b8	guibg=#d0330b	gui=NONE         ctermfg=Blue			cterm=bold,underline
+
+    "silent highlight	CursorLineNr	guibg=#d0c589	guifg=#222222 gui=none	gui=NONE         ctermfg=Blue	cterm=bold,underline
+    "silent highlight	CursorLineNr	guibg=#d0c589	guifg=#111111 gui=none	gui=NONE         ctermfg=Blue	cterm=bold,underline
+    "silent highlight	CursorLineNr	guibg=#d0c589	guifg=black   gui=none	gui=NONE         ctermfg=Blue	cterm=bold,underline
+
+  else
+    highlight clear CursorLineNr
+    silent exec s:slhlcmdd
+  endif
+endfunction
+endif
+
+"function! s:SetStatusLineColor(mode)
+"endfunction
+
+function! s:GetHighlight(hi)
+  redir => hl
+  exec 'highlight '.a:hi
+  redir END
+  let hl = substitute(hl, '[\r\n]', '', 'g')
+  let hl = substitute(hl, 'xxx', '', '')
+  return hl
+endfunction
+
+silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
+
+silent! let s:slhlcmdd = 'highlight ' . s:GetHighlight('CursorLineNr')
 
 
 
