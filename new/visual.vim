@@ -11,9 +11,9 @@ augroup end
 #----------------------------------------------------------------------------------------
 # Enter each Visual Mode
 
-nnoremap v <C-v>
+nnoremap v <C-V>
 
-vnoremap <expr> v mode() !=# '<C-v>' ? '<C-V>' : 'v'
+vnoremap <expr> v mode() !=# '<C-V>' ? '<C-V>' : 'v'
 vnoremap <expr> V mode() !=# 'V'     ? 'V'     : ''
 
 
@@ -70,6 +70,14 @@ vnoremap D zygv"_d
 vnoremap C zygv"_c
 
 
+# #----------------------------------------------------------------------------------------
+# # TODO 行単位にする
+# 
+# vnoremap Y Vy
+# vnoremap D Vd
+# vnoremap C Vc
+
+
 #----------------------------------------------------------------------------------------
 # Virtual Edit
 
@@ -83,3 +91,30 @@ vnoremap . <Cmd>exe 'set virtualedit' .. (stridx(&virtualedit, 'block') < 0 ? '+
 
 # 行右端で、なお右に進もうとしたら、virtualeditにblockを追加して、何事もなかったかのように右へ移動する。
 vnoremap <expr> l (mode() == '<C-V>' && !!search('\%#$', 'bcn') ? '<Cmd>set virtualedit+=block<CR>' : '') .. 'l'
+
+
+#----------------------------------------------------------------------------------------
+# Show Entering Visual Mode
+
+import autoload './PopUpInfo.vim' as pui
+  # pui.PopUpInfo(SearchCountStr(), 1000)
+
+def ShowEnteringVisualMode()
+  if state() =~# 'm'
+    return
+  endif
+
+  const mode_msg = {
+    'v':  'Visual Character',
+    'V':  'Visual Line',
+    '': 'Visual Block'
+  }[v:event["new_mode"]]
+
+  pui.PopUpInfo(mode_msg, 1000)
+  echo 
+enddef
+
+augroup MyVimrc_ModeShow
+  au!
+  au ModeChanged *:[vV]* call ShowEnteringVisualMode()
+augroup end
