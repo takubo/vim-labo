@@ -23,11 +23,11 @@ export def WindowFocus_WrapMove(dir_key: string, count: number, orth: bool = fal
 
   const num_win = winnr('$')  # Windowの数
 
-  # Windowの数が2なら、もう一方へ移動することは自明。Windowの数が1なら、移動はない。
-  if num_win <= 2
-    wincmd w
-    return
-  endif
+  #? # Windowの数が2なら、もう一方へ移動することは自明。Windowの数が1なら、移動はない。
+  #? if num_win <= 2
+  #?   wincmd w
+  #?   return
+  #? endif
 
   # 順方向へ移動
   const fwrd = WindowFocus_WrapMove_Sub(dir_key, count)
@@ -41,10 +41,10 @@ export def WindowFocus_WrapMove(dir_key: string, count: number, orth: bool = fal
   const back = WindowFocus_WrapMove_Sub(rev_dir_key, num_win + 1)
 
   if fwrd.step == 0 &&  back.step == 0
-    if !orth
-      # 直交移動
-      WindowFocus_WrapMove({'h': 'k', 'j': 'l', 'k': 'h', 'l': 'j'}[dir_key], count, true)
-    endif
+    #? if !orth
+    #?   # 直交移動
+    #?   WindowFocus_WrapMove({'h': 'k', 'j': 'l', 'k': 'h', 'l': 'j'}[dir_key], count, true)
+    #? endif
     return
   endif
 
@@ -89,7 +89,7 @@ def WindowFocus_WrapMove_Sub(dir_key: string, count: number): dict<any>
 
     if move_accum == count
       # terminalでないwindowを見つけたので、移動して終了。
-      # 一旦戻って、直接移動にしないと、前Window(<C-w>p)が意図しないものとなる。
+      # 一旦戻って、直接移動にしないと、前Window(<C-W>p)が意図しないものとなる。
       exe ':' .. org_win .. 'wincmd w'
       exe ':' .. new_win .. 'wincmd w'
 
@@ -155,7 +155,8 @@ enddef
 export def WindowResizeToggleOptimalWidthEqual()
   const optimal_width = OptimalWidth()
   if win_getid()->getwininfo()[0].width == optimal_width
-    wincmd =
+    horizontal wincmd =
+    # wincmd =
   else
     exe ':' optimal_width 'wincmd |'
   endif
@@ -167,18 +168,34 @@ enddef
 #----------------------------------------------------------------------------------------
 
 # TODO wrapされた行の考慮も必要。
-const OptimalHeightBuf        = (): number => line('$') + 2  # 2に根拠はない。
-# const OptimalHeightFunction = (): number => 10
-# const OptimalHeightBlock    = (): number => 10
-# const OptimalHeightIfBlock  = (): number => 10
+const OptimalHeightBuf        = (): dict<number> => {
+  return {height: line('$') + 2, top_line: 1}  # 2に根拠はない。
+}
+const OptimalHeightFunction = (): dict<number> => {
+  # TODO normalに!を付けると、飛び先がおかしくなる。
+  #const cur_line = line('.')
+  PushPos
+  normal [[
+  const f_top = line('.')
+  normal ][
+  const f_bot = line('.')
+  PopPos
+  return {height: f_bot - f_top + 2 + &l:scrolloff, top_line: max([f_top, 1])}  # 2に根拠はない。
+}
+# const OptimalHeightBlock    = (): dict<number> => 10
+# const OptimalHeightIfBlock  = (): dict<number> => 10
 
-def WindowResizeOptimalHeight(height: number)
-  exe ':' height 'wincmd _'
-  call repeat('<C-Y>', line('$'))->feedkeys('n')
+def WindowResizeOptimalHeight(arg: dict<number>)
+  echo arg
+  const cur_line = line('.')
+  exe ':' arg.height 'wincmd _'
+  exe 'normal! ' .. arg.top_line .. "z\<CR>" .. cur_line .. 'G'
+  #exe 'normal! ' .. arg.top_line .. 'z' .. arg.height .. "\<CR>"
+  #call repeat("\<C-Y>", line('$'))->feedkeys('n')
 enddef
 
 export const WindowResizeOptimalHeightBuf        = () => OptimalHeightBuf()->WindowResizeOptimalHeight()
-# export const WindowResizeOptimalHeightFunction = () => OptimalHeightFunction()->WindowResizeOptimalHeight()
+export const WindowResizeOptimalHeightFunction = () => OptimalHeightFunction()->WindowResizeOptimalHeight()
 # export const WindowResizeOptimalHeightBlock    = () => OptimalHeightBlock()->WindowResizeOptimalHeight()
 # export const WindowResizeOptimalHeightIfBlock  = () => OptimalHeightIfBlock()->WindowResizeOptimalHeight()
 
@@ -207,6 +224,10 @@ nnoremap <Plug>(Window-Resize-Toggle-OptimalWidth-Equal) <Cmd>WindowResizeToggle
 # Optimal Height (Buf)
 com! -nargs=0 -bar OptimalHeightBuf call WindowResizeOptimalHeightBuf()
 nnoremap <Plug>(Window-Resize-OptimalHeight-Buf) <cmd>OptimalHeightBuf<CR>
+
+# Optimal Height (Function)
+com! -nargs=0 -bar OptimalHeightFunction call WindowResizeOptimalHeightFunction()
+nnoremap <Plug>(Window-Resize-OptimalHeight-Function) <cmd>OptimalHeightFunction<CR>
 
 
 # Equal Only Height
@@ -290,9 +311,8 @@ enddef
 
 def BestScrolloff()
   # Quickfixでは、なぜかWinNewが発火しないので、exists()で変数の存在を確認せねばならない。
-  &l:scrolloff = (TypewriterScroll || (exists('w:TypewriterScroll') && w:TypewriterScroll)) ?
-                 9999 :
-                 ( winheight(0) < 10 ? 0 : winheight(0) < 20 ? 2 : 5 )
+  &l:scrolloff = (!TypewriterScroll && (!exists('w:TypewriterScroll') || !w:TypewriterScroll)) ?
+                 ( winheight(0) < 10 ? 0 : winheight(0) < 20 ? 2 : 5 ) : 9999
 enddef
 
 
@@ -314,6 +334,11 @@ augroup MyVimrc_TypewriterScroll
 augroup end
 
 def ToggleTypewriterScroll(global: bool)
+  # Quickfixでは、なぜかWinNewが発火しないので、ここで変数を定義する。
+  if !exists('w:TypewriterScroll')
+    w:TypewriterScroll = false
+  endif
+
   if global
     TypewriterScroll = !TypewriterScroll
     exe TypewriterScroll ? 'normal! zz' : ''
@@ -325,7 +350,7 @@ def ToggleTypewriterScroll(global: bool)
   call BestScrolloff()
 
   pui.PopUpInfoM([
-    TypewriterScroll ?   'Global    TypewriterScroll' : 'Global No TypewriterScroll',
+    TypewriterScroll   ? 'Global    TypewriterScroll' : 'Global No TypewriterScroll',
     '',
     w:TypewriterScroll ? 'Local     TypewriterScroll' : 'Local  No TypewriterScroll'
   ], 2000)
@@ -426,14 +451,14 @@ nmap M <Plug>(MyVimrc-Window-AutoNew)
 nnoremap gq <C-W>c
 
 # 補償
-nnoremap <C-q> q
-# <C-q>: => q
-# <C-q>: => q:
-# <C-q>/ => q/
-# <C-q>? => q?
+nnoremap <C-Q> q
+# <C-Q>: => q
+# <C-Q>: => q:
+# <C-Q>/ => q/
+# <C-Q>? => q?
 
 # コマンドラインへの遷移に合わせる
-nnoremap <C-q>; q:
+nnoremap <C-Q>; q:
 
 
 #----------------------------------------------------------------------------------------
@@ -461,8 +486,8 @@ nmap L <Plug>(Window-Focus-WrapMove-l)
 #nmap <expr> K winnr('$') >= g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-k)' : '<Plug>(Window-Focus-SkipTerm-Dec)'
 
 # 便利化 (数値指定対応)
-#nmap <expr> J v:prevcount ? '<Esc>' . v:prevcount . '<C-w>w' : winnr('$') > g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-j)' : '<Plug>(Window-Focus-SkipTerm-Inc)'
-#nmap <expr> K v:prevcount ? '<Esc>' . v:prevcount . '<C-w>w' : winnr('$') > g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-k)' : '<Plug>(Window-Focus-SkipTerm-Dec)'
+#nmap <expr> J v:prevcount ? '<Esc>' . v:prevcount . '<C-W>w' : winnr('$') > g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-j)' : '<Plug>(Window-Focus-SkipTerm-Inc)'
+#nmap <expr> K v:prevcount ? '<Esc>' . v:prevcount . '<C-W>w' : winnr('$') > g:WinFocusThresh ? '<Plug>(Window-Focus-WrapMove-k)' : '<Plug>(Window-Focus-SkipTerm-Dec)'
 
 
 #----------------------------------------------------------------------------------------
@@ -521,10 +546,10 @@ nnoremap <expr> <Plug>(MyVimrc-Window-Move-K) '<Cmd>topleft  split<Bar>exe win_i
 #nnoremap <expr> <Plug>(MyVimrc-Window-Move-L) '<Cmd>vert botright split<Bar>exe win_id2win(' .. win_getid() .. ') "wincmd c"<CR>'
 nnoremap        <Plug>(MyVimrc-Window-Move-L)  <C-W>L<CR>
 
-nmap <A-h> <Plug>(MyVimrc-Window-Move-H)
-nmap <A-j> <Plug>(MyVimrc-Window-Move-J)
-nmap <A-k> <Plug>(MyVimrc-Window-Move-K)
-nmap <A-l> <Plug>(MyVimrc-Window-Move-L)
+nmap <A-H> <Plug>(MyVimrc-Window-Move-H)
+nmap <A-J> <Plug>(MyVimrc-Window-Move-J)
+nmap <A-K> <Plug>(MyVimrc-Window-Move-K)
+nmap <A-L> <Plug>(MyVimrc-Window-Move-L)
 
 nmap <Left>  <Plug>(MyVimrc-Window-Move-H)
 nmap <Down>  <Plug>(MyVimrc-Window-Move-J)
@@ -555,28 +580,28 @@ nnoremap )     <C-W>3>
 
 #--------------------------------------------
 # 補償
-nnoremap <silent> <A-o> <C-l>
+nnoremap <silent> <A-O> <C-L>
 
 #--------------------------------------------
 # 最大化・最小化・最適化
 
 # 最大高さ
-nnoremap g<C-h> <C-w>_
+nnoremap g<C-H> <C-W>_
 # 最小最適高さ
-nmap     g<C-l> <Plug>(Window-Resize-OptimalHeight-Buf)
+nmap     g<C-L> <Plug>(Window-Resize-OptimalHeight-Buf)
 # 最大幅
-nnoremap g)     <C-w>|
+nnoremap g)     <C-W>|
 # 最小最適幅
 nmap     g(     <Plug>(Window-Resize-OptimalWidth)
 
 # 最大高さ
-#nnoremap g<C-j> <C-W>_
+#nnoremap g<C-J> <C-W>_
 # 最小高さ
-#nnoremap g<C-k> 1<C-W>_
+#nnoremap g<C-K> 1<C-W>_
 # 最小幅
-#nnoremap g<C-h> 1<C-W>|
+#nnoremap g<C-H> 1<C-W>|
 # 最大幅
-#nnoremap g<C-l> <C-W>|
+#nnoremap g<C-L> <C-W>|
 
 #nmap @ <Plug>(Window-Resize-EqualOnlyWidth)
 #nmap @ <Plug>(Window-Resize-EqualOnlyHeight)
@@ -587,15 +612,15 @@ nmap <Leader><BS>     <Plug>(Window-Resize-OptimalHeight-Buf)
 #--------------------------------------------
 # Submode Window Resize
 if 0
-  call submode#enter_with('WinResize', 'n', '', '<Space>l', '<C-w>>')
-  call submode#enter_with('WinResize', 'n', '', '<Space>h', '<C-w><')
-  call submode#enter_with('WinResize', 'n', '', '<Space>j', '<C-w>+')
-  call submode#enter_with('WinResize', 'n', '', '<Space>k', '<C-w>-')
+  call submode#enter_with('WinResize', 'n', '', '<Space>l', '<C-W>>')
+  call submode#enter_with('WinResize', 'n', '', '<Space>h', '<C-W><')
+  call submode#enter_with('WinResize', 'n', '', '<Space>j', '<C-W>+')
+  call submode#enter_with('WinResize', 'n', '', '<Space>k', '<C-W>-')
 
-  call submode#map(       'WinResize', 'n', '', 'l', '<C-w>>')
-  call submode#map(       'WinResize', 'n', '', 'h', '<C-w><')
-  call submode#map(       'WinResize', 'n', '', 'j', '<C-w>+')
-  call submode#map(       'WinResize', 'n', '', 'k', '<C-w>-')
+  call submode#map(       'WinResize', 'n', '', 'l', '<C-W>>')
+  call submode#map(       'WinResize', 'n', '', 'h', '<C-W><')
+  call submode#map(       'WinResize', 'n', '', 'j', '<C-W>+')
+  call submode#map(       'WinResize', 'n', '', 'k', '<C-W>-')
 
   legacy let g:submode_timeoutlen = 5000
 endif
@@ -604,7 +629,7 @@ endif
 #----------------------------------------------------------------------------------------
 # <Plug> (他機能での再帰マップ用)
 
-nnoremap <Plug>(MyVimrc-WinCmd-p) <C-w>p
+nnoremap <Plug>(MyVimrc-WinCmd-p) <C-W>p
 
 
 #----------------------------------------------------------------------------------------
@@ -612,7 +637,7 @@ nnoremap <Plug>(MyVimrc-WinCmd-p) <C-w>p
 
 # TODO diffのバッファも再現する。
 
-# nnoremap <C-w><C-w> :<C-u>tab split<CR>
+# nnoremap <C-W><C-W> :<C-U>tab split<CR>
 
 nnoremap <Plug>(MyVimrc-Window-TabSplit) <Cmd>tab split <Bar> diffoff<CR>
 nmap     <C-W><C-W> <Plug>(MyVimrc-Window-TabSplit)
@@ -623,7 +648,7 @@ nnoremap <C-W><C-T> <C-W>T
 nnoremap <C-W>T     <C-W>T
 
 # nmap     t <Plug>(MyVimrc-Window-TabSplit)
-# nnoremap T <C-w>T
+# nnoremap T <C-W>T
 
 
 #----------------------------------------------------------------------------------------
@@ -631,11 +656,11 @@ nnoremap <C-W>T     <C-W>T
 
 nnoremap  <C-T> <Cmd>tabnew<CR>
 nnoremap g<C-T> :<C-U>tabnew<Space>
-#nnoremap <silent>  <C-t> <Cmd>tabnew<Bar>SetpathSilent<CR>
-# nnoremap <silent> z<C-t> <Cmd>tab split<CR>
+#nnoremap <silent>  <C-T> <Cmd>tabnew<Bar>SetpathSilent<CR>
+# nnoremap <silent> z<C-T> <Cmd>tab split<CR>
 
-nnoremap <C-f> gt
-nnoremap <C-b> gT
+nnoremap <C-F> gt
+nnoremap <C-B> gT
 # nnoremap t gt
 # nnoremap T gT
 
@@ -659,10 +684,10 @@ tnoremap <expr> <C-W><C-W> winnr('$') == 1 ? '<C-W>:tabNext<CR>' : '<C-W>p'
 tnoremap <expr> <C-W><C-T> winnr('$') == 1 ? '<C-W>:tabNext<CR>' : '<C-W>p'
 
 # Direction Focus (Terminal)
-#tnoremap <S-Left>  <C-w>h
-#tnoremap <S-Down>  <C-w>j
-#tnoremap <S-Up>    <C-w>k
-#tnoremap <S-Right> <C-w>l
+#tnoremap <S-Left>  <C-W>h
+#tnoremap <S-Down>  <C-W>j
+#tnoremap <S-Up>    <C-W>k
+#tnoremap <S-Right> <C-W>l
 
 # Reopen as Tab
 tnoremap <C-W><C-T> <C-W>T
