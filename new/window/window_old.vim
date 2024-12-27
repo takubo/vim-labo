@@ -428,14 +428,14 @@ def Wmv(dir: string)
   exe 'wincmd' dir
   const new_ww = winwidth(0)
   if old_ww != new_ww
-    windo var w:wfw = range(winnr('$'))
+    windo var w:wfw: number
     PushPos
-    windo wfw[winnr()] = &l:winfixwidth
+    windo w:wfw = &l:winfixwidth
     #windo set winfixwidth
     windo &l:winfixwidth = 1
     wincmd =
     #windo set nowinfixwidth
-    windo &l:winfixwidth = wfw[winnr()]
+    windo &l:winfixwidth = w:wfw
     PopPos
   endif
 enddef
