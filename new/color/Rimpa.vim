@@ -412,10 +412,10 @@ hi Directory	guifg=#ff6666	guibg=NONE
 
 augroup InsertModeStlColor
   au!
-  au InsertEnter  * call s:SetStatusLineColor('Insert')
-  au InsertLeave  * call s:SetStatusLineColor('Normal')
-  au CmdlineEnter * call s:SetStatusLineColor('CmdLine')
-  au CmdlineLeave * call s:SetStatusLineColor('Normal')
+  "? au InsertEnter  * call s:SetStatusLineColor('Insert')
+  "? au InsertLeave  * call s:SetStatusLineColor('Normal')
+  "? au CmdlineEnter * call s:SetStatusLineColor('CmdLine')
+  "? au CmdlineLeave * call s:SetStatusLineColor('Normal')
 augroup END
 
 function! s:SetStatusLineColor(mode)
@@ -467,8 +467,8 @@ endfunction
 "silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')	" これだけだと、Command Lineの色が取得される。
 augroup GetStatusLineHighlight
   au!
-  au ColorScheme * silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
-  au ColorScheme * au! GetStatusLineHighlight
+  "? au ColorScheme * silent! let s:slhlcmd = 'highlight ' . s:GetHighlight('StatusLine')
+  "? au ColorScheme * au! GetStatusLineHighlight
 augroup end
 
 
