@@ -38,7 +38,7 @@ enddef
 # 関数名末尾のMは、Multi lineのM.
 export def PopUpInfoM(cont: list<string>, time: number = 2500, line_off: number = 5, col_off: number = 5, pos: string = 'topleft') # center: bool = false)
   if PopUpWindowId != 0
-    #popup_close(PopUpWindowId)
+    popup_close(PopUpWindowId)
   endif
 
   PopUpWindowId = popup_create(cont, {
