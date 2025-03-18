@@ -1,6 +1,155 @@
 scriptencoding utf-8
 " vim:set ts=8 sts=8 sw=2 tw=0: (この行に関しては:help modelineを参照)
 
+
+finish
+
+
+set background=dark
+hi clear
+
+if exists("syntax_on")
+  syntax reset
+endif
+
+let colors_name = "Rimpa"
+
+
+
+finish
+
+
+
+# Base
+Normal
+EndOfBuffer
+NonText
+MatchParen
+SpecialKey
+
+## Cursor
+Cursor
+CursorIM
+lCursor
+CursorLine
+CursorColumn
+
+## Line Number
+LineNr
+LineNrAbove
+LineNrBelow
+CursorLineNr
+
+## Visual
+Visual
+VisualNOS
+
+
+# Diff
+DiffAdd
+DiffChange
+DiffDelete
+DiffText
+
+
+# Fold
+Folded
+FoldColumn
+CursorLineFold
+
+# Sign
+SignColumn
+CursorLineSign
+
+
+# Statusline, Tabline, VertSplit
+StatusLine
+StatusLineNC
+StatusLineTerm
+StatusLineTermNC
+TabLine
+TabLineFill
+TabLineSel
+VertSplit
+
+
+# Completion Menu, Wild Menu
+Pmenu
+PmenuSel
+PmenuKind
+PmenuKindSel
+PmenuExtra
+PmenuExtraSel
+PmenuSbar
+PmenuThumb
+PmenuMatch
+PmenuMatchSel
+
+
+# Search, Quickfix
+QuickFixLine
+IncSearch
+Search
+CurSearch
+
+
+# Message, Question
+ErrorMsg
+ModeMsg
+MsgArea
+MoreMsg
+Question
+Title
+WarningMsg
+
+
+# File Tree
+Directory
+
+
+# Syntax Highlighting
+# TODO
+
+# Spell Check
+SpellBad
+SpellCap
+SpellLocal
+SpellRare
+
+
+# GUI
+
+# Cursor
+
+# Other
+Scrollbar
+Menu
+Tooltip
+
+# PopUpInfo
+
+
+# Special
+ColorColumn
+Conceal
+Terminal
+WildMenu
+MessageWindow
+PopupNotification
+
+
+# Gold
+# Mode Change
+
+
+" My favarite color  : #c0504d
+
+
+
+" ====================================================================================================
+scriptencoding utf-8
+" vim:set ts=8 sts=8 sw=2 tw=0: (この行に関しては:help modelineを参照)
+
 set background=dark
 hi clear
 
@@ -225,8 +374,6 @@ hi TabLineSel		guibg=NONE
 hi TabLineFill		guifg=#343434	guibg=black
 hi TabLineDate		guifg=#efd3b8	guibg=#bb3333	gui=none
 hi TabLineDate		guifg=#efd3b8	guibg=#7f1f1a	gui=none
-hi TabLineSLF		guifg=#cf302d	guibg=NONE
-hi TabLineSLF		guifg=#ff201d	guibg=NONE
 hi TabLineFill		guifg=#d0c589	guibg=#d0c589
 hi TabLineSep		guifg=black	guibg=#d0c589	gui=none
 hi TabLineSep		guifg=#d0c589	guibg=black	gui=underline
@@ -627,4 +774,3 @@ com! KKK call s:SetStatusLineColor('CmdLine')
 " #EF3E0E
 " #BFED9B 薄緑 Statusline へのアクセントに
 " #963634 少し薄い漆赤
-so ./super_rimpa.vim
