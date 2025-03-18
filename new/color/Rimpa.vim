@@ -211,6 +211,7 @@ hi TabLine		guifg=#8c7b6f	guibg=black	gui=none
 hi TabLine		guifg=#d0c5a9	guibg=black	gui=none
 hi TabLine		guifg=#8c7b73	guibg=black	gui=none
 hi TabLine		guifg=#ac9b83	guibg=black	gui=none
+hi TabLine      	guifg=#d0c589	gui=none	ctermfg=184
 hi TabLineSel		guifg=#efd3b8	guibg=#7f1f1a	gui=none
 hi TabLineSel		guifg=#a63318	guibg=#111111	gui=underline
 hi TabLineSel		guifg=#a63318	guibg=#111111	gui=none
@@ -236,7 +237,11 @@ hi TabLineSep		guifg=#d0c5a9	guibg=black	gui=NONE	" 錯覚のため、TabLineFil
 
 " func_name
 hi hl_func_name		guifg=#cdd129			gui=none	ctermfg=184
+hi hl_func_name		guifg=#cdd129	guibg=black	gui=none	ctermfg=184
 hi hl_func_name_stl	guifg=#85b0df	guibg=black	gui=none	ctermfg=184
+hi green_stl        	guifg=#85ffb0	guibg=black	gui=none	ctermfg=184
+hi green_stl        	guifg=#85dfb0	guibg=black	gui=none	ctermfg=184
+hi green_stl        	guifg=#85efb0	guibg=black	gui=none	ctermfg=184
 hi hl_buf_name_stl	guifg=#ff5d28	guibg=black	gui=none	ctermfg=202
 
 " Anzu PopWin
@@ -328,6 +333,7 @@ hi String	guifg=#efa787	gui=none	ctermfg=184	" C
 hi String	guifg=#b7ef97	gui=none	ctermfg=184	" C
 hi String	guifg=#bf97ff	gui=none	ctermfg=184	" C
 hi String	guifg=#b797ef	gui=none	ctermfg=184	" C
+hi String 	guifg=#df9678	gui=none	ctermfg=184
 
 hi Special	guifg=#acf0f2	gui=none	ctermfg=159
 
