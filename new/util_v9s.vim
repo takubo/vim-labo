@@ -281,29 +281,29 @@ com! GetCursorCharCode echo printf('0x%x', GetCursorCharCode())
 
 
 
-iab <silent> q1  ①<C-R>=Eatchar('\s')<CR>
-iab <silent> q2  ②<C-R>=Eatchar('\s')<CR>
-iab <silent> q3  ③<C-R>=Eatchar('\s')<CR>
-iab <silent> q4  ④<C-R>=Eatchar('\s')<CR>
-iab <silent> q5  ⑤<C-R>=Eatchar('\s')<CR>
-iab <silent> q6  ⑥<C-R>=Eatchar('\s')<CR>
-iab <silent> q7  ⑦<C-R>=Eatchar('\s')<CR>
-iab <silent> q8  ⑧<C-R>=Eatchar('\s')<CR>
-iab <silent> q9  ⑨<C-R>=Eatchar('\s')<CR>
-iab <silent> q10 ⑩<C-R>=Eatchar('\s')<CR>
-iab <silent> q11 ⑪<C-R>=Eatchar('\s')<CR>
-iab <silent> q12 ⑫<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q1  ①<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q2  ②<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q3  ③<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q4  ④<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q5  ⑤<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q6  ⑥<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q7  ⑦<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q8  ⑧<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q9  ⑨<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q10 ⑩<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q11 ⑪<C-R>=Eatchar('\s')<CR>
+inoreab <silent> q12 ⑫<C-R>=Eatchar('\s')<CR>
 
-ab <silent> qd ・<C-R>=Eatchar('\s')<CR>
+inoreab <silent> qd ・<C-R>=Eatchar('\s')<CR>
 
-iab <silent> zh ←
-iab <silent> zj ↓
-iab <silent> zk ↑
-iab <silent> zL →
-iab <silent> zl ⇒
+inoreab <silent> zh ←
+inoreab <silent> zj ↓
+inoreab <silent> zk ↑
+inoreab <silent> zL →
+inoreab <silent> zl ⇒
 
-iab <silent> (( （<C-R>=Eatchar('\s')<CR>
-iab <silent> )) ）<C-R>=Eatchar('\s')<CR>
+inoreab <silent> (( （<C-R>=Eatchar('\s')<CR>
+inoreab <silent> )) ）<C-R>=Eatchar('\s')<CR>
 
 
 
@@ -994,14 +994,14 @@ com! -bar -nargs=0 PopPosAll  call PopPosAll()
 endif
 #=============================================================================================
 
-#iab pppos const org_win_view = winsaveview()  # カレントウィンドウのビューを取得<CR>winrestview(org_win_view)           # カレントウィンドウのビューを復元
-#iab <silent> pppos const org_win_view = winsaveview()  # カレントウィンドウのビューを取得<CR>winrestview(org_win_view)           # カレントウィンドウのビューを復元<C-R>=Eatchar('\s')<CR>
-iab <silent> pppos const org_win_view = winsaveview()   # push win view<CR>winrestview(org_win_view)   # pop win view<C-R>=Eatchar('\s')<CR>
+#inoreab pppos const org_win_view = winsaveview()  # カレントウィンドウのビューを取得<CR>winrestview(org_win_view)           # カレントウィンドウのビューを復元
+#inoreab <silent> pppos const org_win_view = winsaveview()  # カレントウィンドウのビューを取得<CR>winrestview(org_win_view)           # カレントウィンドウのビューを復元<C-R>=Eatchar('\s')<CR>
+inoreab <silent> pppos const org_win_view = winsaveview()   # push win view<CR>winrestview(org_win_view)   # pop win view<C-R>=Eatchar('\s')<CR>
 
-#iab ppwin const org_win_id = win_getid()<CR>PushPoswin  win_gotoid(org_win_id)
-iab <silent> ppwin const org_win_id = win_getid()  # push window<CR>win_gotoid(org_win_id)   # pop window<C-R>=Eatchar('\s')<CR>
+#inoreab ppwin const org_win_id = win_getid()<CR>PushPoswin  win_gotoid(org_win_id)
+inoreab <silent> ppwin const org_win_id = win_getid()  # push window<CR>win_gotoid(org_win_id)   # pop window<C-R>=Eatchar('\s')<CR>
 
-iab <silent> ppbuf const org_buf_nr = bufnr(  # push buffer)<CR>exe 'buffer' org_buf_n  # pop bufferr<C-R>=Eatchar('\s')<CR>
+inoreab <silent> ppbuf const org_buf_nr = bufnr(  # push buffer)<CR>exe 'buffer' org_buf_n  # pop bufferr<C-R>=Eatchar('\s')<CR>
 
 # defer winrestview('winsaveview()')
 # defer win_gotoid('win_getid()')
@@ -2138,10 +2138,10 @@ def GotoFunc()
   endwhile
 
   #if &ft == 'vim'
-  if &ft == 'c'
+  #if &ft == 'c'
     # Total前の空行を入れる。
     add(funcs, '')
-  endif
+  #endif
 
   add(funcs, printf("[  %d  ]  ", n))
 
@@ -2217,13 +2217,26 @@ nnoremap ga <Cmd>%yank<CR>
 
 #---------------------------------------------------------------------------------------------
 
+nnoremap ; <Cmd>hi CursorLineNr	guibg=#d0c589	guifg=#222222	gui=NONE<CR><Cmd>redraw<CR>:
+nnoremap ; <Cmd>hi CursorLineNr	guifg=#b8d3ef	guibg=#4444ee	gui=NONE<CR><Cmd>redraw<CR>:
+nnoremap : <Nop>
 
 
 #---------------------------------------------------------------------------------------------
 
+#inoreab IA inoreab <silent> xxx yyyyyy<lt>C-R>=Eatchar('\s')<lt>CR><C-R>=Eatchar('\s')<CR>
+#inoreab IA inoreab <silent> xxx yyyyyy<lt>C-R>=Eatchar('\s')<lt>CR><Esc>bbbbbbbbbbbbi<C-R>=Eatchar('\s')<CR>
+#inoreab IA inoreab <silent>  yyyyyy<lt>C-R>=Eatchar('\s')<lt>CR><Esc>bbbbbbbbbbb<Left>i<C-R>=Eatchar('\s')<CR>
+inoreab IA inoreab <silent>  <lt>C-R>=Eatchar('\s')<lt>CR><Esc>bbbbbbbbbb<Left>i<C-R>=Eatchar('\s')<CR>
 
+inoreab <silent> qqv (_, v) =>
+inoreab <silent> qkv (k, v) =>
+inoreab <silent> qiv (i, v) =>
 
 #---------------------------------------------------------------------------------------------
+
+set complete=.,w,i,t,b,u
+set complete=.,i,t,w,b,u
 
 
 
