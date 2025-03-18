@@ -75,8 +75,8 @@ else
   hi CursorLineNr	guifg=#f8f0e0	guibg=bg	gui=NONE	ctermfg=yellow	cterm=bold,underline
 endif
 "hi LineNrAbove	guifg=#ff6666	guibg=NONE	gui=NONE
-hi LineNrAbove	guifg=#cf403d	guibg=NONE	gui=NONE
-hi LineNrBelow	guifg=#85b0df	guibg=NONE	gui=NONE
+hi LineNrAbove	guifg=#85b0df	guibg=NONE	gui=NONE
+hi LineNrBelow	guifg=#cf403d	guibg=NONE	gui=NONE
 
 
 "----------------------------------------------------------------------------------------
@@ -112,23 +112,22 @@ hi StatusLineTermNC	guifg=#8f7368	guibg=#6d2006	gui=NONE
 hi VertSplit		guifg=#d0c5a9	guibg=black	gui=NONE
 "hi VertSplit		guifg=#282828	guibg=black	gui=NONE
 
-" TODO
-hi TabLine		guifg=#8c7b73	guibg=black	gui=NONE
-hi TabLine		guifg=#eeddcc	guibg=black	gui=NONE
+"hi TabLine		guifg=#8c7b73	guibg=black	gui=NONE
+"hi TabLine		guifg=#eeddcc	guibg=black	gui=NONE
 hi TabLine		guifg=#d0c5a9	guibg=black	gui=NONE
 "hi TabLine						gui=underline
 
 hi! link TabLineSel	StatusLine
 
-hi TabLineSep		guifg=#d0c5a9	guibg=black	gui=NONE	" 錯覚のため、TabLineFillのfgから色を微調整。
+"hi TabLineSep		guifg=#d0c5a9	guibg=black	gui=NONE	" 錯覚のため、TabLineFillのfgから色を微調整。
 "hi TabLineSep						gui=underline
-"hi! link TabLineSep	TabLine
+hi! link TabLineSep	TabLine
 
 if s:gold
   hi TabLineFill	guifg=#d0c589	guibg=#d0c589	gui=NONE
 else
-  hi TabLineFill	guifg=black	guibg=black	gui=NONE
-  hi! link TabLineFill SLFileName
+  "hi TabLineFill	guifg=black	guibg=black	gui=NONE
+  hi! link TabLineFill	StlFill
 endif
 
 "----------------------------------------------------------------------------------------
@@ -145,14 +144,14 @@ hi stl_blue_char	guifg=#85b0df	guibg=black	gui=NONE	ctermfg=184
 
 "hi stl_gold_back_red	guifg=#7f1f1a	guibg=#d0c589	gui=NONE	" guibgは色を錯覚するので#d0c589から補正
 "hi stl_gold_back_black	guifg=#1a1a1a	guibg=#d0c589	gui=NONE
-hi StlGold		guifg=#7f1f1a	guibg=#d0c589	gui=NONE	" guibgは色を錯覚するので#d0c589から補正
+hi StlGoldLeaf		guifg=#7f1f1a	guibg=#d0c589	gui=NONE	" guibgは色を錯覚するので#d0c589から補正
 
 hi! link StlGoldChar	TabLine
 
 "hi StlFill		guifg=#cf302d	guibg=#170a00	gui=NONE
-"hi StlFill		guifg=#cf302d	guibg=#000000	gui=NONE
+hi StlFill		guifg=#cf302d	guibg=#000000	gui=NONE
 "hi StlFill		guifg=#df2103	guibg=#000000	gui=NONE
-hi StlFill		guifg=#ef4123	guibg=#000000	gui=NONE
+"hi StlFill		guifg=#ef4123	guibg=#000000	gui=NONE
 
 "hi! link StlFileName	StlFill
 hi StlNoNameDir		guifg=#5c5a4f	guibg=#000000	gui=NONE
@@ -179,8 +178,11 @@ hi Question		guifg=#666666
 hi WarningMsg		guifg=#44cc44	guibg=NONE	gui=NONE
 "hi ErrorMsg		guifg=#fff129	guibg=NONE	gui=NONE
 "hi ErrorMsg		guifg=#ffaacc	guibg=NONE	gui=NONE
-"hi ErrorMsg		guifg=black	guibg=#ffd129
-hi ErrorMsg		term=standout ctermfg=15 ctermbg=4 guifg=White guibg=Red
+if s:gold
+  hi ErrorMsg		guifg=White	guibg=Red	gui=NONE	term=standout	ctermfg=15	ctermbg=4
+else
+  hi ErrorMsg		guifg=black	guibg=#ffd129	gui=NONE
+endif
 hi PopupNotification	guifg=#cc4444	guibg=black	gui=NONE
 hi MessageWindow	guifg=#cc4444	guibg=black	gui=NONE
 
@@ -200,7 +202,8 @@ if ! s:dark
 else
   hi DiffChange		guifg=NONE	guibg=#000000	gui=NONE	term=NONE	ctermbg=NONE
 endif
-hi DiffText		guifg=NONE	guibg=#701008	gui=NONE	term=reverse	ctermbg=12	cterm=bold
+"hi DiffText		guifg=NONE	guibg=#701008	gui=NONE	term=reverse	ctermbg=12	cterm=bold
+hi DiffText		guifg=NONE	guibg=#701058	gui=NONE	term=reverse	ctermbg=12	cterm=bold
 
 
 "----------------------------------------------------------------------------------------
@@ -294,6 +297,9 @@ hi Search		guifg=white	guibg=#b7282e	gui=NONE
 hi CurSearch		guifg=#b7282e	guibg=white	gui=NONE
 hi IncSearch		guifg=white	guibg=blue	gui=NONE
 hi QuickFixLine		guifg=NONE	guibg=#603a36	gui=NONE
+" TODO
+"hi QuickFixLine	guifg=NONE	guibg=#600a06	gui=NONE
+"hi CurSearch		guifg=White	guibg=#600a06	gui=NONE
 
 
 "----------------------------------------------------------------------------------------
@@ -411,6 +417,9 @@ hi Todo			guifg=#8f8f8f	guibg=Yellow	gui=italic	term=standout	ctermfg=245	ctermb
 hi Added		guifg=white	guibg=red	gui=NONE        " FIXME
 hi Changed		guifg=black	guibg=green	gui=NONE        " FIXME
 hi Removed		guifg=white	guibg=blue	gui=NONE        " FIXME
+" FIXME
+"hi Boolean		guifg=#bb9999	guibg=NONE	gui=NONE
+"hi String		guifg=#acf0f2	guibg=NONE	gui=NONE	ctermfg=159
 
 
 "----------------------------------------------------------------------------------------
