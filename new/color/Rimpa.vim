@@ -225,6 +225,8 @@ hi TabLineSel		guibg=NONE
 hi TabLineFill		guifg=#343434	guibg=black
 hi TabLineDate		guifg=#efd3b8	guibg=#bb3333	gui=none
 hi TabLineDate		guifg=#efd3b8	guibg=#7f1f1a	gui=none
+hi TabLineSLF		guifg=#cf302d	guibg=NONE
+hi TabLineSLF		guifg=#ff201d	guibg=NONE
 hi TabLineFill		guifg=#d0c589	guibg=#d0c589
 hi TabLineSep		guifg=black	guibg=#d0c589	gui=none
 hi TabLineSep		guifg=#d0c589	guibg=black	gui=underline
@@ -625,3 +627,4 @@ com! KKK call s:SetStatusLineColor('CmdLine')
 " #EF3E0E
 " #BFED9B 薄緑 Statusline へのアクセントに
 " #963634 少し薄い漆赤
+so ./super_rimpa.vim
