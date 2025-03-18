@@ -75,8 +75,8 @@ def SearchCWord(whole_wword: bool = true, add: bool = false): bool
   # 自前でechoしないと、前の検索文字列表示が残っていることがある。
   echo '/' .. @/
 
-  SearchCountAuto
   CursorJumped
+  SearchCountAdd
 
   return true
 enddef
@@ -92,15 +92,20 @@ import autoload './PopUpInfo.vim' as pui
 
 def SearchCountStr(): string
   const sc = searchcount({'maxcount': 99999, 'timeout': 1500})
-  return sc.current .. (sc.exact_match || (sc.total == 0) ? '' : ' ->') .. ' / ' .. sc.total .. (sc.incomplete ? '+' : '')
+  return sc.current .. (sc.exact_match || (sc.total == 0) ? '' : ' >') .. ' / ' .. sc.total .. (sc.incomplete ? '+' : '')
 enddef
 
 def SearchCountPopup(display_time: number = 2000)
   pui.PopUpInfo(SearchCountStr(), display_time)
 enddef
 
+def SearchCountPopupAdd(display_time: number = 2000)
+  pui.PopUpInfoA(SearchCountStr(), display_time)
+enddef
+
 com! -bar -nargs=0 SearchCount     call SearchCountPopup(-1)  # カーソル移動するまで、表示しっぱなし。
 com! -bar -nargs=0 SearchCountAuto call SearchCountPopup()    # 一定時間で消える。
+com! -bar -nargs=0 SearchCountAdd  call SearchCountPopupAdd()
 
 
 #----------------------------------------------------------------------------------------
@@ -113,8 +118,8 @@ nnoremap g* <Cmd> if <SID>SearchCWord(v:false, v:false) <Bar> set hlsearch <Bar>
 nnoremap g# <Cmd> if <SID>SearchCWord(v:false, v:true ) <Bar> set hlsearch <Bar> endif <CR>
 
 # normalを使わないと、検索対象がない場合に、SearchCountが発動しない。
-nnoremap n <Cmd>normal! n<CR><ScriptCmd>call mh.Resume()<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
-nnoremap N <Cmd>normal! N<CR><ScriptCmd>call mh.Resume()<CR><Cmd>SearchCountAuto<CR><Cmd>CursorJumped<CR>
+nnoremap n <Cmd>normal! n<CR><ScriptCmd>call mh.Resume()<CR><Cmd>CursorJumped<CR><Cmd>SearchCountAdd<CR>
+nnoremap N <Cmd>normal! N<CR><ScriptCmd>call mh.Resume()<CR><Cmd>CursorJumped<CR><Cmd>SearchCountAdd<CR>
 
 nnoremap <Leader>n <Cmd>SearchCount<CR>
 
@@ -127,8 +132,8 @@ augroup SearchCR
          # なお、エラー終了した場合は、onceでイベントが消されない。
          # エラーとなることで、PopUpは表示されないので、<Esc>や<C-C>で抜けたときはPopUpが表示されないことになり、都合がよい。
          #exe 'au SearchCR SafeState * ++once CursorJumped | try | SearchCountAuto | catch | endtry'
-         exe 'au SearchCR SafeState * ++once try | SearchCountAuto | catch | endtry'
          exe 'au SearchCR SafeState * ++once CursorJumped'
+         exe 'au SearchCR SafeState * ++once try | SearchCountAdd | catch | endtry'
          exe 'au SearchCR SafeState * ++once call mh.Reset()'
        endif
      }
@@ -138,6 +143,11 @@ if 0
   # 最後にコマンドラインモードへの出入りを行うことで、iminsert(or imcmdline?)の効果で、IMEがOFFされる。
   nnoremap <silent> <Plug>(EscEsc) <ScriptCmd> mh.Suspend() <Bar> noh  <Bar> echon <CR>:<Esc>
   nmap <Esc><Esc> <Plug>(EscEsc)
-else
+elseif 0
   g:EscEsc_Add('MHD')
 endif
+
+augroup EscEscSearch
+  au!
+  au User EscEsc MHD
+augroup end
