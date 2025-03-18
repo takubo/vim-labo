@@ -15,7 +15,7 @@ hi Mode      	guifg=#d0c589	guibg=#282828
 hi Mode		guifg=#d7d0c7	guibg=NONE	gui=NONE	ctermfg=102	ctermbg=NONE	cterm=NONE
 
 
-var PopUpWindowId = 0
+var PopUpWindowId = []
 
 
 # Arg
@@ -35,13 +35,30 @@ export def PopUpInfoMC(cont: list<string>, time: number = 2500, line_off: number
   PopUpInfoM(cont, time, line_off, col_off, pos)
 enddef
 
+export def PopUpInfoC(cont: string, time: number = 2500, line_off: number = 5, col_off: number = 5, pos: string = 'center') # center: bool = false)
+  PopUpInfoM([cont], time, line_off, col_off, pos)
+enddef
+
 # 関数名末尾のMは、Multi lineのM.
 export def PopUpInfoM(cont: list<string>, time: number = 2500, line_off: number = 5, col_off: number = 5, pos: string = 'topleft') # center: bool = false)
-  if PopUpWindowId != 0
-    popup_close(PopUpWindowId)
-  endif
+  PopUpInfo_Close()
+  PopUpInfo_Internal(cont, time, line_off, col_off, pos)
+enddef
 
-  PopUpWindowId = popup_create(cont, {
+# 関数名末尾のAは、AddのA.
+export def PopUpInfoA(cont: string, time: number = 2500, line_off: number = 5, col_off: number = 5, pos: string = 'topleft')
+  PopUpInfo_Internal([cont], time, line_off, col_off, pos)
+enddef
+
+def PopUpInfo_Close()
+  if !empty(PopUpWindowId)
+    PopUpWindowId -> map((_, id) => popup_close(id))
+    PopUpWindowId = []
+  endif
+enddef
+
+def PopUpInfo_Internal(cont: list<string>, time: number = 2500, line_off: number = 5, col_off: number = 5, pos: string = 'topleft') # center: bool = false)
+  add(PopUpWindowId, popup_create(cont, {
       #'line':               'cursor+3',
       #'line':               'cursor+2',
       'line':               'cursor' .. (line_off >= 0 ? '+' : '') .. printf('%d', line_off),
@@ -95,36 +112,12 @@ export def PopUpInfoM(cont: list<string>, time: number = 2500, line_off: number 
       #'filtermode':         ,
       #'callback':           ,
     }
-  )
+  ))
 enddef
-
 
 com! -nargs=* PopUpInfo call PopUpInfo(<q-args>, 5000)
 
-
-#----------------------------------------------------------------------------------------
-# Current Function Name
-
-# import autoload "./PopUpInfo.vim" as pui
-#
-
-def CFIPopup(display_time: number = 2000, line_off: number = 5, col_off: number = 5, already: bool = false)
-  const NO_FUNC_STR = "###"
-  const func_name = cfi#format('%s ( )', NO_FUNC_STR)
-  if func_name != NO_FUNC_STR
-    PopUpInfo(func_name, display_time, line_off, +24)
-  endif
-  #PopUpInfo(cfi#format("%s ()", "###"), display_time, line_off, +24)
-  #pui.PopUpInfo(cfi#format("%s ()", "###"), display_time, -5, +6)
-enddef
-
-if exists('*cfi#format')
- #com! -bar -nargs=0 CFIPopup     echo cfi#format("%s ()", "###")
-  com! -bar -nargs=0 CFIPopup     call CFIPopup(-1)
-  com! -bar -nargs=0 CFIPopupAuto call CFIPopup()
-else
-  com! -bar -nargs=0 CFIPopup
-  com! -bar -nargs=0 CFIPopupAuto
-endif
-
-com! -bar -nargs=0 CursorJumped CFIPopupAuto
+augroup EscEscPopupInfo
+  au!
+  au User EscEsc PopUpInfo_Close()
+augroup end
