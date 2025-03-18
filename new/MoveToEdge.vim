@@ -12,7 +12,10 @@ vnoremap H <Cmd>call <SID>BlockMove(+1)<CR>oO<Cmd>call <SID>BlockMove(-1)<CR>Oo
 
 
 nmap <C-V><C-V> vKoOJ
+nmap <C-V><C-V> vJoOK
 nnoremap <C-V><C-V> <C-V><Cmd>call <SID>BlockMove(+1)<CR>oO<Cmd>call <SID>BlockMove(-1)<CR>Oo
+nnoremap <C-V><C-V> <C-V><Cmd>call <SID>BlockMove(-1)<CR>oO<Cmd>call <SID>BlockMove(+1)<CR>Oo
+nnoremap <C-V><C-V> <C-V><Cmd>call <SID>BlockMove(+1)<CR>oO<Cmd>call <SID>BlockMove(-1)<CR>
 nmap <C-V>0 <C-V><C-V>0i
 nmap <C-V>$ <C-V><C-V>$a
 nmap <C-V>i <C-V><C-V>i
