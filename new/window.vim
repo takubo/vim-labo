@@ -294,7 +294,7 @@ enddef
 augroup MyVimrc_BestScrollOff
   au!
   # au WinResized * echo v:event
-  au WinResized * call ExeBestScrolloff()
+  au WinResized * ExeBestScrolloff()
 augroup end
 
 # def BestScrolloff()
@@ -310,9 +310,13 @@ def ExeBestScrolloff()
 enddef
 
 def BestScrolloff()
+  const winheight = winheight(0)
   # Quickfixでは、なぜかWinNewが発火しないので、exists()で変数の存在を確認せねばならない。
   &l:scrolloff = (!TypewriterScroll && (!exists('w:TypewriterScroll') || !w:TypewriterScroll)) ?
-                 ( winheight(0) < 10 ? 0 : winheight(0) < 20 ? 2 : 5 ) : 9999
+                   ( winheight < 10 ? 0 :
+                     winheight < 20 ? 2 :
+                     5 ) :
+                   9999
 enddef
 
 
@@ -326,12 +330,13 @@ import autoload "./PopUpInfo.vim" as pui
 
 var TypewriterScroll = false
 
-augroup MyVimrc_TypewriterScroll
-  au!
-  au WinNew * call setwinvar(0, 'TypewriterScroll', false)
-  # -o, -Oオプション付きで起動したWindowでは、WinNew, WinEnterが発火しないので、別途設定。
-  au VimEnter * PushPosAll | exe "tabdo windo call setwinvar(0, 'TypewriterScroll', false) | call <SID>BestScrolloff()" | PopPosAll
-augroup end
+# 削除 TODO 
+# augroup MyVimrc_TypewriterScroll
+#   au!
+#   au WinNew * call setwinvar(0, 'TypewriterScroll', false)
+#   # -o, -Oオプション付きで起動したWindowでは、WinNew, WinEnterが発火しないので、別途設定。
+#   au VimEnter * PushPosAll | exe "tabdo windo call setwinvar(0, 'TypewriterScroll', false) | call BestScrolloff()" | PopPosAll
+# augroup end
 
 def ToggleTypewriterScroll(global: bool)
   # Quickfixでは、なぜかWinNewが発火しないので、ここで変数を定義する。
@@ -356,8 +361,8 @@ def ToggleTypewriterScroll(global: bool)
   ], 2000)
 enddef
 
-nnoremap z<Space> <ScriptCmd>call ToggleTypewriterScroll(v:true)<CR>
-nnoremap g<Space> <ScriptCmd>call ToggleTypewriterScroll(v:false)<CR>
+nnoremap z<Space> <ScriptCmd>ToggleTypewriterScroll(true)<CR>
+nnoremap g<Space> <ScriptCmd>ToggleTypewriterScroll(false)<CR>
 
 
 
