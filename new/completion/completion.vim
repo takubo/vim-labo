@@ -11,7 +11,8 @@ scriptencoding utf-8
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------
 # Initialize
 
-set complete=.,w,i,t,b,u
+# set complete=.,w,i,t,b,u
+set complete=.,i,t,w,b,u
 set completeopt=menuone,noselect # TODO ,fuzzy
 set pumheight=30
 
@@ -79,7 +80,7 @@ imap <C-G> <Plug>(JK-Complete-GG)
 
 def StartComplete(insert_char: string): string
   # TODO
-  sleep 10m
+  #?? sleep 10m
   #if pumvisible()
   #  # こうしないと、負荷が高いとき、MS-IMEの予測変換を確定した時の挙動がおかしくなる。
   #  # TODO 同事例のURLを貼る、
