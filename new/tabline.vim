@@ -9,13 +9,15 @@ scriptencoding utf-8
 var TablineContentsSwitch = {
   'Battery':    false,
   'Date':       false,
-  'FuncName':   true,
+  'FuncName':   false,
   'TabLabel':    true,
   'Time':        true,
-  'TimeSecond': true,
-  'tlWinnum':   false,
-  'tlModified': false,
-  'tlBufname':  false,
+  'TimeSecond': false,
+# Tab Label
+  'Bufname':     true,
+  'Modified':   false,
+  'Path':       false,
+  'Winnum':     false,
 }
 
 
@@ -23,8 +25,17 @@ var TablineContentsSwitch = {
 # Make TabLineStr
 
 def g:TabLine(): string
-  const gold = true
+  const gold = g:IsGold()
   const contents_switch = TablineContentsSwitch
+
+
+  var fill_color: string
+  if gold
+    fill_color = '%#TabLineFill#'
+  else
+    fill_color = '%#TabLineSel#'
+    fill_color = '%#SLFileName#'
+  endif
 
 
   # Left
@@ -74,13 +85,15 @@ def g:TabLine(): string
     sep = '%#SLFileName# | '  # タブ間の区切り
     sep = '%#TabLineSep#| '  # タブ間の区切り
     sep = '%#TabLineSep# | '  # タブ間の区切り
-
+    sep = '%#TabLineSep# │ '  # タブ間の区切り
 
 
     tabpages = sep .. join(tab_labels, sep) .. sep .. '%#TabLineFill#%T'
     tabpages = sep .. join(tab_labels, sep) .. sep .. '%#TabLineDate#    ' #.. '%#TabLineFill#%T'
     tabpages = '%#TabLineSep#  ' .. join(tab_labels, sep) .. '%#TabLineSep#  %#TabLineDate#    ' .. '%#TabLineFill#%T'
     tabpages = '%##      ' .. '%#TabLineSep#  ' .. join(tab_labels, sep) .. '%#TabLineSep#  %#TabLineDate#    ' .. '%#TabLineFill#%T'
+    tabpages = fill_color .. '      ' .. '%#TabLineSep#  ' .. join(tab_labels, sep) .. '%#TabLineSep#  ' .. '%#TabLineFill#%T'
+    #tabpages = fill_color .. '      ' .. '%#TabLineSep#  ' .. join(tab_labels, sep) .. '%#TabLineSep#  %#TabLineDate#    ' .. '%#TabLineFill#%T'
   else
    #tabpages =  '%#SLFileName#    ' .. '%#TabLine#  [ ' ..  tabpagenr() .. ' / ' .. tabpagenr('$') .. ' ]  %#SLFileName# '
     tabpages =  '%#SLFileName#    ' .. '%#TabLineDate#  [ ' ..  tabpagenr() .. ' / ' .. tabpagenr('$') .. ' ]  %#SLFileName# '
@@ -92,7 +105,7 @@ def g:TabLine(): string
 
 
   # Current Function Name
-  if contents_switch['FuncName']
+  if contents_switch.FuncName
    #right ..= "%#hl_func_name_stl#"
     right ..= "%#TabLine#"
 
@@ -118,14 +131,6 @@ def g:TabLine(): string
   right ..= '%#TabLineDate# '
 
 
-  var fill_color: string
-
-  if gold
-    fill_color = '%#TabLineFill#'
-  else
-    fill_color = '%#SLFileName#'
-  endif
-
   return left .. '%<' .. tabpages .. fill_color .. '%=' .. right
 enddef
 
@@ -144,38 +149,59 @@ enddef
 # 8  タブ番号 バッファ数 Mod フルバッファ名
 
 def MakeTabpageLabel(tabn: number): string
-  var   hi: string
-  hi = tabn == tabpagenr() ? '%#TabLineSel#' : '%#VertSplit#'
-  hi = tabn == tabpagenr() ? '%#TabLineSel#' : '%#TabLineSep#'
-  hi = tabn == tabpagenr() ? '%#SLFileName#' : '%#TabLineSep#'
-  hi = tabn == tabpagenr() ? '%#TabLineDate#' : '%#TabLineSep#'
+  var label: string  # 最終的なラベル (返り値)
+
+  const contents_switch = TablineContentsSwitch
+
+  # const hi = tabn == tabpagenr() ? '%#TabLineSel#' : '%#VertSplit#'
+  # const hi = tabn == tabpagenr() ? '%#TabLineSel#' : '%#TabLineSep#'
+
+  var hi: string
 
   const tabn_str = '[' .. tabn .. ']'
 
-  # タブ内のバッファのリスト
-  var bufnrs = tabpagebuflist(tabn)
+  if contents_switch.Bufname
+    # タブ内のバッファのリスト
+    var bufnrs = tabpagebuflist(tabn)
 
-  # バッファ数
-  const bufnum_str = '(' .. len(bufnrs) .. ')'
+    # バッファ数
+    #? const bufnum_str = '(' .. len(bufnrs) .. ')'
 
-  # カレントバッファ番号
-  const curbufnr = bufnrs[tabpagewinnr(tabn) - 1]  # tabpagewinnr()は、 1始まり。
+    # カレントバッファ番号
+    const curbufnr = bufnrs[tabpagewinnr(tabn) - 1]  # tabpagewinnr()は、 1始まり。
 
-  # カレントバッファ名
-  # const bufname_tmp = expand('#' .. curbufnr .. ':t')
-  # const bufname_tmp = pathshorten(bufname(curbufnr)) )
-  # const bufname_tmp = pathshorten(expand('#' .. curbufnr .. ':p'))
-  # const bufname = bufname_tmp == '' ? 'No Name' : bufname_tmp  # 無名バッファは、バッファ名が出ない。
-  # const bufname = bufname_tmp == '' ? ' ' : bufname_tmp  # 無名バッファは、バッファ名が出ない。
+    # カレントバッファ名
+    const bufname_tmp = expand('#' .. curbufnr .. ':t')
+
+    # const bufname_tmp = pathshorten(bufname(curbufnr)) )
+    # const bufname_tmp = pathshorten(expand('#' .. curbufnr .. ':p'))
+
+    const bufname = bufname_tmp == '' ? 'No Name' : bufname_tmp  # 無名バッファは、バッファ名が出ない。
+    # const bufname = bufname_tmp == '' ? ' ' : bufname_tmp  # 無名バッファは、バッファ名が出ない。
+
+    hi = tabn == tabpagenr() ? '%#SLFileName#' : '%#TabLineSep#'
+    hi = tabn == tabpagenr() ? '%#TabLineDate#' : '%#TabLineSep#'
+    label = tabn_str .. ' ' .. bufname
+    #label = ' ' .. tabn_str .. ' ' .. bufname .. ' '
+
+    # アクティブタブ名の廻りにNormalを付ける
+    if 1
+      if tabn == tabpagenr()
+        label = '%#Normal# ' .. hi .. label .. '%#Normal# '
+      else
+        label = ' ' .. hi .. label .. ' '
+      endif
+      return label
+    endif
+  else
+    hi = tabn == tabpagenr() ? '%#TabLineDate#' : '%#TabLineSep#'
+    label = tabn_str
+  endif
 
   # タブ内に変更ありのバッファがあったら '+' を付ける
-  const mod = bufnrs -> filter((_, val) => getbufvar(val, "&modified")) -> len() != 0 ? '+' : ''
+  #? const mod = bufnrs -> filter((_, val) => getbufvar(val, "&modified")) -> len() != 0 ? '+' : ''
 
-  return hi .. tabn_str
- #return hi .. tabn_str .. mod
-
- #return hi .. tabn_str .. ' ' .. bufnum_str .. mod
- #return hi .. '%' .. tabn .. 'T' .. tabn_str .. '%T'
+  return hi .. label
 enddef
 
 
@@ -207,33 +233,28 @@ enddef
 #----------------------------------------------------------------------------------------
 # Switch TabLine Status & Contents
 
-def SwitchTabline(args: list<string>)
-  const arg = args[0]
-
-  if (arg) == ''
+def SwitchTabline(...args: list<string>)
+  if args == []
     &showtabline = (&showtabline == 0 ? 2 : 0 )
     SetTimer(false)
     return
   endif
 
-  TablineContentsSwitch[arg] = !TablineContentsSwitch[arg]
-
-  # 一定間隔で更新する必要があるコンテンツがあるときのみ、タイマーを有効にする。
-  const req_timer_cont = ( ['Battery', 'Date', 'Time', 'TimeSecond']
-    -> map((_, val) => TablineContentsSwitch[val])
-    -> reduce((acc, val) => acc && val, true)
-  )
+  # TODO foreach
+  args->mapnew((_, val) => {
+    TablineContentsSwitch[val] = !TablineContentsSwitch[val]
+    return 0
+  })
 
   redrawtabline
-
-  SetTimer(req_timer_cont)
+  SetTimer(true)
 enddef
 
 def CompletionTblContents(ArgLead: string, CmdLine: string, CusorPos: number): list<string>
   return keys(TablineContentsSwitch) -> filter((_, val) => val =~? ('^' .. ArgLead .. '.*')) -> sort()
 enddef
 
-com! -nargs=? -complete=customlist,CompletionTblContents Tbl {
+com! -nargs=* -complete=customlist,CompletionTblContents Tbl {
   SwitchTabline(<f-args>)
 }
 
@@ -241,23 +262,32 @@ com! -nargs=? -complete=customlist,CompletionTblContents Tbl {
 #----------------------------------------------------------------------------------------
 # TabLine Timer
 
-const RedrawTablineInterval = 1000
-
 # 旧タイマの削除 (再読み込みする際、古いタイマを削除しないと、どんどん貯まっていってしまう。)
 if exists('g:RedrawTablineTimerId') | timer_stop(g:RedrawTablineTimerId) | endif
 
 g:RedrawTablineTimerId = 0
 
 def SetTimer(on: bool)
-  if on && timer_info(g:RedrawTablineTimerId) == []
-    g:RedrawTablineTimerId = timer_start(RedrawTablineInterval, (dummy) => execute('redrawtabline'), {'repeat': -1})
+  # 一定間隔で更新する必要があるコンテンツがあるときのみ、タイマーを有効にする。
+  const req_timer_cont = ( ['Battery', 'Date', 'Time', 'TimeSecond']
+    -> map((_, val) => TablineContentsSwitch[val])
+    -> reduce((acc, val) => acc || val, true)
+  )
+
+  if on && req_timer_cont
+    if timer_info(g:RedrawTablineTimerId) == []
+      g:RedrawTablineTimerId = timer_start(RedrawTablineInterval, (dummy) => execute('redrawtabline'), {'repeat': -1})
+    endif
   else
     timer_stop(g:RedrawTablineTimerId)
   endif
 enddef
 
+
 #----------------------------------------------------------------------------------------
 # Initial Setting
+
+const RedrawTablineInterval = 1000
 
 set showtabline=2
 set tabline=%!TabLine()
