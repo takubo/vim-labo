@@ -4,7 +4,7 @@ scriptencoding utf-8
 
 
 #----------------------------------------------------------------------------------------
-# Switch TabLine Contents
+# TabLine Contents Switch
 
 var TablineContentsSwitch = {
   'Battery':    false,
@@ -12,7 +12,7 @@ var TablineContentsSwitch = {
   'FuncName':   true,
   'TabLabel':    true,
   'Time':        true,
-  'TimeSecond': false,
+  'TimeSecond': true,
   'tlWinnum':   false,
   'tlModified': false,
   'tlBufname':  false,
@@ -207,6 +207,28 @@ enddef
 #----------------------------------------------------------------------------------------
 # Switch TabLine Status & Contents
 
+def SwitchTabline(args: list<string>)
+  const arg = args[0]
+
+  if (arg) == ''
+    &showtabline = (&showtabline == 0 ? 2 : 0 )
+    SetTimer(false)
+    return
+  endif
+
+  TablineContentsSwitch[arg] = !TablineContentsSwitch[arg]
+
+  # 一定間隔で更新する必要があるコンテンツがあるときのみ、タイマーを有効にする。
+  const req_timer_cont = ( ['Battery', 'Date', 'Time', 'TimeSecond']
+    -> map((_, val) => TablineContentsSwitch[val])
+    -> reduce((acc, val) => acc && val, true)
+  )
+
+  redrawtabline
+
+  SetTimer(req_timer_cont)
+enddef
+
 def CompletionTblContents(ArgLead: string, CmdLine: string, CusorPos: number): list<string>
   return keys(TablineContentsSwitch) -> filter((_, val) => val =~? ('^' .. ArgLead .. '.*')) -> sort()
 enddef
@@ -215,36 +237,35 @@ com! -nargs=? -complete=customlist,CompletionTblContents Tbl {
   SwitchTabline(<f-args>)
 }
 
-def SwitchTabline(args: list<string>)
-  const arg = args[0]
-
-  if (arg) == ''
-    &showtabline = (&showtabline == 0 ? 2 : 0 )
-    # TODO delete timer
-    return
-  endif
-
-  TablineContentsSwitch[arg] = !TablineContentsSwitch[arg]
-
-  redrawtabline
-enddef
-
 
 #----------------------------------------------------------------------------------------
 # TabLine Timer
 
-# 旧タイマの削除  vimrcを再読み込みする際、古いタイマを削除しないと、どんどん貯まっていってしまう。
-if exists('TimerTabline') | call timer_stop(TimerTabline) | endif
+# 旧タイマの削除 (再読み込みする際、古いタイマを削除しないと、どんどん貯まっていってしまう。)
+if exists('g:RedrawTablineTimerId') | timer_stop(g:RedrawTablineTimerId) | endif
 
-const UpdateTablineInterval = 1000
-var TimerTabline = timer_start(UpdateTablineInterval, (dummy) => execute('redrawtabline'), {'repeat': -1})
+g:RedrawTablineTimerId = 0
 
+def SetTimer(on: bool)
+  const timer_id = g:RedrawTablineTimerId
+  if on && timer_info(timer_id) == []
+    # 旧タイマの削除 (古いタイマを削除しないと、どんどん貯まっていってしまう。念のため、常時削除する。)
+    timer_stop(timer_id)
+    g:RedrawTablineTimerId = timer_start(UpdateTablineInterval, (dummy) => execute('redrawtabline'), {'repeat': -1})
+  else
+    timer_stop(timer_id)
+  endif
+enddef
 
 #----------------------------------------------------------------------------------------
 # Initial Setting
 
+const UpdateTablineInterval = 1000
+
 set showtabline=2
 set tabline=%!TabLine()
+
+SetTimer(true)
 
 
 #----------------------------------------------------------------------------------------
