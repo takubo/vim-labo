@@ -18,15 +18,6 @@ var TablineContentsSwitch = {
   'tlBufname':  false,
 }
 
-#def CompletionStlContents(ArgLead: string, CmdLine: string, CusorPos: number): list<string>
-#  return keys(StatuslineContentsSwitch) -> filter((_, val) => val =~? ('^' .. ArgLead .. '.*')) -> sort()
-#enddef
-#
-#com! -nargs=1 -complete=customlist,CompletionStlContents Stl {
-#  StatuslineContentsSwitch['<args>'] = !StatuslineContentsSwitch['<args>']
-#  redrawstatus!
-#}
-
 
 #----------------------------------------------------------------------------------------
 # Make TabLineStr
@@ -141,6 +132,16 @@ enddef
 
 #----------------------------------------------------------------------------------------
 # Make TabLabel
+#
+# 0
+# 1  タブ番号
+# 2  タブ番号            Mod
+# 3  タブ番号 バッファ数 Mod
+# 4  タブ番号                バッファ名
+# 5  タブ番号 バッファ数     バッファ名
+# 6  タブ番号 バッファ数 Mod バッファ名
+# 7  タブ番号 バッファ数     フルバッファ名
+# 8  タブ番号 バッファ数 Mod フルバッファ名
 
 def MakeTabpageLabel(tabn: number): string
   var   hi: string
@@ -207,11 +208,38 @@ enddef
 # Switch TabLine Status & Contents
 
 def CompletionTblContents(ArgLead: string, CmdLine: string, CusorPos: number): list<string>
+  return keys(TablineContentsSwitch) -> filter((_, val) => val =~? ('^' .. ArgLead .. '.*')) -> sort()
 enddef
 
+com! -nargs=? -complete=customlist,CompletionTblContents Tbl {
+  StatuslineContentsSwitch['<args>'] = !StatuslineContentsSwitch['<args>']
+  redrawtabline
+}
 
 def ToggleTabline(arg: string)
+  if (a:arg . '') == ''
+    echo s:TablineStatus
+  elseif (a:arg . '') == '+'
+    let s:TablineStatus = ( s:TablineStatus + 1 ) % s:TablineStatusNum
+  elseif (a:arg . '') == '-'
+    let s:TablineStatus = ( s:TablineStatus - 1 ) % s:TablineStatusNum
+  elseif a:arg < s:TablineStatusNum
+    let s:TablineStatus = a:arg
+  else
+    echoerr 'Tabline:Invalid argument.'
+    return
+  endif
+
+  let &showtabline = ( s:TablineStatus == 0 ? 0 : 2 )
+
+  call UpdateTabline(0)
+  # set tabline=%!TabLineStr()
 enddef
+
+
+
+
+
 
 
 #----------------------------------------------------------------------------------------
@@ -238,58 +266,3 @@ set tabline=%!TabLine()
 com! Mayday set showtabline=0
 com! MayDay Mayday
 com! MAYDAY Mayday
-
-
-
-finish
-
-
-
-" 1228
-"---------------------------------------------------------------------------------------------
-function! s:ToggleTabline(arg)
-  if (a:arg . '') == ''
-    echo s:TablineStatus
-  elseif (a:arg . '') == '+'
-    let s:TablineStatus = ( s:TablineStatus + 1 ) % s:TablineStatusNum
-  elseif (a:arg . '') == '-'
-    let s:TablineStatus = ( s:TablineStatus - 1 ) % s:TablineStatusNum
-  elseif a:arg < s:TablineStatusNum
-    let s:TablineStatus = a:arg
-  else
-    echoerr 'Tabline:Invalid argument.'
-    return
-  endif
-
-  let &showtabline = ( s:TablineStatus == 0 ? 0 : 2 )
-
-  call UpdateTabline(0)
-  "set tabline=%!TabLineStr()
-endfunction
-
-
-"----------------------------------------------------------------------------------------
-" Initial Setting
-let s:TablineStatusNum = 9
-" 0
-" 1  タブ番号
-" 2  タブ番号            Mod
-" 3  タブ番号 バッファ数 Mod
-" 4  タブ番号                バッファ名
-" 5  タブ番号 バッファ数     バッファ名
-" 6  タブ番号 バッファ数 Mod バッファ名
-" 7  タブ番号 バッファ数     フルバッファ名
-" 8  タブ番号 バッファ数 Mod フルバッファ名
-
-
-com! -nargs=? -complete=customlist,s:CompletionTabline Tabline call <SID>ToggleTabline(<args>)
-
-" 1228
-function! s:CompletionTabline(ArgLead, CmdLine, CusorPos)
-  return map(range(0, s:TablineStatusNum), 'v:val . ""') + ['+', '-']
-endfunction
-
-
-
-" vimrc
-"nnoremap <silent> <leader>= :<C-u>call <SID>ToggleTabline('')<CR>
