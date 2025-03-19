@@ -4,18 +4,6 @@ scriptencoding utf-8
 
 
 #----------------------------------------------------------------------------------------
-# Gold
-
-var Gold = true
-
-def IsGold(): bool
-  return Gold
-enddef
-
-com! Gold Gold = !Gold
-
-
-#----------------------------------------------------------------------------------------
 # Switch Statusline Contents
 
 var StatuslineContentsSwitch = {
@@ -28,14 +16,14 @@ var StatuslineContentsSwitch = {
   'FuncName':      false,
   'KeywordChars':  true,
   'Line':          false,
-  'LinePercent':   false,
+  'LinePercent':   true,
   'NoNameBufPath': true,
-  'ScreenPercent': true,
+  'ScreenPercent': false,
   'ShadowDir':     false,
   'TabStop':       false,
   'Winnr':         false,
   'WordLen':       false,
-  'Wrap':          true
+  'Wrap':          true,
 }
 
 def CompletionStlContents(ArgLead: string, CmdLine: string, CusorPos: number): list<string>
@@ -110,7 +98,7 @@ def g:Statusline(): string
   const filetype = B('&filetype')
 
 
-  const gold = IsGold()
+  const gold = g:IsGold()
   const contents_switch = StatuslineContentsSwitch
 
 
@@ -158,10 +146,17 @@ def g:Statusline(): string
   if gold
     stl ..= "%#VertSplit2#"
     stl ..= "%#TabLine#"
+    stl ..= "%#TabLineSep#"
   elseif contents_switch['Winnr']
     stl ..= "%##"
+    stl ..= "%#SLFileName#"
+    stl ..= "%#VertSplit2#"
+    stl ..= "%#TabLineSep#"
   else
-    stl ..= "%#SLFileName#%##"
+    stl ..= "%#SLFileName#"
+    stl ..= "%##"
+    stl ..= "%#VertSplit2#"
+    stl ..= "%#TabLineSep#"
   endif
 
  #stl ..= "%( %m%r %)" .. (AutoRead(bufnr) ? '[AR]' : '')
@@ -190,7 +185,8 @@ def g:Statusline(): string
   if gold
     if contents_switch['Winnr']
       stl ..= "%##"
-      stl ..= "  %t  "
+      #stl ..= "  %t  "
+      stl ..= " %t "
     else
       stl ..= "%#VertSplit2#"
       stl ..= " %t "
@@ -203,11 +199,12 @@ def g:Statusline(): string
       stl ..= "%#VertSplit2#"
       stl ..= "%#TabLine#"      # ?? semi-gold
       stl ..= "%#SLFileName#"
-      stl ..= "  %t  "
+      #stl ..= "  %t  "
+      stl ..= " %t "
     endif
   endif
 
-  stl ..= "%<"
+  stl ..= "%#TabLineSep# %<"
 
   if contents_switch['ShadowDir'] && !nonamebuf
     stl ..= "%#SLNoNameDir#  "
@@ -237,7 +234,7 @@ def g:Statusline(): string
 
   #------------------------------------------------- {{{
   # ===== Separate Left Right =====
-  if Gold
+  if gold
     stl ..= "%#TabLine#  %="
   else
     stl ..= "%#SLFileName#  %="
@@ -248,7 +245,16 @@ def g:Statusline(): string
   #------------------------------------------------- {{{
   # Keyword Characters
   if contents_switch['KeywordChars']
-    stl ..= " ≪ " .. B('&isk') -> substitute('[^,]\zs,', ' ', 'g') -> substitute(',,', ', ', 'g') -> substitute('\d\+-\d\+,\?', '', 'g') .. "≫ "
+    #if 0
+    #  stl ..= " ≪ " .. B('&isk') -> substitute('[^,]\zs,', ' ', 'g') -> substitute(',,', ', ', 'g') -> substitute('\d\+-\d\+,\?', '', 'g') .. "≫ "
+    #else
+    #  const kws = B('&isk') -> substitute('[^,]\zs,', ' ', 'g') -> substitute(',,', ', ', 'g') -> substitute('\d\+-\d\+,\?', '', 'g')
+    #  const keyword_str = kws -> substitute('^ *', ' ', '') -> substitute(' *$', ' ', '')
+    #  stl ..= " ≪" .. keyword_str .. "≫ "
+    #endif
+    const kwc = B('&isk') -> substitute('[^,]\zs,', ' ', 'g') -> substitute(',,', ', ', 'g') -> substitute('\d\+-\d\+,\?', '', 'g')
+                -> substitute('^ *', ' ', '') -> substitute(' *$', ' ', '')
+    stl ..= " ≪" .. kwc .. "≫ "
   endif
   #------------------------------------------------- }}}
 
@@ -270,10 +276,13 @@ def g:Statusline(): string
   #------------------------------------------------- {{{
   # Buffer Local Options
   stl ..= "%#SLFileName#"
+  stl ..= "%#TabLine#"
 
   if contents_switch['Wrap']
     stl ..= " " .. (W('&wrap') ? '  ' : '>>') .. " "
   endif
+
+  stl ..= W('&scrollbind') ?  " $" : "  "
 
   if contents_switch['TabStop']
     stl ..= " ⇒" .. B('&tabstop')
@@ -289,18 +298,28 @@ def g:Statusline(): string
 
   #------------------------------------------------- {{{
   # Under Cursor Information
-  stl ..= "%#SLFileName#"
+  if winwidth(0) > 130
 
-  if contents_switch['WordLen']
-    stl ..= " ≪%{" .. "len(expand('<cword>'))" .. "}≫"
-  endif
+    stl ..= "%#SLFileName#"
+    stl ..= "%#TabLine#"
+    stl ..= "%##"
 
-  if contents_switch['CharCode']
-    stl ..= " %10(《%(0x%B%)》%)"
-  endif
+    if contents_switch['WordLen']
+      stl ..= " ≪%{" .. "len(expand('<cword>'))" .. "}≫"
+    endif
 
-  if contents_switch['CharCode10']
-    stl ..= " %10(《%(%b%)》%)"
+    if contents_switch['CharCode']
+      stl ..= " %10(《%(0x%B%)》%)"
+    else
+      stl ..= "%#TabLine#" .. "           "
+    endif
+
+    if contents_switch['CharCode10']
+      stl ..= " %10(《%(%b%)》%)"
+    else
+      stl ..= "%#TabLine#" .. "           "
+    endif
+
   endif
   #------------------------------------------------- }}}
 
@@ -362,8 +381,73 @@ set laststatus=2
 set statusline=%!Statusline()
 
 
-#----------------------------------------------------------------------------------------
-# 
 
-nnoremap @ <Cmd>Stl Winnr<CR>
-nnoremap , <Cmd>Gold<CR><Cmd>redrawstatus!<CR>
+#----------------------------------------------------------------------------------------
+function! g:Statusline_O()
+
+  let StatuslineContents = {}
+
+  let StatuslineContents['Column'] = v:false
+  let StatuslineContents['Branch'] = v:false
+  let StatuslineContents['FuncName'] = v:false
+  let StatuslineContents['Keywords'] = v:false
+  let StatuslineContents['LineColumn'] = v:false
+  let StatuslineContents['Path'] = v:false
+  let StatuslineContents['TabStop'] = v:false
+
+  let statusline_contents = StatuslineContents
+
+  let stl = "  "
+  let stl ..= "%#SLFileName#[ %{winnr()} ]%## ( %n ) "
+  let stl ..= "%##%m%r%{(!&autoread&&!&l:autoread)?'[AR]':''}%h%w "
+
+  let g:MyStlFugitive = statusline_contents['Branch'] ? ' [fugitive]' : ' fugitive'
+  let stl ..= "%#hl_func_name_stl#%{bufname('') =~ '^fugitive' ? g:MyStlFugitive : ''}"
+  let stl ..= "%#hl_func_name_stl#%{&filetype == 'fugitive' ? g:MyStlFugitive : ''}"
+
+  if statusline_contents['Branch']
+    let stl ..= "%#hl_func_name_stl# %{FugitiveHead(7)}"
+  endif
+
+  if statusline_contents['Path']
+    let stl ..= "%<"
+    let stl ..= "%##%#SLFileName# %F "
+  else
+    let stl ..= "%##%#SLFileName# %t "
+    let stl ..= "%<"
+  endif
+
+  if statusline_contents['FuncName']
+    let stl ..= "%#hl_func_name_stl# %{cfi#format('%s()', '')}"
+  endif
+
+
+  " ===== Separate Left Right =====
+  let stl ..= "%#SLFileName#%="
+  " ===== Separate Left Right =====
+
+  if statusline_contents['Keywords']
+    let stl ..= " %{substitute(substitute(&isk, '\\\\d\\\\+-\\\\d\\\\+', '', 'g'), ',\\\\+', ' ', 'g')} "
+  endif
+
+  let stl ..= "%## %-4{&ft==''?'    ':&ft}  %-5{&fenc==''?'     ':&fenc}  %4{&ff} "
+
+  let stl ..= "%#SLFileName# %{&l:scrollbind?'$':'@'} "
+  let stl ..= "%1{c_jk_local!=0?'L':'G'} %1{&l:wrap?'==':'>>'} %{g:clever_f_use_migemo?'(M)':'(F)'} %4{&iminsert?'Jpn':'Code'} "
+
+  let stl ..= "%#SLFileName#  %{repeat(' ',winwidth(0)-178)}"
+
+  let stl ..= "%## %3p%% [%4L] "
+
+  if statusline_contents['LineColumn']
+    let stl ..= "%## %4lL, %3v(%3c)C "
+  elseif statusline_contents['Column']
+    let stl ..= "%## %3v,%3c "
+  endif
+
+  if statusline_contents['TabStop']
+    let stl ..= "%## %{&l:tabstop} "
+  endif
+
+  return stl
+endfunction
