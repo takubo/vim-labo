@@ -212,34 +212,22 @@ def CompletionTblContents(ArgLead: string, CmdLine: string, CusorPos: number): l
 enddef
 
 com! -nargs=? -complete=customlist,CompletionTblContents Tbl {
-  StatuslineContentsSwitch['<args>'] = !StatuslineContentsSwitch['<args>']
-  redrawtabline
+  SwitchTabline(<f-args>)
 }
 
-def ToggleTabline(arg: string)
-  if (a:arg . '') == ''
-    echo s:TablineStatus
-  elseif (a:arg . '') == '+'
-    let s:TablineStatus = ( s:TablineStatus + 1 ) % s:TablineStatusNum
-  elseif (a:arg . '') == '-'
-    let s:TablineStatus = ( s:TablineStatus - 1 ) % s:TablineStatusNum
-  elseif a:arg < s:TablineStatusNum
-    let s:TablineStatus = a:arg
-  else
-    echoerr 'Tabline:Invalid argument.'
+def SwitchTabline(args: list<string>)
+  const arg = args[0]
+
+  if (arg) == ''
+    &showtabline = (&showtabline == 0 ? 2 : 0 )
+    # TODO delete timer
     return
   endif
 
-  let &showtabline = ( s:TablineStatus == 0 ? 0 : 2 )
+  TablineContentsSwitch[arg] = !TablineContentsSwitch[arg]
 
-  call UpdateTabline(0)
-  # set tabline=%!TabLineStr()
+  redrawtabline
 enddef
-
-
-
-
-
 
 
 #----------------------------------------------------------------------------------------
