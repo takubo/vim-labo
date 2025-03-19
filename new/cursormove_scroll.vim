@@ -70,6 +70,13 @@ vnoremap gk <C-u>
 #----------------------------------------------------------------------------------------
 # Horizontal Scroll
 
+var ve: string
+augroup HorizScroll
+  au!
+  au User SubmodeEnterHorizScroll ve = &ve | &ve = 'all'
+  au User SubmodeLeaveHorizScroll &ve = ve
+augroup end
+
 submode#enter_with('HorizScroll', 'nv', '', 'zh', 'zh'   )
 submode#enter_with('HorizScroll', 'nv', '', 'zj', '<c-e>')
 submode#enter_with('HorizScroll', 'nv', '', 'zk', '<c-y>')
@@ -81,6 +88,7 @@ submode#map(       'HorizScroll', 'nv', '',  'l', 'zl'   )
 
 submode#map(       'HorizScroll', 'nv', '',  'J', 'j')
 submode#map(       'HorizScroll', 'nv', '',  'K', 'k')
+
 # sidescrolloffが1以上のとき、タブ文字(または多バイト文字)上にカーソルがあると、水平スクロールできないバグがあるので、カーソルを動かせるようにしておく。
 submode#map(       'HorizScroll', 'nv', '',  'w', 'w')
 submode#map(       'HorizScroll', 'nv', '',  'b', 'b')
