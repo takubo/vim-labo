@@ -201,7 +201,7 @@ function SetStatusline(statusline_contents)
 
   let stl ..= " %3{getcursorcharpos()[2]}:c"
   let stl ..= " %3v:v"
-  if a:statusline_contents['BytesOfColumn']
+  if a:statusline_contents['ColumnBytes']
     let stl ..= " %3c:b"
   endif
  "let stl ..= " %3v:v %3c:b"
@@ -231,49 +231,38 @@ endfunction
 #----------------------------------------------------------------------------------------
 # Switch Statusline Contents
 
-g:StatuslineContents = {
-  'Branch':         v:false,
-  'BytesOfColumn':  v:false,
-  'BytesOfFile':    v:false,
-  'CharCode':       v:true,
-  'CharCode10':     v:false,
-  'Column':         v:true,
-  'FuncName':       v:false,
-  'KeywordChars':   v:false,
-  'Line':           v:false,
-  'LinePercent':    v:true,
-  'NoNameBufPath':  v:false,
-  'Path':           v:false,
-  'ScreenPercent':  v:false,
-  'ShadowDir':      v:true,
-  'TabStop':        v:false,
-  'Winnr':          v:true,
-  'WordLen':        v:false,
-  '':               v:false
+var StatuslineContents = {
+  'Branch':         false,
+  'BytesOfFile':    false,
+  'CharCode':       false,
+  'CharCode10':     false,
+  #'Column':         true,
+  'ColumnBytes':    false,
+  'FuncName':       false,
+  'KeywordChars':   false,
+  'Line':           false,
+  'LinePercent':    true,
+  'NoNameBufPath':  false,
+  'Path':           false,
+  'ScreenPercent':  false,
+  'ShadowDir':      true,
+  'TabStop':        false,
+  'Winnr':          true,
+  'WordLen':        false
 }
 
-function CompletionStlContents(ArgLead, CmdLine, CusorPos)
-  let l = copy(g:StatuslineContents)
-  return l->filter({ key -> key =~? ('^'..a:ArgLead..'.*') })->keys()->sort()
-  "return g:StatuslineContents->filter((key, val) => !!(key =~? ('^'..ArgLead)))->keys()->sort()
-  "return sort(keys(g:StatuslineContents))
-endfunction
-com! -nargs=1 -complete=customlist,CompletionStlContents Stl let g:StatuslineContents['<args>'] = !g:StatuslineContents['<args>'] | call <SID>SetDefaultStatusline(g:StatuslineContents)
+def CompletionStlContents(ArgLead: string, CmdLine: string, CusorPos: number): list<string>
+  return copy(StatuslineContents) -> filter((key, _) => key =~? ('^' .. ArgLead .. '.*')) -> keys() -> sort()
+enddef
 
-
-#----------------------------------------------------------------------------------------
-function ToCapital(str)
-  return substitute(a:str, '.*', '\L\u&', '')
- "return toupper(a:str[0]) . a:str[1:]
-endfunction
+com! -nargs=1 -complete=customlist,CompletionStlContents Stl {
+  StatuslineContents['<args>'] = !StatuslineContents['<args>']
+  SetStatusline(StatuslineContents)
+}
 
 
 #----------------------------------------------------------------------------------------
 # Initialize Statusline
 
 # 初期設定のために1回は呼び出す。
-call SetStatusline(g:StatuslineContents)
-
-
-#----------------------------------------------------------------------------------------
-#hi StatusLineNC		guifg=#7f1f1a	guibg=#d0c589	gui=none	" guibgは色を錯覚するので#d0c589から補正
+SetStatusline(StatuslineContents)
