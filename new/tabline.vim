@@ -241,26 +241,23 @@ com! -nargs=? -complete=customlist,CompletionTblContents Tbl {
 #----------------------------------------------------------------------------------------
 # TabLine Timer
 
+const RedrawTablineInterval = 1000
+
 # 旧タイマの削除 (再読み込みする際、古いタイマを削除しないと、どんどん貯まっていってしまう。)
 if exists('g:RedrawTablineTimerId') | timer_stop(g:RedrawTablineTimerId) | endif
 
 g:RedrawTablineTimerId = 0
 
 def SetTimer(on: bool)
-  const timer_id = g:RedrawTablineTimerId
-  if on && timer_info(timer_id) == []
-    # 旧タイマの削除 (古いタイマを削除しないと、どんどん貯まっていってしまう。念のため、常時削除する。)
-    timer_stop(timer_id)
-    g:RedrawTablineTimerId = timer_start(UpdateTablineInterval, (dummy) => execute('redrawtabline'), {'repeat': -1})
+  if on && timer_info(g:RedrawTablineTimerId) == []
+    g:RedrawTablineTimerId = timer_start(RedrawTablineInterval, (dummy) => execute('redrawtabline'), {'repeat': -1})
   else
-    timer_stop(timer_id)
+    timer_stop(g:RedrawTablineTimerId)
   endif
 enddef
 
 #----------------------------------------------------------------------------------------
 # Initial Setting
-
-const UpdateTablineInterval = 1000
 
 set showtabline=2
 set tabline=%!TabLine()
