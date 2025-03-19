@@ -112,7 +112,7 @@ def g:Statusline(): string
     stl ..= " [ " .. win_id2win(winid) .. " ] "
 
     if gold
-      stl ..= "%#StlGold#"
+      stl ..= "%#StlGoldLeaf#"
     else
       stl ..= "%#StlFill#"
     endif
@@ -129,7 +129,7 @@ def g:Statusline(): string
     if gold
       stl ..= "%##"
     else
-     #stl ..= "%#StlGold#"
+     #stl ..= "%#StlGoldLeaf#"
       stl ..= "%#StlFill#"
     endif
   else
@@ -144,18 +144,18 @@ def g:Statusline(): string
   stl ..= "%( %h%w %)"
 
   if gold
-    stl ..= "%#StlGold#"
+    stl ..= "%#StlGoldLeaf#"
     stl ..= "%#StlGoldChar#"
     stl ..= "%#StlGoldChar#"
   elseif contents_switch['Winnr']
     stl ..= "%##"
     stl ..= "%#StlFill#"
-    stl ..= "%#StlGold#"
+    stl ..= "%#StlGoldLeaf#"
     stl ..= "%#StlGoldChar#"
   else
     stl ..= "%#StlFill#"
     stl ..= "%##"
-    stl ..= "%#StlGold#"
+    stl ..= "%#StlGoldLeaf#"
     stl ..= "%#StlGoldChar#"
   endif
 
@@ -188,7 +188,7 @@ def g:Statusline(): string
       #stl ..= "  %t  "
       stl ..= " %t "
     else
-      stl ..= "%#StlGold#"
+      stl ..= "%#StlGoldLeaf#"
       stl ..= " %t "
     endif
   else
@@ -196,7 +196,7 @@ def g:Statusline(): string
       stl ..= "%##"
       stl ..= " %t "
     else
-      stl ..= "%#StlGold#"
+      stl ..= "%#StlGoldLeaf#"
       stl ..= "%#StlGoldChar#"      # ?? semi-gold
       stl ..= "%#StlFill#"
       #stl ..= "  %t  "
@@ -327,7 +327,7 @@ def g:Statusline(): string
   #------------------------------------------------- {{{
   # Overall Buffer
   if gold
-    stl ..= "%#StlGold#"
+    stl ..= "%#StlGoldLeaf#"
   else
     stl ..= "%#StlFill#"
   endif
