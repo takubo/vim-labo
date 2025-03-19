@@ -3,18 +3,26 @@ vim9script
 scriptencoding utf-8
 
 
-function SetStatusline(statusline_contents)
-  let Gold = v:false
+var Gold = v:true
+
+def IsGold(): bool
+  return Gold
+enddef
+
+
+function SetStatusline()
+  let gold = s:IsGold()
+  let contents_switch = s:StatuslineContentsSwitch
 
   let stl = ""
 
 
   "------------------------------------------------- {{{
-  if a:statusline_contents['Winnr']
+  if contents_switch['Winnr']
     "let stl ..= "  %#SLFileName#"
     let stl ..= " [ %{winnr()} ] "
 
-    if Gold
+    if gold
       let stl ..= "%#VertSplit2#"
     else
       let stl ..= "%#SLFileName#"
@@ -28,21 +36,21 @@ function SetStatusline(statusline_contents)
 
 
   "------------------------------------------------- {{{
-  if a:statusline_contents['Winnr']
+  if contents_switch['Winnr']
     let stl ..= "%##"
-  elseif Gold
+  elseif gold
     let stl ..= "%#VertSplit2#"
   else
     let stl ..= "%#SLFileName#"
-    if !a:statusline_contents['Winnr']
+    if !contents_switch['Winnr']
       let stl ..= "  "
     endif
   endif
   let stl ..= "%h%w"
 
-  if Gold
+  if gold
     let stl ..= "%#VertSplit2#"
-  elseif a:statusline_contents['Winnr']
+  elseif contents_switch['Winnr']
     let stl ..= "%##"
   else
     let stl ..= "%#SLFileName#  %##"
@@ -53,18 +61,18 @@ function SetStatusline(statusline_contents)
 
   " TODO 
   "------------------------------------------------- {{{
-  let MyStlFugitive = a:statusline_contents['Branch'] ? ' [fugitive]' : ' fugitive'
+  let MyStlFugitive = contents_switch['Branch'] ? ' [fugitive]' : ' fugitive'
   let stl ..= "%#hl_func_name_stl#"
   let stl ..= "%{(bufname('') =~ '^fugitive') \\|\\| (&filetype == 'fugitive') ? MyStlFugitive : ''}"
 
-  if a:statusline_contents['Branch']
+  if contents_switch['Branch']
     let stl ..= "%{(FugitiveHead(7)!=''&& bufname('')!='NetrwTreeListing'&& bufname('')!~'^NERD_tree') ? (' ['.FugitiveHead(7).']') : ''}"
   endif
   "------------------------------------------------- }}}
 
 
   "------------------------------------------------- {{{
-  if a:statusline_contents['Path']
+  if contents_switch['Path']
     "let stl ..= "%#SLFileName#"
     let stl ..= "%##"
     let stl ..= "%<"
@@ -73,21 +81,21 @@ function SetStatusline(statusline_contents)
     "let stl ..= "%#VertSplit2#"
     let stl ..= "%#SLFileName#"
     let stl ..= "%##"
-    if !a:statusline_contents['Winnr']
+    if !contents_switch['Winnr']
       let stl ..= "%#SLFileName#"
     endif
     let stl ..= "  %t  "
 
     let stl ..= "%<"
 
-    if a:statusline_contents['ShadowDir']
+    if contents_switch['ShadowDir']
       let stl ..= "%#SLNoNameDir#"
       let stl ..= "  %{bufname('')=='' ? ' '.getcwd(winnr()) : expand('%:p:h')}"
     endif
   endif
 
   " TODO 
-  if a:statusline_contents['Path'] || (a:statusline_contents['NoNameBufPath'] && !a:statusline_contents['ShadowDir'])
+  if contents_switch['Path'] || (contents_switch['NoNameBufPath'] && !contents_switch['ShadowDir'])
     " 無名バッファなら、cwdを常に表示。
     let stl ..= "%#SLNoNameDir#"
     let stl ..= " %{ bufname('') == '' ? getcwd(winnr()) : '' }"
@@ -96,7 +104,7 @@ function SetStatusline(statusline_contents)
 
 
   "------------------------------------------------- {{{
-  if a:statusline_contents['FuncName']
+  if contents_switch['FuncName']
     let stl ..= "%#hl_func_name_stl#"
     let stl ..= " %{cfi#format('%s()', '')}"
   endif
@@ -110,7 +118,7 @@ function SetStatusline(statusline_contents)
 
 
   "------------------------------------------------- {{{
-  if a:statusline_contents['KeywordChars']
+  if contents_switch['KeywordChars']
     let stl ..= "%#SLFileName#"
     let stl ..= " ≪%{substitute(substitute(&isk, '\\\\d\\\\+-\\\\d\\\\+', '', 'g'), ',\\\\+', ' ', 'g')}≫"
   endif
@@ -127,11 +135,11 @@ function SetStatusline(statusline_contents)
   "let stl ..= "%#SLNoNameDir#"
   let stl ..= "%#SLFileName#"
 
-  if a:statusline_contents['Wrap']
+  if contents_switch['Wrap']
     let stl ..= " %1{ &l:wrap ? '  ' : '>>' } "
   endif
 
-  if a:statusline_contents['TabStop']
+  if contents_switch['TabStop']
     let stl ..= " ⇒%{&l:tabstop}"
   endif
   "------------------------------------------------- }}}
@@ -150,15 +158,15 @@ function SetStatusline(statusline_contents)
   "let stl ..= "%##"
   let stl ..= "%#SLFileName#"
 
-  if a:statusline_contents['WordLen']
+  if contents_switch['WordLen']
     let stl ..= " %4{'≪'.len(expand('<cword>'))}≫"
   endif
 
-  if a:statusline_contents['CharCode']
+  if contents_switch['CharCode']
     let stl ..= " %10(《%(0x%B%)》%)"
   endif
 
-  if a:statusline_contents['CharCode10']
+  if contents_switch['CharCode10']
     let stl ..= " %10(《%(%b%)》%)"
   endif
   "------------------------------------------------- }}}
@@ -166,22 +174,22 @@ function SetStatusline(statusline_contents)
 
   "------------------------------------------------- {{{
   "let stl ..= "%##"
-  if Gold
+  if gold
     let stl ..= "%#VertSplit2#"
   else
     let stl ..= "%#SLFileName#"
   endif
 
-  if a:statusline_contents['LinePercent']
+  if contents_switch['LinePercent']
     let stl ..= " %3p%%"
   endif
-  if a:statusline_contents['ScreenPercent']
+  if contents_switch['ScreenPercent']
     let stl ..= " [%3P%%]"
   endif
 
   let stl ..= " %6([%L]%)"
 
-  if a:statusline_contents['BytesOfFile']
+  if contents_switch['BytesOfFile']
     let stl ..= " %6oBytes"
   endif
 
@@ -194,14 +202,14 @@ function SetStatusline(statusline_contents)
   "let stl ..= "%#VertSplit2#"
   let stl ..= "%##"
 
-  if a:statusline_contents['Line']
+  if contents_switch['Line']
     let stl ..= " %4l:L"
   endif
 
   let stl ..= " %3{getcursorcharpos()[2]}:c"
   let stl ..= " %3v:v"
 
-  if a:statusline_contents['ColumnBytes']
+  if contents_switch['ColumnBytes']
     let stl ..= " %3c:b"
   endif
 
@@ -243,7 +251,7 @@ enddef
 
 com! -nargs=1 -complete=customlist,CompletionStlContents Stl {
   StatuslineContentsSwitch['<args>'] = !StatuslineContentsSwitch['<args>']
-  SetStatusline(StatuslineContentsSwitch)
+  SetStatusline()
 }
 
 
@@ -251,4 +259,4 @@ com! -nargs=1 -complete=customlist,CompletionStlContents Stl {
 # Initialize Statusline
 
 # 初期設定のために1回は呼び出す。
-SetStatusline(StatuslineContentsSwitch)
+SetStatusline()
