@@ -29,40 +29,38 @@ def! g:TabLine(): string
 
   const gold = g:IsGold()
 
-  const fill_color = gold ?  '%#TabLineFill#' : '%#SLFileName#' #'%#TabLineSel#'
-
 
   # ------------------------------------------------------------------------
   # Left
   var left: string
 
   if contents_switch.Date && contents_switch.Time
-    left ..= '%#TabLineDate# ◎ '
-    left ..= '%#TabLineDate# ' .. strftime('%Y/%m/%d (%a)') .. '  '
-    left ..= '%#SLFileName#  '  .. strftime('%X') .. '  '
-    left ..= "%#TabLineDate#    "
+    left ..= '%#TblDate# ◎ '
+    left ..= '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '  '
+    left ..= '%#StlFill#  '  .. strftime('%X') .. '  '
+    left ..= "%#TblDate#    "
   elseif contents_switch.Date
-    left ..= '%#TabLineDate# ◎ '
-    left ..= '%#TabLineDate# ' .. strftime('%Y/%m/%d (%a)') .. '  '
+    left ..= '%#TblDate# ◎ '
+    left ..= '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '  '
   elseif contents_switch.Time
     if contents_switch.TimeSecond
       if 0
-        left ..= '%#TabLineDate# ◎ '
-        left ..= '%#TabLineDate# ' .. strftime('%X') .. ' '
+        left ..= '%#TblDate# ◎ '
+        left ..= '%#TblDate# ' .. strftime('%X') .. ' '
       else
-        left ..= '%#TabLineDate# ' .. strftime('%X') .. ' '
+        left ..= '%#TblDate# ' .. strftime('%X') .. ' '
       endif
     else
-      left ..= '%#TabLineDate# ◎'
-      left ..= '%#TabLineDate# ' .. strftime('%H:%M') .. '  '
+      left ..= '%#TblDate# ◎'
+      left ..= '%#TblDate# ' .. strftime('%H:%M') .. '  '
     endif
   else
-    left ..= '%#TabLineDate# ◎ '
+    left ..= '%#TblDate# ◎ '
   endif
 
   if contents_switch.Battery
-    left ..= '%#SLFileName# ' .. BatteryStr() .. '  '
-    left ..= '%#TabLineDate#    '
+    left ..= '%#StlFill# ' .. BatteryStr() .. '  '
+    left ..= '%#TblDate#    '
   endif
 
 
@@ -72,20 +70,21 @@ def! g:TabLine(): string
 
   # Current Function Name
   #? if contents_switch.FuncName
-  #?   right ..= "%#hl_func_name_stl#"
+  #?   right ..= "%#StlFuncName#"
   #?   right ..= "%#TabLine#"
   #?
   #?   right ..= "  %{ cfi#format('%s()', '[--]') }  "
   #?   #right ..= " %{ FuncName() }"
   #? endif
 
-  right ..= "%#TabLineDate#    "
+  right ..= "%#TblDate#    "
 
-  right ..= "%#SLFileName# [ " .. DiffOptStr() .. "%#SLFileName# ] "
+  right ..= "%#StlFill# [ " .. DiffOptStr() .. "%#StlFill# ] "
+  #right ..= DiffOptStr()
 
-  right ..= '%#TabLineDate# %7(' .. tabpagenr() .. ' / ' .. tabpagenr('$') .. '%)'
+  right ..= '%#TblDate# %7(' .. tabpagenr() .. ' / ' .. tabpagenr('$') .. '%)'
 
-  right ..= '%#TabLineDate# '
+  right ..= '%#TblDate# '
 
 
   # ------------------------------------------------------------------------
@@ -130,7 +129,7 @@ def! g:TabLine(): string
     const cur_tab_idx = tabpagenr() - 1
     const end_tab_idx = tabpagenr('$') - 1
 
-    #const triangle_hi = "%#SLFileName#"
+    #const triangle_hi = "%#StlFill#"
     const triangle_hi = "%#TabLineSep#"
 
     var triangle_l = triangle_hi .. "    "
@@ -176,14 +175,14 @@ def! g:TabLine(): string
     endif
 
     # Tabpages
-    tabpages = fill_color .. (gold ? '     ' : '  ')  .. triangle_l .. '%<%#TabLineSep#' .. join(tab_labels_disp, sep) .. triangle_r .. '%#TabLineSep# ' .. '%#TabLineFill#'
+    tabpages = '%#TabLineFill#' .. (gold ? '     ' : '  ')  .. triangle_l .. '%<%#TabLineSep#' .. join(tab_labels_disp, sep) .. triangle_r .. '%#TabLineSep# ' .. '%#TabLineFill#'
   else
     # Tabpages
-    tabpages =  '%#SLFileName#    ' .. '%#TabLine#  [ ' ..  tabpagenr() .. ' / ' .. tabpagenr('$') .. ' ]  %#SLFileName# %<'
+    tabpages =  '%#StlFill#    ' .. '%#TabLine#  [ ' ..  tabpagenr() .. ' / ' .. tabpagenr('$') .. ' ]  %#StlFill# %<'
   endif
 
 
-  return left .. tabpages .. fill_color .. '%=' .. right
+  return left .. tabpages .. '%#TabLineFill#' .. '%=' .. right
 enddef
 
 
@@ -207,13 +206,15 @@ def MakeTabpageLabel(tabn: number): string
 
   const cur_tabnr = tabpagenr()
 
+  # 表示桁数を容易に算出できるよう、非アクティブのときのhighlightは、
+  # TabLineではな(TabLineSelと文字数が等しい)くTabLineSepとしておく。
+  #const hi = tabn == cur_tabnr ? '%#TabLineSel#' : '%#TabLineSep#'
+  #const hi = tabn == cur_tabnr ? '%#StlFill#' : '%#TabLineSep#'
+  const hi = tabn == cur_tabnr ? '%#TabLineSel#' : '%#TabLineSep#'
+
   const tabn_str = '[' .. tabn .. ']'
 
   if contents_switch.Bufname
-    #const hi = tabn == cur_tabnr ? '%#TabLineSel#' : '%#TabLineSep#'
-    #const hi = tabn == cur_tabnr ? '%#SLFileName#' : '%#TabLineSep#'
-    const hi = tabn == cur_tabnr ? '%#TabLineDate#' : '%#TabLineSep#'
-
     # タブ内のバッファのリスト
     var bufnrs = tabpagebuflist(tabn)
 
@@ -239,7 +240,7 @@ def MakeTabpageLabel(tabn: number): string
       endif
     endif
   else
-    label = (cur_tabnr ? '%#TabLineDate#' : '%#TabLineSep#') .. tabn_str
+    label = hi .. tabn_str
   endif
 
   # タブ内に変更ありのバッファがあったら '+' を付ける
@@ -259,18 +260,19 @@ enddef
 def DiffOptStr(): string
   const diffopts = split(&diffopt, ',')
 
-  const case  = (index(diffopts, 'icase') == -1 ?  '%#SLFileName#' : '%#SLNoNameDir#') ..  'Case'
+  const case = (index(diffopts, 'icase') == -1 ?  '%#TblDiffOn#' : '%#TblDiffOff#') ..  'Case'
 
   const white =
     ( ['iblank', 'iwhite', 'iwhiteall', 'iwhiteeol']
         -> map((_, val) => index(diffopts, val))
         -> reduce((acc, val) => acc && (val == -1), true)
-      ?  '%#SLFileName#' : '%#SLNoNameDir#'
+      ?  '%#TblDiffOn#' : '%#TblDiffOff#'
     ) ..  'White'
 
   # 'Blank'
 
-  return '%#SLFileName# ' .. case .. ' ' .. white .. '%#SLFileName# '
+  return ' ' .. case .. ' ' .. white .. ' '
+  # return '%#StlFill# [  ' .. case .. ' ' .. white .. '%#StlFill#  ] '
 enddef
 
 
