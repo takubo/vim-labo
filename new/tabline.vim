@@ -347,6 +347,7 @@ function! TabLineStr()
 
   " Left
   let left = ''
+ "let left .= '%#TabLineDate# '. strftime('%Y/%m/%d (%a)   ') . strftime('%X') . '  '
   let left .= '%#TabLineDate#  ' . strftime('%X') . '  '
   let left .= '%#SLFileName# ' . g:BatteryInfo . ' '
   let left .= '%#TabLineDate#  '
