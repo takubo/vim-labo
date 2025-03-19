@@ -7,10 +7,8 @@ function SetStatusline(statusline_contents)
 
   let Gold = v:true
 
-
  "let stl = "  "
   let stl = " "
-
 
  "let stl ..= "%#SLFileName#[ %{winnr()} ]%## ( %n ) "
 
@@ -52,13 +50,27 @@ function SetStatusline(statusline_contents)
   endif
 
   " OK
-  if v:true
+  if 0
+    if v:true
+      let stl ..= "%#VertSplit2#"
+    else
+      let stl ..= "%##"
+    endif
+   "let stl ..= "%m%r%{(!&l:autoread\\\<Bar>\\\<Bar>(&l:autoread==-1&&!&autoread))?'':'[AR]'}"
+    let stl ..= "%h%w%m%r%{(!&l:autoread\\\<Bar>\\\<Bar>(&l:autoread==-1&&!&autoread))?'':'[AR]'}"
+  elseif 1
+    let stl ..= "%##"
+    let stl ..= "%h%w"
     let stl ..= "%#VertSplit2#"
+    let stl ..= "%m%r%{(!&l:autoread\\\<Bar>\\\<Bar>(&l:autoread==-1&&!&autoread))?'':'[AR]'}"
   else
     let stl ..= "%##"
+    let stl ..= "%h%w"
+    let stl ..= "%#VertSplit2#"
+    let stl ..= "%m"
+    let stl ..= "%##"
+    let stl ..= "%r%{(!&l:autoread\\\<Bar>\\\<Bar>(&l:autoread==-1&&!&autoread))?'':'[AR]'}"
   endif
- "let stl ..= "%m%r%{(!&l:autoread\\\<Bar>\\\<Bar>(&l:autoread==-1&&!&autoread))?'':'[AR]'}"
-  let stl ..= "%h%w%m%r%{(!&l:autoread\\\<Bar>\\\<Bar>(&l:autoread==-1&&!&autoread))?'':'[AR]'}"
 
 
   " OK
@@ -93,7 +105,6 @@ function SetStatusline(statusline_contents)
         let stl ..= "%#SLNoNameDir#  "
       endif
       let stl ..= "%{bufname('')=='' ? ' '.getcwd(winnr()) : expand('%:p:h')}"
-      let stl ..= "    "
     endif
   endif
 
@@ -108,6 +119,7 @@ function SetStatusline(statusline_contents)
     let stl ..= "%#hl_func_name_stl# %{cfi#format('%s()', '')}"
   endif
 
+  let stl ..= "    "
 
   " OK
   " ===== Separate Left Right =====
@@ -131,18 +143,22 @@ function SetStatusline(statusline_contents)
 
 
   " OK
-  let stl ..= "%#SLFileName# "
-  let stl ..= "%1{ &l:wrap ? '==' : '>>' } "
+  if a:statusline_contents['Wrap']
+    let stl ..= "%#SLNoNameDir#"
+    let stl ..= "%#SLFileName#"
+    let stl ..= " %1{ &l:wrap ? '  ' : '>>' } "
+  endif
+
  "let stl ..= "%{&l:scrollbind?'$':'@'} "
  "let stl ..= "      "
+
   if a:statusline_contents['TabStop']
     let stl ..= " ⇒%{&l:tabstop}"
   endif
-  "
+
   "let stl ..= "%1{ c_jk_local != 0 ? 'L' : 'G' } "
   "let stl ..= "%4{ &iminsert ? 'Jpn' : 'Code' } "
   "let stl ..= "%{g:clever_f_use_migemo?'(M)':'(F)'} "
-
 
   " OK
   let stl ..= "%#SLFileName#  %{repeat(' ',winwidth(0)-178)}"
@@ -204,7 +220,6 @@ function SetStatusline(statusline_contents)
   if a:statusline_contents['ColumnBytes']
     let stl ..= " %3c:b"
   endif
- "let stl ..= " %3v:v %3c:b"
 
   if a:statusline_contents['BytesOfFile']
     let stl ..= " B:%6oBytes"
@@ -231,33 +246,34 @@ endfunction
 #----------------------------------------------------------------------------------------
 # Switch Statusline Contents
 
-var StatuslineContents = {
-  'Branch':         false,
-  'BytesOfFile':    false,
-  'CharCode':       false,
-  'CharCode10':     false,
-  #'Column':         true,
-  'ColumnBytes':    false,
-  'FuncName':       false,
-  'KeywordChars':   false,
-  'Line':           false,
-  'LinePercent':    true,
-  'NoNameBufPath':  false,
-  'Path':           false,
-  'ScreenPercent':  false,
-  'ShadowDir':      true,
-  'TabStop':        false,
-  'Winnr':          true,
-  'WordLen':        false
+var StatuslineContentsSwitch = {
+  'Branch':        false,
+  'BytesOfFile':   false,
+  'CharCode':      false,
+  'CharCode10':    false,
+  #'Column':        true,
+  'ColumnBytes':   false,
+  'FuncName':      false,
+  'KeywordChars':  false,
+  'Line':          false,
+  'LinePercent':   true,
+  'NoNameBufPath': true,
+  'Path':          false,
+  'ScreenPercent': false,
+  'ShadowDir':     false,
+  'TabStop':       false,
+  'Winnr':         true,
+  'WordLen':       false,
+  'Wrap':          true
 }
 
 def CompletionStlContents(ArgLead: string, CmdLine: string, CusorPos: number): list<string>
-  return copy(StatuslineContents) -> filter((key, _) => key =~? ('^' .. ArgLead .. '.*')) -> keys() -> sort()
+  return copy(StatuslineContentsSwitch) -> filter((key, _) => key =~? ('^' .. ArgLead .. '.*')) -> keys() -> sort()
 enddef
 
 com! -nargs=1 -complete=customlist,CompletionStlContents Stl {
-  StatuslineContents['<args>'] = !StatuslineContents['<args>']
-  SetStatusline(StatuslineContents)
+  StatuslineContentsSwitch['<args>'] = !StatuslineContentsSwitch['<args>']
+  SetStatusline(StatuslineContentsSwitch)
 }
 
 
@@ -265,4 +281,4 @@ com! -nargs=1 -complete=customlist,CompletionStlContents Stl {
 # Initialize Statusline
 
 # 初期設定のために1回は呼び出す。
-SetStatusline(StatuslineContents)
+SetStatusline(StatuslineContentsSwitch)
