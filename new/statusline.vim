@@ -110,20 +110,18 @@ def g:Statusline(): string
   const contents_switch = StatuslineContentsSwitch
 
 
-  # 返り値(statuslineの値となる)
+  # 返り値('statusline'の値となる)
   var stl = ""
 
 
   #------------------------------------------------- {{{
   if contents_switch['Winnr']
-    #stl ..= "  %#SLFileName#"
     stl ..= " [ " .. win_id2win(winid) .. " ] "
 
     if gold
       stl ..= "%#VertSplit2#"
     else
       stl ..= "%#SLFileName#"
-      #stl ..= "%##"
     endif
     stl ..= " ( %n ) "
   else
@@ -175,7 +173,7 @@ def g:Statusline(): string
   #------------------------------------------------- {{{
   if contents_switch['Path']
     stl ..= "%#SLFileName#"
-    #stl ..= "%##"
+   #stl ..= "%##"
 
     stl ..= "%<"
     stl ..= " %F "
@@ -202,6 +200,7 @@ def g:Statusline(): string
 
     if contents_switch['ShadowDir'] && !nonamebuf
       stl ..= "%#SLNoNameDir#  "
+
       stl ..= bufname -> fnamemodify(':p:h')
     endif
   endif
@@ -209,6 +208,7 @@ def g:Statusline(): string
   if (contents_switch['Path'] || contents_switch['ShadowDir'] || contents_switch['NoNameBufPath']) && nonamebuf
     # 無名バッファなら、cwdを常に表示。
     stl ..= "%#SLNoNameDir# "
+
     stl ..= getcwd(winid)
   endif
   #------------------------------------------------- }}}
@@ -216,8 +216,9 @@ def g:Statusline(): string
 
   #------------------------------------------------- {{{
   if contents_switch['FuncName']
-    stl ..= "%#hl_func_name_stl# "
+    stl ..= "%#hl_func_name_stl#"
     stl ..= "%#TabLine#"
+
     stl ..= " %{ cfi#format('%s()', '[--]') }"    #stl ..= " %{ FuncName() }"
   endif
   #------------------------------------------------- }}}
@@ -228,8 +229,6 @@ def g:Statusline(): string
   stl ..= "%#SLFileName#  %="
 
   if contents_switch['KeywordChars']
-    #stl ..= " ≪" .. B('&isk') .. "≫ "
-    #stl ..= " ≪" .. B('&isk') -> substitute('\d\+-\d\+', '', 'g') -> substitute(',\+', ' ', 'g') .. "≫ "
     stl ..= " ≪" .. B('&isk') -> substitute('[^,]\zs,', ' ', 'g') -> substitute(',,', ', ', 'g') -> substitute('\d\+-\d\+,\?', '', 'g') .. "≫ "
   endif
   #------------------------------------------------- }}}
@@ -237,6 +236,7 @@ def g:Statusline(): string
 
   #------------------------------------------------- {{{
   stl ..= "%##"
+
   const fenc = B('&fenc')
   const ff   = B('&ff')
   stl ..= printf(" %-5s  %-5s  %4s ",
