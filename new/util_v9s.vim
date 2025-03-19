@@ -1515,7 +1515,11 @@ def Unified_CR(mode: string)
     return
   endif
 
-  GotoFile()
+  if GotoFile()
+    return
+  endif
+
+  keeppatterns normal! gd
 enddef
 
 nnoremap <silent> <CR> <ScriptCmd>Unified_CR('')<CR>
@@ -1716,8 +1720,10 @@ def VimHelp(): number
     # TODO オプション 関数 コマンド
 
     const word = expand('<cword>')
-    exe 'help ' .. word
-    TempHighLight(word, 2500)
+    # TODO const on_opt = VimHelp_OnOpt()
+    const sufix = VimHelp_OnBIF() ? '()' : ''
+    exe 'help ' .. word .. sufix
+    TempHighLight(word, 1500)
     return 1
   catch /:E149/
   endtry
@@ -2232,11 +2238,85 @@ inoreab IA inoreab <silent>  <lt>C-R>=Eatchar('\s')<lt>CR><Esc>bbbbbbbbbb<Left>i
 inoreab <silent> qqv (_, v) =>
 inoreab <silent> qkv (k, v) =>
 inoreab <silent> qiv (i, v) =>
+inoreab <silent> qqq const name = (a1: t1, a2: t2): type =>
+
 
 #---------------------------------------------------------------------------------------------
 
-set complete=.,w,i,t,b,u
-set complete=.,i,t,w,b,u
+#vsp tabline.vim.old
+#vsp tabline.old1.5
+#vsp tabline.vim.old2
+#vsp tabline.vim.old3
+#vsp tabline.vim.old4
+#vsp tabline.vim.old5
+#vsp tabline.vim.old6
+#vsp tabline.vim.old7
+#vsp tabline.vim.old8
+#vsp tabline.vim.old9
+#vsp tabline.vim.old.10
+#vsp tabline.vim.old11
+#vsp tabline.vim
+
+
+
+#---------------------------------------------------------------------------------------------
+def CWord()
+  echo search('\%#[^[:keyword:]]*\k\+', 'bcn', line('.'))
+enddef
+com! CWord CWord()
+
+def VimHelp_OnBIF(): bool
+  return search('\%#[^[:keyword:]]*\k\+(', 'bcn', line('.')) != 0
+enddef
+def VimHelp_OnBIF_Test()
+  echo search('\%#[^[:keyword:]]*\k\+(', 'bcn', line('.'))
+enddef
+com! VimHelpOnBIF VimHelp_OnBIF_Test()
+
+def VimHelp_OnOpt(): bool
+  return search('\%#[^[:keyword:]]*&\%(l:\)\?\k\+', 'bcn', line('.')) != 0
+      || search('&\%#\%(l:\)\?\k\+', 'bcn', line('.')) != 0
+      || search('&\%(l\%#:\)\?\k\+', 'bcn', line('.')) != 0
+      || search('&\%(l:\)\?\%#\k\+', 'bcn', line('.')) != 0
+      || search('\<se\%[t[gl]]\>\s*\%#s*\k\+', 'bcn', line('.')) != 0
+enddef
+
+def VimHelp_OnOpt_Test()
+  echo search('\%#[^[:keyword:]]*&\%(l:\)\?\k\+', 'bcn', line('.'))
+  echo search('&\%#\%(l:\)\?\k\+', 'bcn', line('.'))
+  echo search('&\%(l\%#:\)\?\k\+', 'bcn', line('.'))
+  echo search('&\%(l:\)\?\%#\k\+', 'bcn', line('.'))
+  echo search('\<se\%[t[gl]]\>\s*\%#s*\k\+', 'bcn', line('.'))
+enddef
+com! VimHelpOnOpt VimHelp_OnOpt_Test()
+
+# &path
+
+#---------------------------------------------------------------------------------------------
+
+nnoremap <Leader>0 <Cmd>set relativenumber!<CR>
+
+def SwitchLineNumber()
+  if !&l:number && !&l:relativenumber
+    &l:number = 1
+  elseif &l:number && !&l:relativenumber
+    &l:number = 1
+    &l:relativenumber = 1
+  else
+    &l:number = 0
+    &l:relativenumber = 0
+  endif
+enddef
+
+# nnoremap <silent> <Leader># <ScriptCmd>SwitchLineNumber()<CR>
+com! -bar SwitchLineNumber SwitchLineNumber()
+
+
+#---------------------------------------------------------------------------------------------
+
+
+
+#---------------------------------------------------------------------------------------------
 
 
 
