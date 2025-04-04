@@ -101,8 +101,8 @@ nnoremap <buffer> >> <Cmd>exe 'cnewer' v:count1<CR>
 nnoremap <buffer> << <Cmd>exe 'colder' v:count1<CR>
 nnoremap <buffer> == <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
 nnoremap <buffer> s  <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
-nnoremap m <Cmd>chistory<CR>:<C-U>chistory<Space>
-nnoremap R <Cmd>chistory<CR>:<C-U>chistory<Space>
+nnoremap <buffer> m  <Cmd>chistory<CR>:<C-U>chistory<Space>
+nnoremap <buffer> R  <Cmd>chistory<CR>:<C-U>chistory<Space>
 
 
 
@@ -124,18 +124,55 @@ function Del_entry() range
   call add(history, copy(qf))
   let w:qf_history = history
   unlet! qf[a:firstline - 1 : a:lastline - 1]
+  let title = getqflist({'title': 0}).title
   " TODO noau がないと、FTloadが走る。
-  "      function <SNR>82_del_entry[6]..FileType Autocommands for "*"..function <SNR>12_LoadFTPlugin[18]..script C:\Users\U351376\vimfiles\ftplugin\qf.vim の処理中にエラーが検出されました:
+  "      function <SNR>82_del_entry[6]..FileType Autocommands for "*"..function <SNR>12_LoadFTPlugin[18]..script C:\Users\UserName\vimfiles\ftplugin\qf.vim の処理中にエラーが検出されました:
   "      行  121:
   " E127: 関数 <SNR>82_del_entry を再定義できません: 使用中です
-  noau call setqflist(qf, 'r')
+  noautocmd call setqflist(qf, 'r')
+  call setqflist([], 'r', {'title': title})
   execute a:firstline
 endfunction
-
 
 function Undo_entry()
   let history = get(w:, 'qf_history', [])
   if !empty(history)
-    call setqflist(remove(history, -1), 'r')
+    let title = getqflist({'title': 0}).title
+    " TODO noau がないと、FTloadが走る。
+    noautocmd call setqflist(remove(history, -1), 'r')
+    call setqflist([], 'r', {'title': title})
   endif
 endfunction
+
+function DelEntry() range
+  DelEntry_body(a:fi:firstline, a:lastline)
+endfunction
+
+def DelEntry_body(firstline: number, lastline: number)
+  var qf = getqflist()
+  var history = get(w:, 'qf_history', [])
+  history -> add(copy(qf))
+  w:qf_history = history
+  qf -> remove(firstline - 1, lastline - 1)
+  const title = getqflist({'title': 0}).title
+  # TODO noau がないと、FTloadが走る。
+  #      function <SNR>82_del_entry[6]..FileType Autocommands for "*"..function <SNR>12_LoadFTPlugin[18]..script C:\Users\UserName\vimfiles\ftplugin\qf.vim の処理中にエラーが検出されました:
+  #      行  121:
+  # E127: 関数 <SNR>82_del_entry を再定義できません: 使用中です
+  noautocmd setqflist(qf, 'r')
+  setqflist([], 'r', {'title': title})
+  execute ':' .. firstline
+enddef
+
+def UndoEntry()
+  var history = get(w:, 'qf_history', [])
+  if !empty(history)
+    const title = getqflist({'title': 0}).title
+    # TODO noau がないと、FTloadが走る。
+    noautocmd remove(history, -1) -> setqflist('r')
+    setqflist([], 'r', {'title': title})
+  endif
+enddef
+
+
+# TODO Locationlist
