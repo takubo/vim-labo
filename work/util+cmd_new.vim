@@ -41,17 +41,30 @@ com! WinNoWrap PushPosAll | exe 'windo set nowrap' | PopPosAll
 com! AllWrap   PushPosAll | exe 'windo set wrap'   | PopPosAll
 com! AllNoWrap PushPosAll | exe 'windo set nowrap' | PopPosAll
 
+# def GLLLL()
+#   PushPosAll
+#   wrap = !&l:wrap
+#   windo &l:wrap = wrap
+#   PopPosAll
+# enddef
+#
+# nnoremap <silent> gL <ScriptCmd>GLLLL()<CR>
+
 
 #----------------------------------------------------------------------------------------
 # Tempfile
-com! -bar -nargs=? ETempfile exe 'edit'      tempname() . (<q-args> =~ '^[^.]' ? '.' . <q-args> : <q-args>)
-com! -bar -nargs=? STempfile exe 'split'     tempname() . (<q-args> =~ '^[^.]' ? '.' . <q-args> : <q-args>)
-com! -bar -nargs=? VTempfile exe 'vsplit'    tempname() . (<q-args> =~ '^[^.]' ? '.' . <q-args> : <q-args>)
-com! -bar -nargs=? TTempfile exe 'tab split' tempname() . (<q-args> =~ '^[^.]' ? '.' . <q-args> : <q-args>)
+com! -bar -nargs=? ETempfile exe 'edit'      tempname() .. (<q-args> =~ '^[^.]' ? ('.' .. <q-args>) : <q-args>)
+com! -bar -nargs=? STempfile exe 'split'     tempname() .. (<q-args> =~ '^[^.]' ? ('.' .. <q-args>) : <q-args>)
+com! -bar -nargs=? VTempfile exe 'vsplit'    tempname() .. (<q-args> =~ '^[^.]' ? ('.' .. <q-args>) : <q-args>)
+com! -bar -nargs=? TTempfile exe 'tab split' tempname() .. (<q-args> =~ '^[^.]' ? ('.' .. <q-args>) : <q-args>)
 com! -bar -nargs=? Tempfile  STempfile <args>
 
 
 #----------------------------------------------------------------------------------------
+# 単語文字数
+
+com! WordLen echo len(expand('<cword>'))
+
 # 単語文字数自動表示
 augroup WordLen
   autocmd!
@@ -64,9 +77,118 @@ com! Utf8  setl fileencoding=UTF-8
 com! EucJp setl fileencoding=EUC-JP
 com! Cp932 setl fileencoding=CP932
 
+com! Unicode normal! g8
+
 
 #----------------------------------------------------------------------------------------
-# HighlightInfo
+# find
+
+#nnoremap : :<C-u>find<Space>
+#nnoremap <Leader>: :<C-u>find<Space>
+#nnoremap <Leader>g :<C-u>find<Space>
+#nnoremap <Leader>G :<C-u>sfind<Space>
+
+
+#----------------------------------------------------------------------------------------
+# " type は、"r"かそれ以外""
+# "exe "r!~/bin/matsub " . expand("#24:p") . " " . expand("#23:p")
+# function! Test0(type, cmd, ...)
+# 
+#   "let cmd = (a:type == 'r' ? a:type : '') . '!' . a:cmd
+#   let cmd = (a:type == 'r' ? a:type : '') . '!' . (a:cmd == '0' ? expand('%:p') : a:cmd)
+# 
+#   if a:0 == 0
+#     let cmd .= ' ' .  expand('%:p')
+#   else
+#     for i in a:000
+#       if i =~ '^\d\+$'
+#         let cmd .= ' ' . (i == 0 ? expand('%:p') : expand('#' . i . ':p'))
+#       else 
+#         let cmd .= ' ' . i
+#       endif
+#     endfor
+#   endif
+# 
+#   "echo cmd
+#   exe cmd
+# endfunction
+# 
+# " call Test0("r", "ls", 5, 8)
+# com! -nargs=* R call Test0('r', <f-args>)
+# com! -nargs=* P call Test0('n', <f-args>)
+
+
+#----------------------------------------------------------------------------------------
+# HighlightInfo TODO
+
+
+def GetSynId(transparent: number, col: number = col('.')): number
+  const synid = synID(line('.'), col, 1)
+  return transparent != 0 ? synIDtrans(synid) : synid
+enddef
+
+def GetSynName(synid: number): string
+  return synIDattr(synid, 'name')
+enddef
+
+
+# カーソル下のhighlight情報を表示する
+def HighlightInfoShow()
+  var old = ''
+  var i = 0
+
+  while true
+    const syn_name = GetSynId(i) -> GetSynName()
+
+    if old == syn_name
+      break
+    endif
+
+    execute 'highlight' syn_name
+
+    old = syn_name
+    i += 1
+  endwhile
+enddef
+
+command! HighlightInfoShow HighlightInfoShow()
+
+
+# 返り値
+#   ・カーソルがコメント列の上なら、-1
+#   ・カーソルが文字列の上なら、1
+#   ・その他なら、0
+export def GetHighlightInfo(col: number = col('.'), off: number = 0, show: bool = false): number
+  var old = ''
+  var i = 0
+
+  while true
+    const syn_name = GetSynId(i, col + off) -> GetSynName()
+
+    if old == syn_name | break | endif
+
+    if show
+      execute 'highlight' syn_name
+    endif
+
+    if syn_name =~? 'comment' | return -1 | endif  # Block Comment
+    if syn_name =~? 'string'  | return  1 | endif  # String
+
+    old = syn_name
+    i += 1
+  endwhile
+
+  return 0
+enddef
+
+# command! HighlightInfo echo GetHighlightInfo()
+
+
+# def HighlightInfoLight()
+#     execute 'highlight' GetSynName(GetSynId(0))
+#     execute 'highlight' GetSynName(GetSynId(1))
+#     execute 'highlight' GetSynName(GetSynId(2))
+# enddef
 
 
 #----------------------------------------------------------------------------------------
@@ -200,6 +322,46 @@ def InsertIncludeGurd()
 enddef
 
 com! -nargs=0 -bar InsertIncludeGurd call InsertIncludeGurd()
+
+
+#----------------------------------------------------------------------------------------
+# CheckPath
+
+# #com! -nargs=? CheckIncludes CommnadOutputCapture checkpath! | normal! /<args><CR>
+# com! -nargs=? CheckIncludes CommnadOutputCapture checkpath! | call feedkeys('/<args><CR>', 'n')
+# com! -nargs=? CheckPath     CommnadOutputCapture checkpath! | call feedkeys('/<args><CR>', 'n')
+
+
+#----------------------------------------------------------------------------------------
+# IncSubstitude
+
+# function! IncSubstitude(...)
+#   echo a:000 a:0 a:1 a:2 a:3
+#   normal! gg
+#   for i in range(1, a:2)
+#     normal! n
+#     "echo i
+#     "exe 'normal! ' . '/' . a:1
+#     let s = 's/' . a:1 . '/' . printf(a:3, i) . '/'
+#     "echo s
+#     exe s
+#     "red
+#     "sleep 0.5
+#   endfor
+# endfunction
+#
+# com! -nargs=* IncSubstitude call IncSubstitude('@', <f-args>)
+# "IncSubstitude 15 【テストケース%d】
+
+
+#----------------------------------------------------------------------------------------
+#func! s:func_copy_cmd_output(cmd)
+#  redir @*>
+#  silent execute a:cmd
+#  redir END
+#endfunc
+#
+#command! -nargs=1 -complete=command CopyCmdOutput call <SID>func_copy_cmd_output(<q-args>)
 
 
 #----------------------------------------------------------------------------------------
