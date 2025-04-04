@@ -3,14 +3,9 @@ vim9script
 scriptencoding utf-8
 
 
-
-#---------------------------------------------------------------------------------------------
-# Initialize
-#---------------------------------------------------------------------------------------------
-
-
 #---------------------------------------------------------------------------------------------
 # Leader
+
 legacy let mapleader = "\<Space>"
 
 # Leader(Space)の空打ちで、カーソルが一つ進むのが鬱陶しいので。
@@ -18,21 +13,7 @@ nnoremap <Leader> <Nop>
 
 
 #---------------------------------------------------------------------------------------------
-# 無名バッファなら、pwd。そうでなければ、保存。
-nnoremap <expr> <silent> <Leader>w bufname() == '' ? '<Cmd>pwd<CR>' : '<Cmd>update<CR>'
-
-
-#---------------------------------------------------------------------------------------------
-# Basic
-noremap ; :
-
-# ; を連続で押してしまったとき用。
-cnoremap <expr> ; getcmdline() =~# '^:*$' ? ':' : ';'
-cnoremap <expr> : getcmdline() =~# '^:*$' ? ';' : ':'
-
-nnoremap Y y$
-
-# nnoremap ' "
+# Invalidate
 
 nnoremap <silent> ZZ <Nop>
 nnoremap <silent> ZQ <Nop>
@@ -40,89 +21,235 @@ nnoremap <silent> ZQ <Nop>
 # IME状態の切り替えをさせない。
 inoremap <C-^> <Nop>
 
+
+#---------------------------------------------------------------------------------------------
+# Basic
+
+nnoremap Y y$
+
+#nnoremap ; :
+#nnoremap ; <Cmd>hi CursorLineNr guibg=#d0c589 guifg=#222222 gui=NONE<CR><Cmd>redraw<CR>:
+nnoremap ; <Cmd>hi CursorLineNr guifg=#b8d3ef guibg=#4444ee gui=NONE<CR><Cmd>redraw<CR>:
+
+# ; を連続で押してしまったとき用。
+cnoremap <expr> ; ((getcmdtype()  == ':') && (getcmdline() =~# '^:*$')) ? ':' : ';'
+#cnoremap <expr> : ((getcmdtype()  == ':') && (getcmdline() =~# '^:*$')) ? ';' : ':'
+
 nnoremap gcc 0cc
 nnoremap gC  0cc
-#nnoremap gA S
+nnoremap gA  S
+
+
+nnoremap ' "
+vnoremap ' "
+
+nnoremap '' "0
+vnoremap '' "0
+
+nnoremap " '
+vnoremap " '
+
+nnoremap ` m
+vnoremap ` m
 
 
 #---------------------------------------------------------------------------------------------
-nnoremap <silent> <C-o> o<Esc>
+# EscEsc
+
+# 'noh'は自動コマンド内では(事実上)実行出来ないので、別途実行の要あり。
+# TODO  doautocmd nomodeline User
+# コマンドラインモードへの出入りを行うことで、iminsert(or imcmdline?)の効果で、IMEがOFFされる。
+nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR><Cmd>normal! :<lt>Esc><CR>
+nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR>:<Esc>
+
+
+#---------------------------------------------------------------------------------------------
+# 保存
+
+# 無名バッファなら、pwd。そうでなければ、保存。
+nnoremap <expr> <silent> <Leader>w bufname() == '' ? '<Cmd>pwd<CR>' : '<Cmd>update<CR>'
+#
+#nmap <silent> <Leader>e <Leader>w
+
+
+#---------------------------------------------------------------------------------------------
+# Line Number
+
+set number relativenumber
+
+nnoremap <Leader>0 <Cmd>set relativenumber!<CR>
+
+def SwitchLineNumber()
+  if !&l:number && !&l:relativenumber
+    &l:number = 1
+  elseif &l:number && !&l:relativenumber
+    &l:number = 1
+    &l:relativenumber = 1
+  else
+    &l:number = 0
+    &l:relativenumber = 0
+  endif
+enddef
+
+com! -bar SwitchLineNumber SwitchLineNumber()  # TODO
+
+
+#---------------------------------------------------------------------------------------------
+# 空行の挿入
+
+nnoremap <C-O> O<Esc>
+
+# TODO
+nnoremap go o<Esc>
+nnoremap gO O<Esc>
 #nnoremap <silent> <C-o> :<C-u>call append(expand('.'), '')<CR>j
 
 
 #---------------------------------------------------------------------------------------------
-nnoremap g4 g$
-nnoremap g6 g^
+# Undo Redo
 
-nnoremap ]3 ]#
-nnoremap [3 [#
-
-nnoremap ]8 ]*
-nnoremap [8 [*
-
-
-#---------------------------------------------------------------------------------------------
-def SwitchLineNumber()
-  if !&l:number && !&l:relativenumber
-    &l:number = true
-  elseif &l:number && !&l:relativenumber
-    &l:relativenumber = true
-  else
-    &l:number = false
-    &l:relativenumber = false
-  endif
-enddef
-nnoremap <silent> <Leader># <ScriptCmd>SwitchLineNumber()<CR>
+call submode#enter_with('undo/redo', 'n', '', 'g-', 'g-')
+call submode#enter_with('undo/redo', 'n', '', 'g+', 'g+')
+call submode#map(       'undo/redo', 'n', '',  '-', 'g-')
+call submode#map(       'undo/redo', 'n', '',  '+', 'g+')
 
 
 #---------------------------------------------------------------------------------------------
 # MRU
-nnoremap <Space>o :<C-u>MRU<Space>
+
+nnoremap <Space>o <Cmd>MRU<Space>
 
 
 #---------------------------------------------------------------------------------------------
-# Undo Redo
-call submode#enter_with('undo/redo', 'n', '', 'g-', 'g-')
-call submode#enter_with('undo/redo', 'n', '', 'g+', 'g+')
-call submode#map(       'undo/redo', 'n', '', '-',  'g-')
-call submode#map(       'undo/redo', 'n', '', '+',  'g+')
+# コメント行の前後の新規行の自動コメント化
+
+# 自動コメント化のON/OFF
+com! -bang RO {
+    if &formatoptions =~# 'o' || <bang>false
+      set formatoptions-=o formatoptions-=r
+    else
+      set formatoptions+=o formatoptions+=r
+    endif
+    echo &formatoptions
+  }
+
+nnoremap <Leader># <Cmd>RO<CR>
 
 
 #---------------------------------------------------------------------------------------------
-# コメント行の後の新規行の自動コメント化のON/OFF
-#nnoremap <expr> <Leader>@
-#      \ &formatoptions =~# 'o' ?
-#      \ ':<C-u>set formatoptions-=o<CR>:set formatoptions-=r<CR>' :
-#      \ ':<C-u>set formatoptions+=o<CR>:set formatoptions+=r<CR>'
+# ge
+
+submode#enter_with('word_move_ge', 'nvo', '', 'ge', 'ge')
+submode#map(       'word_move_ge', 'nvo', '',  'e', 'ge')
+submode#map(       'word_move_ge', 'nvo', '',  'E',  'e')
+submode#map(       'word_move_ge', 'nvo', '',  'w',  'w')
+submode#map(       'word_move_ge', 'nvo', '',  'b',  'b')
 
 
 #---------------------------------------------------------------------------------------------
-# TODO
-#nmap <silent> W <Plug>CamelCaseMotion_w
-#nmap <silent> B <Plug>CamelCaseMotion_b
-#if 0
-#  noremap E ge
-#  map <silent> ge <Plug>CamelCaseMotion_e
-#  map <silent> gE <Plug>CamelCaseMotion_ge
-#elseif 1
-#  map E  <Plug>CamelCaseMotion_e
-#  map gE <Plug>CamelCaseMotion_ge
-#else
-#  map E  <Plug>CamelCaseMotion_e
-#  map gE <Plug>CamelCaseMotion_ge
-#
-#  call submode#enter_with('ge', 'nvo', '', 'ge', 'ge')
-#  call submode#map(       'ge', 'nvo', '', 'e',  'ge')
-#  call submode#map(       'ge', 'nvo', '', 'E',  'e')
-#  call submode#enter_with('gE', 'nvo', 'r', 'gE', '<Plug>CamelCaseMotion_ge')
-#  call submode#map(       'gE', 'nvo', 'r', 'E',  '<Plug>CamelCaseMotion_ge')
-#  call submode#map(       'gE', 'nvo', 'r', 'e',  '<Plug>CamelCaseMotion_e')
-#endif
+# ge
+
+map <silent> W  <Plug>CamelCaseMotion_w
+map <silent> B  <Plug>CamelCaseMotion_b
+map <silent> E  <Plug>CamelCaseMotion_e
+sunmap W
+sunmap B
+sunmap E
+
+
+#---------------------------------------------------------------------------------------------
+# Case Motion
+
+submode#enter_with('CaseMotion_gE', 'nvo', 'r', 'gE', '<Plug>CamelCaseMotion_ge')
+submode#map(       'CaseMotion_gE', 'nvo', 'r',  'E', '<Plug>CamelCaseMotion_ge')
+submode#map(       'CaseMotion_gE', 'nvo', 'r',  'e', '<Plug>CamelCaseMotion_e')
+submode#map(       'CaseMotion_ge', 'nvo', '',   'W', 'W')
+submode#map(       'CaseMotion_ge', 'nvo', '',   'B', 'B')
+submode#map(       'CaseMotion_ge', 'nvo', '',   'w', 'w')
+submode#map(       'CaseMotion_ge', 'nvo', '',   'b', 'b')
+
+
+#---------------------------------------------------------------------------------------------
+# Short Cut
+
+nnoremap <silent> <Leader>r <Cmd>setl readonly!<CR>
+nnoremap <silent> <Leader>R <Cmd>exe 'setl' &l:modifiable ? 'readonly nomodifiable' : 'modifiable'<CR>
+com! AR setl autoread!
+
+# is key word
+nnoremap <silent> + <Cmd>echo '++ ' <Bar> exe 'setl isk+=' .. GetKeyEcho()<CR>
+nnoremap <silent> - <Cmd>echo '-- ' <Bar> exe 'setl isk-=' .. GetKeyEcho()<CR>
+
+# scrollbind
+nnoremap <Leader>$ <Cmd>setl scrollbind!<CR>
+
+
+#---------------------------------------------------------------------------------------------
+# Browsing
+
+set jumpoptions=stack
+
+# 進む
+nnoremap <C-p> <C-O><Cmd>CursorJumped<CR>
+# 戻る
+nnoremap <C-n> <C-I><Cmd>CursorJumped<CR>
+
+#nnoremap <BS><C-p> <Plug>(MyVimrc-Window-AutoSplit)<C-O>
+#nnoremap <BS><C-n> <Plug>(MyVimrc-Window-AutoSplit)<C-I>
+
+# 変更リスト
+nnoremap <silent> <C-]> g;<Cmd>CursorJumped<CR>
+nnoremap <silent> <C-\> g,<Cmd>CursorJumped<CR>
+
+
+#---------------------------------------------------------------------------------------------
+# Swap_Exists
+
+var swap_select = true
+
+augroup MyVimrc_SwapExists
+  au!
+  au SwapExists * if !swap_select | v:swapchoice = 'o' | endif
+augroup END
+
+com! SwapSelect {
+      swap_select = true
+      edit %
+      swap_select = false
+    }
+
+
+#---------------------------------------------------------------------------------------------
+# Folding
+
+
+# 折り畳みトグル (現在行)
+#com! ToggleFold if foldclosed(line('.')) != -1 | foldopen | else | foldclose | endif
+
+
+# 折り畳みトグル (ファイル)
+#def ToggleFolding()
+#  normal! zi
+#  if &l:foldenable
+#    normal! zM
+#  endif
+#enddef
+#nnoremap zi <Cmd><SID>ToggleFolding()<CR>
+#nnoremap ZZ zi
+
+
+# Move to Hunk
+#nnoremap ]z <Cmd>try <Bar> exe 'normal! ]z' <Bar> catch exe 'normal! zj' <Bar> endtry<CR>
+#nnoremap [z <Cmd>try <Bar> exe 'normal! [z' <Bar> catch exe 'normal! zk' <Bar> endtry<CR>
+nnoremap ]z zj
+nnoremap [z zk
+
 
 
 #---------------------------------------------------------------------------------------------
 # Insert Mode Mappings
 #---------------------------------------------------------------------------------------------
+
 
 #---------------------------------------------------------------------------------------------
 # 全角括弧
@@ -130,13 +257,16 @@ inoremap (( （
 inoremap )) ）
 
 
+
 #---------------------------------------------------------------------------------------------
 # Command Line Mappings
 #---------------------------------------------------------------------------------------------
 
+
 #---------------------------------------------------------------------------------------------
 # Emacs
 # コマンドラインでのキーバインドを Emacs スタイルにする
+
 # 行頭へ移動
 cnoremap <C-a>	<Home>
 # 一文字戻る
@@ -160,14 +290,41 @@ cnoremap <A-b>	<S-Left>
 # 単語削除
 #cnoremap <A-d>	TODO
 
+
 #---------------------------------------------------------------------------------------------
 # コマンドラインで、"<Space>"を入力しやすくする。
 cnoremap <expr> <C-V><Space> "<lt>Space>"
 
+
+
 #---------------------------------------------------------------------------------------------
-# 検索時に/, ?を楽に入力する
+# Search & Regex
+#---------------------------------------------------------------------------------------------
+
+
+#---------------------------------------------------------------------------------------------
+# /, ?を楽に入力する
 cnoremap <expr> / getcmdtype() == '/' ? '\/' : '/'
 cnoremap <expr> ? getcmdtype() == '?' ? '\?' : '?'
+
+
+#---------------------------------------------------------------------------------------------
+# 単語検索にする
+#cnoremap <C-O> <C-\>e(getcmdtype() == '/' <Bar><Bar> getcmdtype() == '?') ? '\<' .. getcmdline() .. '\>' : getcmdline()<CR><Left><Left>
+cnoremap <Plug>(Cmap-C-O-S) <C-\>e(getcmdtype() == '/' <Bar><Bar> getcmdtype() == '?') ? '\<' .. getcmdline() .. '\>' : getcmdline()<CR><Left><Left>
+
+#---------------------------------------------------------------------------------------------
+# CommnadOutputCapture 付きで実行する
+cnoremap <Plug>(Cmap-C-O-C) <C-\>e(getcmdtype() == ':'                               ) ? 'CC ' .. getcmdline() : getcmdline()<CR><End>
+cnoremap <Plug>(Cmap-C-O-X) <C-\>e(getcmdtype() == ':'                               ) ? 'CommnadOutputCapture ' .. getcmdline() : getcmdline()<CR><End><CR>
+cnoremap <Plug>(Cmap-C-O-V) <C-\>e(getcmdtype() == ':'                               ) ? 'verbose ' .. getcmdline() : getcmdline()<CR><End>
+
+#---------------------------------------------------------------------------------------------
+# Unified c_Ctrl-O
+cnoremap <C-O> <Plug>(Cmap-C-O-S)<Plug>(Cmap-C-O-X)
+cnoremap <C-J> <Plug>(Cmap-C-O-X)
+cnoremap <C-G> <Plug>(Cmap-C-O-V)
+
 
 #---------------------------------------------------------------------------------------------
 # 正規表現のメタ文字を楽に入力する
@@ -177,162 +334,118 @@ cnoremap << \<
 cnoremap >> \>
 cnoremap <Bar><Bar> \<Bar>
 
-#---------------------------------------------------------------------------------------------
-# 正規表現 (肯|否)定(先|後)読み
-# cnoremap <C-@>! \%()\@<!<Left><Left><Left><Left><Left>
-# cnoremap <C-@>@ \%()\@<=<Left><Left><Left><Left><Left>
-# cnoremap <C-@># \%()\@=<Left><Left><Left><Left>
-# cnoremap <C-@>$ \%()\@!<Left><Left><Left><Left>
 
 #---------------------------------------------------------------------------------------------
-# 単語検索にする
-cnoremap <C-o> <C-\>e(getcmdtype() == '/' <Bar><Bar> getcmdtype() == '?') ? '\<' .. getcmdline() .. '\>' : getcmdline()<CR><Left><Left>
+# 正規表現 (肯|否)定(先|後)読み
+noremap! <C-@>! \%()\@<!<Left><Left><Left><Left><Left>
+noremap! <C-@>@ \%()\@<=<Left><Left><Left><Left><Left>
+noremap! <C-@># \%()\@=<Left><Left><Left><Left>
+noremap! <C-@>$ \%()\@!<Left><Left><Left><Left>
+
+
+#---------------------------------------------------------------------------------------------
+# スペースへの色付け
+# TODO nbsp
+highlight ZenkakuSpace guibg=#337733 guifg=#eeeeee cterm=underline ctermfg=lightblue
+highlight ZenkakuSpace guibg=#433387 guifg=#eeeeee cterm=underline ctermfg=lightblue
+syntax match ZenkakuSpace /　/
+augroup MyVimrc_ZenkakuSpace
+  au!
+  au BufNewFile,BufRead * match ZenkakuSpace /　/
+ #au BufNewFile,BufRead * matchadd(ZenkakuSpace, '　')
+  au BufNew,BufNewFile,BufRead * syntax match ZenkakuSpace /　/
+augroup end
+
+
+#---------------------------------------------------------------------------------------------
+# TBC
+
+nnoremap <C-O> <C-L>
+
+
+nnoremap <silent> gl           <Cmd>setl nowrap!<CR>
+nnoremap <silent> <Leader><CR> <Cmd>setl nowrap!<CR>
+
+
+nnoremap <silent> gf <Plug>(MyVimrc-Window-AutoSplit)gF
+
+
+noremap! <C-R><C-R> <C-R><C-R>*
+
+cnoremap <C-X><CR> <Home>echo<Space><CR>
+
+cnoremap <C-X><C-X> <Home>verbose<Space><End>
+
+
+nnoremap <silent> g<C-o> :<C-u>pwd
+         \ <Bar> echon '        ' &fileencoding '  ' &fileformat '  ' &filetype '    ' printf('L %d  C %d  %3.2f %%  TL %3d', line('.'), col('.'), line('.') * 100.0 / line('$'), line('$'))
+         \ <Bar> echo expand('%:ph')<CR>
+
+
+#---------------------------------------------------------------------------------------------
+# TBC 2
+
+#set whichwrap+=hl
+
+# parent directory
+cnoremap <expr> <C-t> getcmdtype() == ':' ? '../' : '<C-t>'
+cnoremap <expr> <C-^> getcmdtype() == ':' ? '../' : '<C-^>'
+
+# select function
+cnoremap <expr> <C-t> getcmdtype() == ':' ? '../' : '<C-t>'
+vnoremap af ][<ESC>V[[
+vnoremap if ][k<ESC>V[[j
+
+# paste register
+noremap! <C-r><C-r> <C-r><C-r>*
+
+
+#---------------------------------------------------------------------------------------------
+# Command Line WildMenu TBD
+
+#set wildchar=<C-j>
+
+cnoremap <C-G> <Tab>
+cnoremap <C-J> <Tab>
+cnoremap <C-K> <S-Tab>
+
+# cnoremap <C-L> <C-D>
+# cnoremap <C-J> <C-D>
+
+
+#---------------------------------------------------------------------------------------------
+# TBC 3
+
+inoremap <C-F> <C-P>
+inoremap <C-J> <C-N>
+
+inoremap <C-F> <Right>
+inoremap <C-B> <Left>
+inoremap <C-A> <Home>
+inoremap <C-E> <End>
+
+#inoremap <CR> <C-]><C-G>u<CR>
+#inoremap <C-H> <C-G>u<C-H>
+
+
 
 
 finish
 
 
 
-nnoremap ' "
-vnoremap ' "
-nnoremap '' "0
-vnoremap '' "0
 
-nnoremap " '
-vnoremap " '
-nnoremap ` m
-vnoremap ` m
+#---------------------------------------------------------------------------------------------
 
+nnoremap ]3 ]#
+nnoremap [3 [#
+
+nnoremap ]8 ]*
+nnoremap [8 [*
 
 
-" Basic {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-
-cnoremap <expr> <C-t> getcmdtype() == ':' ? '../' : '<C-t>'
-cnoremap <expr> <C-^> getcmdtype() == ':' ? '../' : '<C-^>'
-
-
-nmap <Leader>2 <Leader>@
-nmap <Leader>3 <Leader>#
-
-
-vnoremap af ][<ESC>V[[
-vnoremap if ][k<ESC>V[[j
-
-
-nnoremap <silent> +  :echo '++ ' <Bar> exe 'setl isk+=' . GetKeyEcho()<CR>
-nnoremap <silent> -  :echo '-- ' <Bar> exe 'setl isk-=' . GetKeyEcho()<CR>
-nnoremap <silent> z+ :exe 'setl isk+=' . substitute(input('isk++ '), '.\($\)\@!', '&,', 'g')<CR>
-nnoremap <silent> z- :exe 'setl isk-=' . substitute(input('isk-- '), '.\($\)\@!', '&,', 'g')<CR>
-nnoremap <silent> z= :exe 'setl isk+=' . substitute(input('isk++ '), '.\($\)\@!', '&,', 'g')<CR>
-
-" Basic }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-
-" EscEsc {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-
-nmap <Esc><Esc> <Plug>(EscEsc)
-
-if !exists('s:EscEsc_Add_Done')
-  " おかしくなったときにEscEscで復帰できるように、念のためforceをTrueにして呼び出す。
-  call EscEsc_Add('call RestoreDefaultStatusline(v:true)')
-  call EscEsc_Add('call clever_f#reset()')
-endif
-"let s:EscEsc_Add_Done = v:true
-
-" EscEsc }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-
-" Other Key-Maps {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-
-nnoremap <leader>w :<C-u>w<CR>
-nnoremap <silent> <leader>w :<C-u>update<CR>
-"nnoremap <silent> <expr> <leader>w ':<C-u>' . (bufname('')=='' ? 'write' : 'update') . '<CR>'
-"nnoremap <silent> <Leader>e :update<CR>
-nmap <silent> <Leader>e <Leader>w
-
-nnoremap <silent> <expr> <Leader>r &l:readonly ? ':<C-u>setl noreadonly<CR>' : ':<C-u>setl readonly<CR>'
-nnoremap <silent> <expr> <Leader>R &l:modifiable ? ':<C-u>setl nomodifiable <BAR> setl readonly<CR>' : ':<C-u>setl modifiable<CR>'
-nnoremap <leader>L :<C-u>echo len("<C-r><C-w>")<CR>
-nnoremap <silent> yx :PushPos<CR>ggyG:PopPos<CR> | ":echo "All lines yanked."<CR>
-
-"nnoremap <silent> <C-o> :<C-u>exe (g:alt_stl_time > 0 ? '' : 'normal! <C-l>')
-"                      \ <Bar> let g:alt_stl_time = 12
-nnoremap <silent> g<C-o> :<C-u>pwd
-                      \ <Bar> echon '        ' &fileencoding '  ' &fileformat '  ' &filetype '    ' printf('L %d  C %d  %3.2f %%  TL %3d', line('.'), col('.'), line('.') * 100.0 / line('$'), line('$'))
-                      \ <Bar> call SetAltStatusline('%#hl_buf_name_stl#  %F', 'g', 10000)<CR>
-
-
-"nnoremap <C-Tab> <C-w>p
-inoremap <C-f> <C-p>
-inoremap <C-e>	<End>
-"inoremap <CR> <C-]><C-G>u<CR>
-inoremap <C-H> <C-G>u<C-H>
-
-nnoremap <silent> gl :setl nowrap!<CR>
-nnoremap <silent> <Leader><CR> :setl nowrap!<CR>
-
-nnoremap gG G
-
-nnoremap <silent> gf :<C-u>aboveleft sp<CR>gF
-
-nnoremap <Plug>(Normal-gF) gF
-nmap <silent> gf <Plug>(MyVimrc-Window-AutoSplit)<Plug>(Normal-gF)
-
-" Other Key-Maps }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-
-nnoremap <Leader>$ :<C-u>setl scrollbind!<CR>
-nmap <Leader>4 <Leader>$
-
-
-"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if 0
-  nnoremap <C-i> g;
-  nnoremap <C-o> g,
-
-  nmap ' \
-
-  set whichwrap+=hl
-endif
-"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-"cmap <C-j> <Tab>
-"cmap <C-k> <S-Tab>
-"set wildchar=<C-j>
-
-
-cnoremap <C-l> <C-d>
-cnoremap <C-j> <C-d>
-" cunmap <C-d>
-cnoremap <C-j> <C-d>
-cnoremap <C-k> <S-Tab>
-
-
-"highlight ZenkakuSpace cterm=underline ctermfg=lightblue guibg=#ffffff
-highlight ZenkakuSpace cterm=underline ctermfg=lightblue guibg=#333377
-augroup MyVimrc_ZenkakuSpace
-  au!
-  au BufNewFile,BufRead * match ZenkakuSpace /　/
-augroup end
-
-
-cnoremap <C-r><C-t> <C-r><C-r>*
-cnoremap <C-r><C-r> <C-r><C-r>*
-inoremap <C-r><C-r> <C-r><C-r>*
-
-
-" Fold {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-
-
-nnoremap ]z :try <Bar> exe 'normal! ]z' <Bar> catch exe 'normal! zj' <Bar> endtry<CR>
-
-com! ToggleFold if foldclosed(line('.')) != -1 | foldopen | else | foldclose | endif
-
-" Fold }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-
-" 折り畳みトグル
-function! Toggle_folding()
+# 折り畳みトグル
+def ToggleFolding()
   for i in range(1, line('$'))
     if foldclosed(i) != -1
       normal! zR
@@ -341,18 +454,18 @@ function! Toggle_folding()
     endif
   endfor
   normal! zM
-  "echo "folding close"
+  #echo "folding close"
   return
 endfunction
-nnoremap ZZ :<C-u>call Toggle_folding()<CR>
 
 
-" 折り畳みトグル
-function! Toggle_folding()
-  normal! zi
-  if &l:foldenable
-    normal! zM
-  endif
-  return
-endfunction
-nnoremap zi :<C-u>call Toggle_folding()<CR>
+nnoremap <C-@> g-
+nnoremap <C-^> g+
+
+
+nnoremap <silent> z+ :exe 'setl isk+=' . substitute(input('isk++ '), '.\($\)\@!', '&,', 'g')<CR>
+nnoremap <silent> z- :exe 'setl isk-=' . substitute(input('isk-- '), '.\($\)\@!', '&,', 'g')<CR>
+nnoremap <silent> z= :exe 'setl isk+=' . substitute(input('isk++ '), '.\($\)\@!', '&,', 'g')<CR>
+
+
+nnoremap <C-Tab> <C-w>p
