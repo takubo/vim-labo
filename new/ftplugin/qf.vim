@@ -21,12 +21,13 @@ b:undo_ftplugin = "set stl<"
 #setlocal stl=%t%{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}\ %#StlFill#%=%##\ %-15(%3l,\ %3c%3V%)\ %P\ 
 #let &l:stl = " %t %#StlGoldChar# [%{exists('w:quickfix_title')? w:quickfix_title : ''}] %#StlFill#%=%## %-15(%3l, %3c%3V%) %p%% %P [%4L] "
 
-def QfStl(): string
+def g:QfStl(): string
   const prop = getqflist({'all': 0})
 
   var stl = ''
 
-  stl ..= " %t %#StlGoldChar# [%{exists('w:quickfix_title')? w:quickfix_title : ''}] "
+ #stl ..= " %t %#StlGoldChar# [%{exists('w:quickfix_title')? w:quickfix_title : ''}] "
+  stl ..= " %t %#StlGoldChar# [ " .. prop.title .. " ] "
 
   stl ..= ' %7(cur:' .. prop.idx .. '%) '
   stl ..= ' %10(total:' .. prop.size .. '%) '
@@ -57,7 +58,7 @@ setlocal stl=%!QfStl()
 
 
 #---------------------------------------------------------------------------------------------
-# Jump
+# View
 nnoremap <buffer>      <CR> <CR><Cmd>CursorJumped<CR>
 nnoremap <buffer> <C-W><CR> <CR><Cmd>CursorJumped<CR>
 
@@ -94,11 +95,16 @@ endif
 
 
 #---------------------------------------------------------------------------------------------
-# Stack
+# History Stack
 # TODO LL未対応
 nnoremap <buffer> >> <Cmd>exe 'cnewer' v:count1<CR>
 nnoremap <buffer> << <Cmd>exe 'colder' v:count1<CR>
 nnoremap <buffer> == <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
+nnoremap <buffer> s  <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
+nnoremap m <Cmd>chistory<CR>:<C-U>chistory<Space>
+nnoremap R <Cmd>chistory<CR>:<C-U>chistory<Space>
+
+
 
 #---------------------------------------------------------------------------------------------
 # Edit
