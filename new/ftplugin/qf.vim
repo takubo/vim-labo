@@ -4,7 +4,7 @@ scriptencoding utf-8
 
 
 if exists("b:did_ftplugin")
-  # finish
+  finish
 endif
 
 # Don't load another plugin for this buffer
@@ -43,6 +43,8 @@ def g:QfStl(): string
   const stack_max = getqflist({'nr': '$'}).nr
  #stl ..= ' 《stack:' .. prop.nr .. '/' .. stack_max .. '》 '
   stl ..= ' 《stack:' .. (stack_max - prop.nr + 1) .. '/' .. stack_max .. '》 '
+
+  stl ..= '%#StlNoNameDir# ' .. prop.context .. ' '
 
   stl ..= '%#StlNoNameDir# ' .. getcwd() .. ' '
 
@@ -109,43 +111,17 @@ nnoremap <buffer> R  <Cmd>chistory<CR>:<C-U>chistory<Space>
 #---------------------------------------------------------------------------------------------
 # Edit
 
-nnoremap <silent> <buffer> dd <ScriptCmd>Del_entry()<CR>
-nnoremap <silent> <buffer>  x <ScriptCmd>Del_entry()<CR>
+nnoremap <silent> <buffer> dd <ScriptCmd>DelEntry()<CR>
+nnoremap <silent> <buffer>  x <ScriptCmd>DelEntry()<CR>
 
-vnoremap <silent> <buffer>  d :call <SID>Del_entry()<CR>
-vnoremap <silent> <buffer>  x :call <SID>Del_entry()<CR>
+vnoremap <silent> <buffer>  d :call <SID>DelEntry()<CR>
+vnoremap <silent> <buffer>  x :call <SID>DelEntry()<CR>
 
-nnoremap <silent> <buffer>  u <ScriptCmd>Undo_entry()<CR>
+nnoremap <silent> <buffer>  u <ScriptCmd>UndoEntry()<CR>
 
-
-function Del_entry() range
-  let qf = getqflist()
-  let history = get(w:, 'qf_history', [])
-  call add(history, copy(qf))
-  let w:qf_history = history
-  unlet! qf[a:firstline - 1 : a:lastline - 1]
-  let title = getqflist({'title': 0}).title
-  " TODO noau がないと、FTloadが走る。
-  "      function <SNR>82_del_entry[6]..FileType Autocommands for "*"..function <SNR>12_LoadFTPlugin[18]..script C:\Users\UserName\vimfiles\ftplugin\qf.vim の処理中にエラーが検出されました:
-  "      行  121:
-  " E127: 関数 <SNR>82_del_entry を再定義できません: 使用中です
-  noautocmd call setqflist(qf, 'r')
-  call setqflist([], 'r', {'title': title})
-  execute a:firstline
-endfunction
-
-function Undo_entry()
-  let history = get(w:, 'qf_history', [])
-  if !empty(history)
-    let title = getqflist({'title': 0}).title
-    " TODO noau がないと、FTloadが走る。
-    noautocmd call setqflist(remove(history, -1), 'r')
-    call setqflist([], 'r', {'title': title})
-  endif
-endfunction
 
 function DelEntry() range
-  DelEntry_body(a:fi:firstline, a:lastline)
+  call <SID>DelEntry_body(a:firstline, a:lastline)
 endfunction
 
 def DelEntry_body(firstline: number, lastline: number)
