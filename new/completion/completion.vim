@@ -166,5 +166,6 @@ enddef
 # ファイル名補完
 
 inoremap <C-F> <C-X><C-F>
+inoremap <C-T> <C-X><C-F>
 # プロジェクトルートに移動してから補完
 inoremap <expr> <C-K> '<Cmd>cd ' .. GetPrjRoot() .. '\<CR>' .. '<C-X><C-F>'
