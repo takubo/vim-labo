@@ -13,7 +13,7 @@ var TablineContentsSwitch = {
   'TabLabel':    true,
   'Time':        true,
   'TimeSecond': false,
-# Tab Label
+  # Tab Label
   'Bufname':     true,
   'Modified':   false,
   'Path':       false,
@@ -27,7 +27,8 @@ var TablineContentsSwitch = {
 def! g:TabLine(): string
   const contents_switch = TablineContentsSwitch
 
-  const gold = g:IsGold()
+  #const gold = g:IsGold()
+  const gold = !exists('g:RimpaGold') || g:RimpaGold
 
 
   # ------------------------------------------------------------------------
@@ -69,13 +70,13 @@ def! g:TabLine(): string
   var right: string
 
   # Current Function Name
-  #? if contents_switch.FuncName
-  #?   right ..= "%#StlFuncName#"
-  #?   right ..= "%#TabLine#"
-  #?
-  #?   right ..= "  %{ cfi#format('%s()', '[--]') }  "
-  #?   #right ..= " %{ FuncName() }"
-  #? endif
+  # if contents_switch.FuncName
+  #   right ..= "%#StlFuncName#"
+  #   right ..= "%#TabLine#"
+  #
+  #   right ..= "  %{ cfi#format('%s()', '[--]') }  "
+  #   #right ..= " %{ FuncName() }"
+  # endif
 
   right ..= "%#TblDate#    "
 
@@ -91,95 +92,87 @@ def! g:TabLine(): string
   # Tab Pages
   var tabpages: string
 
-  if contents_switch.TabLabel
-
-    # ----------------------------------------------------------------------
-    # Tab Separater
-    #const sep = '%#TabLineSep# | '  # タブ間の区切り
-    const sep = '%#TabLineSep# │ '  # タブ間の区切り
+  # --------------------------------------------------------
+  # Tab Separater
+  #const sep = '%#TabLineSep# | '  # タブ間の区切り
+  const sep = '%#TabLineSep# │ '  # タブ間の区切り
 
 
-    #const cur_tabnr = tabpagenr()
+  # --------------------------------------------------------
+  # Tab Label
+  const cur_tabnr = tabpagenr()
+  const tab_labels = tabpagenr('$') -> range() -> map((_, val) => {
+    const tabnr = val + 1
+    return MakeTabpageLabel(tabnr, tabnr == cur_tabnr)
+  })
 
+  # --------------------------------------------------------
+  # Highlighting命令を除いた表示長を返す
+  # TODO Highlightの名称は既知なので、置換せずに引き算だけでよい。
+  def DispWidth(s: string): number
+    return s -> substitute('%#\w\+#', '', 'g') -> strdisplaywidth()
+  enddef
 
-    # ----------------------------------------------------------------------
-    # Tab Label
-    const tab_labels = tabpagenr('$') -> range() -> map((_, val) => MakeTabpageLabel(val + 1))  # cur_tabnr TODO
+  # --------------------------------------------------------
+  # Calculate Tab Label Space
+  const win_width = &columns
+  const l_width = DispWidth(left)
+  const r_width = DispWidth(right)
+  const label_space = win_width - l_width - r_width
 
-    # TODO
-    const KARI = 12
+  # --------------------------------------------------------
+  # Calculate Tab Label Width
+  const KARI = 12  # TODO
+  const sep_width = DispWidth(sep)
+  const labels_width = tab_labels -> mapnew((_, val) =>  DispWidth(val) + sep_width) -> reduce((acc, val) => acc + val, -sep_width + KARI)
 
-    # Highlighting命令を除いた表示長を返す
-    # TODO Highlightの名称は既知なので、置換せずに引き算だけでよい。
-    def DispLen(s: string): number
-      return s -> substitute('%#\w\+#', '', 'g') -> strdisplaywidth()
-    enddef
+  # --------------------------------------------------------
+  # Make Tab Label String
 
-    const win_width = &columns
-    const l_width = DispLen(left)  # strdisplaywidth(left)
-    const r_width = DispLen(right) # strdisplaywidth(right)
-    # TODO fill考慮
-    const label_space = win_width - l_width - r_width
+  const cur_tab_idx = tabpagenr() - 1
+  const end_tab_idx = tabpagenr('$') - 1
 
-    #const sep_width = strdisplaywidth(sep)
-    const sep_width = DispLen(sep)
+  var triangle_l = "%#TabLineSep#" .. "    "
+  var triangle_r = "%#TabLineSep#" .. "   "
 
-    const labels_width = tab_labels -> mapnew((_, val) => val -> DispLen() + sep_width) -> reduce((acc, val) => acc + val, -sep_width + KARI)
+  var tab_labels_disp: list<string> = tab_labels
 
-    const cur_tab_idx = tabpagenr() - 1
-    const end_tab_idx = tabpagenr('$') - 1
+  if labels_width > label_space
+    const N = max([1, label_space / 24])    # TODO contents_switch.Bufname
+    const base_idx = cur_tab_idx / N * N    # タブをN個ずつまとめたときの、カレントタブを含む群の先頭タブのインデックス
 
-    #const triangle_hi = "%#StlFill#"
-    const triangle_hi = "%#TabLineSep#"
-
-    var triangle_l = triangle_hi .. "    "
-    var triangle_r = triangle_hi .. "   "
-
-    var tab_labels_disp: list<string>
-
-    if contents_switch.Bufname && labels_width > label_space
-      #const N = &columns / 40 # 4
-      #const N = label_space / 30 # 4
-      const N = max([1, label_space / 24])
-      #const N = max([1, label_space / 30])
-      #const N = 4
-      #const N = 5                            # タブ表示最大数
-      const base_idx = cur_tab_idx / N * N    # タブをN個ずつまとめたときの、カレントタブを含む群の先頭タブのインデックス
-
-      var sta_idx: number
-      var end_idx: number
-      if end_tab_idx < N
-        # タブ個数が、最大表示数未満
-        sta_idx = base_idx              # 開始は、現在タブ
-        end_idx = end_tab_idx           # 終了は、最終タブ
-      elseif (end_tab_idx - base_idx + 1) < N
-        # カレントタブを含む群のタブ数は、最大表示数未満である。(末尾群のときのみ、あり得る。)
-        sta_idx = end_tab_idx - N  + 1  # 開始は、最終-N (N個のタブが表示されるようにしている。)
-        end_idx = end_tab_idx           # 終了は、最終タブ
-      else
-        sta_idx = base_idx
-        end_idx = base_idx + N - 1
-      endif
-
-      tab_labels_disp = tab_labels[sta_idx : end_idx]
-      if sta_idx != 0
-        #tab_labels_disp = [triangle_hi .. "◀"] + tab_labels_disp
-        triangle_l = triangle_hi .. "  ◀"
-      endif
-      if end_idx != end_tab_idx
-        #tab_labels_disp = tab_labels_disp + [triangle_hi .. "▶"]
-        triangle_r = triangle_hi .. " ▶"
-      endif
+    var sta_idx: number
+    var end_idx: number
+    if end_tab_idx < N
+      # タブ個数が、最大表示数未満
+      sta_idx = base_idx              # 開始は、現在タブ
+      end_idx = end_tab_idx           # 終了は、最終タブ
+    elseif (end_tab_idx - base_idx + 1) < N
+      # カレントタブを含む群のタブ数は、最大表示数未満である。(末尾群のときのみ、あり得る。)
+      sta_idx = end_tab_idx - N  + 1  # 開始は、最終-N (N個のタブが表示されるようにしている。)
+      end_idx = end_tab_idx           # 終了は、最終タブ
     else
-      tab_labels_disp = tab_labels
+      sta_idx = base_idx
+      end_idx = base_idx + N - 1
     endif
 
-    # Tabpages
-    tabpages = '%#TabLineFill#' .. (gold ? '     ' : '  ')  .. triangle_l .. '%<%#TabLineSep#' .. join(tab_labels_disp, sep) .. triangle_r .. '%#TabLineSep# ' .. '%#TabLineFill#'
-  else
-    # Tabpages
-    tabpages =  '%#StlFill#    ' .. '%#TabLine#  [ ' ..  tabpagenr() .. ' / ' .. tabpagenr('$') .. ' ]  %#StlFill# %<'
+    if sta_idx != 0
+      triangle_l = "%#TabLineSep#" .. "  ◀"
+    endif
+    if end_idx != end_tab_idx
+      triangle_r = "%#TabLineSep#" .. " ▶"
+    endif
+
+    tab_labels_disp = tab_labels[sta_idx : end_idx]
   endif
+
+  # Tabpages
+  tabpages = '%#TabLineFill#' .. (gold ? '     ' : '  ')  .. triangle_l .. '%<%#TabLineSep#' .. join(tab_labels_disp, sep) .. triangle_r .. '%#TabLineSep# ' .. '%#TabLineFill#'
+
+  # if !contents_switch.TabLabel
+  #   # Tabpages
+  #   tabpages =  '%#StlFill#    ' .. '%#TabLine#  [ ' ..  tabpagenr() .. ' / ' .. tabpagenr('$') .. ' ]  %#StlFill# %<'
+  # endif
 
 
   return left .. tabpages .. '%#TabLineFill#' .. '%=' .. right
@@ -199,18 +192,14 @@ enddef
 # 7  タブ番号 バッファ数     フルバッファ名
 # 8  タブ番号 バッファ数 Mod フルバッファ名
 
-def MakeTabpageLabel(tabn: number): string
+def MakeTabpageLabel(tabn: number, cur_tab: bool): string
   var label: string  # 最終的なラベル (返り値)
 
   const contents_switch = TablineContentsSwitch
 
-  const cur_tabnr = tabpagenr()
-
   # 表示桁数を容易に算出できるよう、非アクティブのときのhighlightは、
   # TabLineではな(TabLineSelと文字数が等しい)くTabLineSepとしておく。
-  #const hi = tabn == cur_tabnr ? '%#TabLineSel#' : '%#TabLineSep#'
-  #const hi = tabn == cur_tabnr ? '%#StlFill#' : '%#TabLineSep#'
-  const hi = tabn == cur_tabnr ? '%#TabLineSel#' : '%#TabLineSep#'
+  const hi = cur_tab ? '%#TabLineSel#' : '%#TabLineSep#'
 
   const tabn_str = '[' .. tabn .. ']'
 
@@ -219,7 +208,7 @@ def MakeTabpageLabel(tabn: number): string
     var bufnrs = tabpagebuflist(tabn)
 
     # バッファ数
-    #? const bufnum_str = '(' .. len(bufnrs) .. ')'
+    # const bufnum_str = '(' .. len(bufnrs) .. ')'
 
     # カレントバッファ番号
     const curbufnr = bufnrs[tabpagewinnr(tabn) - 1]  # tabpagewinnr()は、 1始まり。
@@ -233,7 +222,7 @@ def MakeTabpageLabel(tabn: number): string
 
     # アクティブタブ名の廻りにNormalを付ける
     if 1
-      if tabn == cur_tabnr
+      if cur_tab
         label = '%#Normal# ' .. hi .. label .. '%#Normal# '
       else
         label = ' ' .. hi .. label .. ' '
@@ -244,12 +233,13 @@ def MakeTabpageLabel(tabn: number): string
   endif
 
   # タブ内に変更ありのバッファがあったら '+' を付ける
-  #? const mod = bufnrs -> filter((_, val) => getbufvar(val, "&modified")) -> len() != 0 ? '+' : ''
+  # const mod = bufnrs -> filter((_, val) => getbufvar(val, "&modified")) -> len() != 0 ? '+' : ''
 
   return label
 enddef
 
 
+# TODO
 def BatteryStr(): string
   #return '🔋  85%% [10:04:43]'
   return '🔌  85%% [10:04:43]'
