@@ -21,7 +21,5 @@ enddef
 #       Vert Split すべきとき、true が返る。
 # Horizontal Split すべきとき、falseが返る。
 export def VertSplit(): bool
-  return ( winwidth(0) > (&columns * 7 / 10) && <SID>WindowRatio() >= 0 )
+  return ( winwidth(0) > (&columns * 7 / 10) && WindowRatio() >= 0 )
 enddef
-
-
