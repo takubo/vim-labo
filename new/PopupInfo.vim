@@ -1,4 +1,6 @@
 vim9script
+# vim: set ts=8 sts=2 sw=2 tw=0 et:
+scriptencoding utf-8
 
 # TODO
 #   add API
@@ -50,6 +52,12 @@ export def PopUpInfoA(cont: string, time: number = 2500, line_off: number = 5, c
   PopUpInfo_Internal([cont], time, line_off, col_off, pos)
 enddef
 
+# TODO
+export def PopUpInfo_NMV(cont: string, time: number = 2500, line_off: number = 5, col_off: number = 5)
+  PopUpInfo_Close()
+  PopUpInfo_Internal([cont], time, line_off, col_off, 'topleft', [0, 0, 0])
+enddef
+
 def PopUpInfo_Close()
   if !empty(PopUpWindowId)
     PopUpWindowId -> map((_, id) => popup_close(id))
@@ -57,7 +65,8 @@ def PopUpInfo_Close()
   endif
 enddef
 
-def PopUpInfo_Internal(cont: list<string>, time: number = 2500, line_off: number = 5, col_off: number = 5, pos: string = 'topleft') # center: bool = false)
+#def PopUpInfo_Internal(cont: list<string>, time: number = 2500, line_off: number = 5, col_off: number = 5, pos: string = 'topleft') # center: bool = false)
+def PopUpInfo_Internal(cont: list<string>, time: number = 2500, line_off: number = 5, col_off: number = 5, pos: string = 'topleft', moved: any = 'any') # center: bool = false)
   add(PopUpWindowId, popup_create(cont, {
       #'line':               'cursor+3',
       #'line':               'cursor+2',
@@ -104,7 +113,7 @@ def PopUpInfo_Internal(cont: list<string>, time: number = 2500, line_off: number
       'zindex':             1000,
       #'mask':               ,
       'time':               time,
-      'moved':              'any',
+      'moved':              moved,
       #'mousemoved':         ,
       #'cursorline':         ,
       #'filter':             ,
@@ -116,6 +125,7 @@ def PopUpInfo_Internal(cont: list<string>, time: number = 2500, line_off: number
 enddef
 
 com! -nargs=* PopUpInfo call PopUpInfo(<q-args>, 5000)
+com! -nargs=* PopUpInfo call PopUpInfo(<q-args>, 2500)
 
 augroup EscEscPopupInfo
   au!
