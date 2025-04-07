@@ -149,5 +149,5 @@ endif
 
 augroup EscEscSearch
   au!
-  au User EscEsc MHD
+  au User EscEsc mh.Suspend()
 augroup end
