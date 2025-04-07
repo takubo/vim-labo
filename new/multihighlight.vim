@@ -274,13 +274,16 @@ Init()
 #----------------------------------------------------------------------------------------
 # Command Definition
 
-com! -nargs=1 -bang MHA call Add(<q-args>)
-com! -nargs=0 -bang MHD call Suspend()
-com! -nargs=0 -bang MHR call Resume()
-com! -nargs=0 -bang MHZ call Reset()
+#? com! -nargs=1 -bang MHA call Add(<q-args>)
+#? com! -nargs=0 -bang MHD call Suspend()
+#? com! -nargs=0 -bang MHR call Resume()
+#? com! -nargs=0 -bang MHZ call Reset()
+com! -nargs=0 -bang MultiHighLightReset call Reset()
+
 
 
 finish
+
 
 
 #----------------------------------------------------------------------------------------
