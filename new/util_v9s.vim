@@ -601,13 +601,6 @@ com! RRR call RRR()
 
 #---------------------------------------------------------------------------------------------
 
-noremap! <C-R><C-R> <C-R>*
-
-
-
-
-#---------------------------------------------------------------------------------------------
-
 com! HL echo hlget()->map((k, v) => v.name)
 
 def HL()
@@ -647,7 +640,7 @@ g:RimpaGold = true
 
 com! Gold {
   g:RimpaGold = !g:RimpaGold
-  colorscheme super_rimpa
+  colorscheme rimpa
 }
 
 def g:IsGold(): bool
@@ -663,7 +656,7 @@ g:RimpaDark = true
 
 com! Dark {
   g:RimpaDark = !g:RimpaDark
-  colorscheme super_rimpa
+  colorscheme rimpa
 }
 
 nnoremap @ <Cmd>Dark<CR>
@@ -875,33 +868,10 @@ def ColorColumn(arg: number = 0)
   endif
 enddef
 
-com! -nargs=? -bar CC ColorColumn(<f-args>)
+com! -nargs=? -bar ColorColumn ColorColumn(<f-args>)
 
 
 #---------------------------------------------------------------------------------------------
-
-#=============================================================================================
-# EscEsc.vim
-
-com! -nargs=0 -bar EscEsc {
-  # 'noh'は自動コマンド内では(事実上)実行出来ないので、別途実行の要あり。
-  noh
-  doautocmd User EscEsc
-  #doautocmd nomodeline User EscEsc   TODO
-}
-
-# EscEsc内のdoautocmdがエラーにならないよう、1つは自動コマンドを設定しておく。
-# 実際には、自動コマンド内のnohは意味をなさない。
-augroup EscEscDefault
-  au!
- #au User EscEsc noh
-  au User EscEsc echon
-augroup end
-
-# 最後にコマンドラインモードへの出入りを行うことで、iminsert(or imcmdline?)の効果で、IMEがOFFされる。
-nnoremap <silent> <Plug>(EscEsc) <Cmd>EscEsc<CR>:<Esc>
-
-nmap <Esc><Esc> <Plug>(EscEsc)
 
 #=============================================================================================
 
@@ -929,10 +899,18 @@ def CFIPopup(display_time: number = 2000, line_off: number = 5, col_off: number 
   #pui.PopUpInfo(cfi#format("%s ()", "###"), display_time, -5, +6)
 enddef
 
+def CFIPopupNMV(display_time: number = 2000, line_off: number = 5, col_off: number = 5, already: bool = false)
+  const func_name = cfi#format('%s ( )', NO_FUNC_STR)
+  if func_name != NO_FUNC_STR
+    pui.PopUpInfo_NMV(func_name, display_time, line_off, +24)
+  endif
+enddef
+
 if 1 || exists('*cfi#format')
  #com! -bar -nargs=0 CFIPopup     echo cfi#format("%s ()", "###")
   com! -bar -nargs=0 CFIPopup     call CFIPopup(-1)
   com! -bar -nargs=0 CFIPopupAuto call CFIPopup()
+  com! -bar -nargs=0 CFIPopupNMV  call CFIPopupNMV(2000)
 else
   com! -bar -nargs=0 CFIPopup
   com! -bar -nargs=0 CFIPopupAuto
@@ -1016,13 +994,14 @@ inoreab <silent> ppbuf const org_buf_nr = bufnr(  # push buffer)<CR>exe 'buffer'
 import autoload '../impauto/window_ratio.vim' as wr
 
 
-const vimrc_path = $HOME .. (has('win32') ? '/vimfiles/vimrc' : '/.vimrc')
+const vimrc_path = $HOME .. (true || has('win32') ? '/vimfiles/vimrc' : '/.vimrc')
 
-const colors_dir = $HOME .. (has('win32') ? '/vimfiles/colors/' : '/.vim/colors/')  # TODO
+const colors_dir = $HOME .. (true || has('win32') ? '/vimfiles/colors/' : '/.vim/colors/')  # TODO
+
 const color_path = colors_dir .. g:colors_name .. '.vim'
 
 
-def Vimrc(path: string, bang: string = '')
+def Vimrc(path: string, other_tab: bool = false)
   const buf_name = '^' .. path
   const win_id_list = bufnr(buf_name) -> win_findbuf()
 
@@ -1035,7 +1014,7 @@ def Vimrc(path: string, bang: string = '')
   endif
 
   # 別のタブページで開かれていれば
-  if bang == '!'
+  if other_tab
     const othr_win_idx = win_id_list -> mapnew((_, v) => win_id2tabwin(v)) -> flattennew() -> indexof((_, v) => v > 0)
     if othr_win_idx != -1
       win_gotoid(win_id_list[othr_win_idx])
@@ -1053,9 +1032,10 @@ def Vimrc(path: string, bang: string = '')
 enddef
 
 
-com! -bang -bar EditVIMRC Vimrc(vimrc_path, '<bang>')
-com! -bang -bar EditColor Vimrc(color_path, '<bang>')
+com! -bang -bar EditVIMRC Vimrc(vimrc_path, <bang>false)
 com! -bang -bar VIMRC EditVIMRC
+
+com! -bang -bar EditColor Vimrc(color_path, <bang>false)
 
 nnoremap <silent> <Leader>v <Cmd>EditVIMRC<CR>
 nnoremap <silent> <Leader>V <Cmd>EditColor<CR>
@@ -1481,12 +1461,24 @@ com! LlNumAdd QfNumPopup('R ', LlNum(), LlLeaveNum())
 #=============================================================================================
 # Unified_CR.vim
 
+
+#---------------------------------------------------------------------------------------------
+# Unified CR
+
 def Unified_CR(mode: string)
+  # 行番号へジャンプ
   if v:count != 0
     GotoLine(v:count)
     return
   endif
 
+  # CommandLine-Window
+  if bufname() == '[コマンドライン]' && &l:buftype == 'nofile'
+    feedkeys("\<CR>", 'nt')
+    return
+  endif
+
+  # これらは、Buffer Local Map.
   # # TODO
   # Buffer Local Map
   # if &buftype == 'quickfix'
@@ -1499,27 +1491,32 @@ def Unified_CR(mode: string)
   #   return
   # endif
 
+  # 数値の情報を表示
   #if EmIsNum()
   #  TODO
   #  EmDispNoTimeOut
   #  return
   #endif
 
-  if JumpToDefinition(mode)
-  #  TODO
-    #keeppatterns normal! gd
+  # Tag Jump
+  if TagJump(mode)
     return
   endif
 
+  # VimのHelpを引く
   if &ft == 'vim' && VimHelp()
     return
   endif
 
+  # gF相当
   if GotoFile()
     return
   endif
 
-  keeppatterns normal! gd
+  # 定義へジャンプ
+  if JumpToDefinition()
+    return
+  endif
 enddef
 
 nnoremap <silent> <CR> <ScriptCmd>Unified_CR('')<CR>
@@ -1529,73 +1526,63 @@ nnoremap <silent> <CR> <ScriptCmd>Unified_CR('')<CR>
 # help.vim FIXME
 #nnoremap <buffer> <CR> <C-]>
 
-def GotoLine(line: number)
+
+#---------------------------------------------------------------------------------------------
+# Go to Line
+
+def GotoLine(line: number = v:count)
   # jumplistに残すために、Gを使用。
   exe 'normal!' line .. 'G'
   histadd('cmd', line .. '')
+  CursorJumped
 enddef
 
-def GotoLineVCount(line: number): number
-  if v:count
-    GotoLine(v:count)
-    return 1
-  endif
-  return 0
-enddef
 
-com! UnifiedCR Unified_CR('')
+#---------------------------------------------------------------------------------------------
+# Tag Jump
 
-
-def JumpToDefinition(mode: string): number
+def TagJump(mode: string): number
   const cword = expand("<cword>")
 
-  if cword !~ '\<\i\+\>'
+  if cword !~# '\<\i\+\>'
     return 0
   endif
 
-  TempHighLightWord(cword)
-
   # エラーメッセージ表示用にオリジナル単語でのエラー文字列を保存
-  var err_msg = JumpToDefinition_Sub(mode, cword)
+  var err_msg = TagJumpSub(mode, cword)
 
-  # if err_msg != ''
-  #   var nword: string
-  #
-  #   if cword =~ '^_'
-  #     # 元の検索語は"_"始まり
-  #     nword = substitute(cword, '^_', '', '')
-  #   else
-  #     # 元の検索語は"_"始まりでない
-  #     nword = '_' .. cword
-  #   endif
-  #
-  #   err_msg = JumpToDefinition_Sub(mode, nword)
-  # endif
+  # 先頭のアンダーバーを切り替えて、再検索。 (C <--> Assembly)
+  if err_msg != ''
+    const nword = cword =~ '^_' ?
+                  # 元の検索語は"_"始まり。
+                  substitute(cword, '^_', '', '') :
+                  # 元の検索語は"_"始まりでない。
+                  '_' .. cword
+
+    err_msg = TagJumpSub(mode, nword)
+  endif
 
   if err_msg != ''
     # TODO
     # エラーメッセージ表示用にオリジナル単語でのエラー文字列を保存
-    # TempHighLightDelete()
   endif
 
   return err_msg == '' ? 1 : 0
 enddef
 
-
-def JumpToDefinition_Sub(mode: string, word: string): string
+def TagJumpSub(mode: string, word: string): string
   var err_msg = ''
 
   try
     if 1
-      # TODO
       if mode =~? 's'
         exe (mode =~? 'p' ? 'p' : (mode =~? 'w' ? 's' : '')) .. "tselect " .. word
       else
         exe (mode =~? 'p' ? 'p' : (mode =~? 'w' ? 's' : '')) .. "tjump " .. word
       endif
     else
-      if ! TaggJumpExt(word, mode)
-        # TODO 無理やり例外を発生させる
+      if ! TagJumpExe(word, mode)
+        # 無理やり例外を発生させる
         throw ':E426:'
       endif
     endif
@@ -1606,8 +1593,6 @@ def JumpToDefinition_Sub(mode: string, word: string): string
     PostTagJumpCursor_C()
 
     TempHighLightWord(word)
-
-    err_msg = ''
   catch /:E426:/
     err_msg = v:exception
   catch /:E433:/
@@ -1619,7 +1604,8 @@ def JumpToDefinition_Sub(mode: string, word: string): string
   return err_msg
 enddef
 
-def TaggJumpExt(word: string, mode: string): bool
+# TODO
+def TagJumpExe(word: string, mode: string): bool
   const cur_file = expand('%:p')
 
   const taglist = taglist('^' .. word .. '$', cur_file)
@@ -1628,11 +1614,12 @@ def TaggJumpExt(word: string, mode: string): bool
     return false
   endif
 
-  var   cmd_tag     = (a:mode =~? 'p' ? 'p' : (a:mode =~? 'w' ? 's' : '')) . 'tag'
-  const cmd_tselect = (a:mode =~? 'p' ? 'p' : (a:mode =~? 'w' ? 's' : '')) . 'tselect'
+  var   cmd_tag     = (mode =~? 'p' ? 'p' : (mode =~? 'w' ? 's' : '')) .. 'tag'
+  const cmd_tselect = (mode =~? 'p' ? 'p' : (mode =~? 'w' ? 's' : '')) .. 'tselect'
   if mode =~? 's'
     cmd_tag = cmd_tselect
   endif
+
 
   ### タグが1つならそれ
   if len(taglist) == 1
@@ -1640,33 +1627,39 @@ def TaggJumpExt(word: string, mode: string): bool
     return true
   endif
 
+
   ### 内部タグがあればそれ（内部タグ複数はない想定）
 
-  const cur_file_dos = fnamemodify(cur_file, ':.')  # カレントディレクトリ相対にしないと、ctagsとDOSでパスの形式が異なる。
+  #? const cur_file_dos = fnamemodify(cur_file, ':.')  # カレントディレクトリ相対にしないと、ctagsとDOSでパスの形式が異なる。
+  #?
+  #? const cur_file_tag_idx = taglist ->
+  #?        \ mapnew((_, v) => v.filename = fnamemodify(v.filename, ':.')) ->  # カレントディレクトリ相対
+  #?        \ indexof((_, v) => v.filename == cur_file)
 
-  const cur_file_tag_idx = taglist ->
-                           mapnew((_, v) => v.filename = fnamemodify(v.filenam, ':.')) ->  # カレントディレクトリ相対
-                           indexof((_, v) => v.filename == cur_file_dos)
+  const cur_file_tag_idx = taglist -> indexof((_, v) => v.filename == cur_file)
 
   if cur_file_tag_idx != -1
     exe cur_file_tag_idx + 1 cmd_tag word
-    return v:true
+    return true
   endif
+
 
   ### include files に対して探索
 
-  var inclist = GetIncludeFiles(expand('%f'))
-  # TODO Trim
-  var inclist = inclist -> map((_, v) => substitute(v, ' \+', '', 'g'))
+  #                                       TODO Trim
+  const inclist = GetIncludeFiles(expand('%f')) -> map((_, v) => substitute(v, ' \+', '', 'g'))
 
-  const inc_file_tag_idx = taglist ->
-                           indexof((_, t) => indexof(inclist,
-                             (_, i) => i == t.filename) != -1
-                           )
+  const inc_file_tag_idx = taglist -> indexof(
+                                        (_, t) =>
+                                          inclist -> indexof((_, i) => i == t.filename)
+                                        != -1
+                                      )
+
   if inc_file_tag_idx != -1
     exe inc_file_tag_idx + 1 cmd_tag word
     return true
   endif
+
 
   exe cmd_tselect word
 
@@ -1675,6 +1668,7 @@ enddef
 
 
 def GetIncludeFiles(file: string): list<string>
+  # TODO checkpathが遅すぎる
   const inclist = execute('checkpath!')
 
   var incs = split(inclist, '\n')
@@ -1696,13 +1690,13 @@ def PostTagJumpCursor_C()
     return
   endif
 
-  if search('\%##define\s\+\k\+(', 'bcn')
+  if search('\%##define\s\+\k\+(', 'bcn') != 0
     # 関数形式マクロ
     normal! ww
-  elseif search('\%##define\s\+\k\+\s\+', 'bcn')
+  elseif search('\%##define\s\+\k\+\s\+', 'bcn') != 0
     # 定数マクロ
     normal! ww
-  elseif search('\%#.\+;', 'bcn')
+  elseif search('\%#.\+;', 'bcn') != 0
     # 変数
     normal! f;b
   else
@@ -1712,23 +1706,49 @@ def PostTagJumpCursor_C()
 enddef
 
 
+#---------------------------------------------------------------------------------------------
+# Vim Help
+
 # Helpの呼び出しに成功したら、非0を返す。
 def VimHelp(): number
   try
-    #exe 'help ' .. expand('<cword>')
-
-    # TODO オプション 関数 コマンド
-
     const word = expand('<cword>')
-    # TODO const on_opt = VimHelp_OnOpt()
-    const sufix = VimHelp_OnBIF() ? '()' : ''
-    exe 'help ' .. word .. sufix
+
+    # オプション, 組み込み関数(BIF), その他を分ける
+    var prefix = ''
+    var sufix = ''
+
+    if VimHelp_OnBIF()
+      sufix = '()'
+    elseif VimHelp_OnOpt()
+      prefix = "'"
+      sufix  = "'"
+    endif
+
+    exe 'help ' .. prefix .. word .. sufix
+
     TempHighLight(word, 1500)
     return 1
   catch /:E149/
   endtry
   return 0
 enddef
+
+def VimHelp_OnBIF(): bool
+  return search('\%#[^[:keyword:]]*\k\+(', 'bcn', line('.')) != 0
+enddef
+
+def VimHelp_OnOpt(): bool
+  return search('\%#[^[:keyword:]]*&\%(l:\)\?\k\+', 'bcn', line('.')) != 0
+      || search('&\%#\%(l:\)\?\k\+', 'bcn', line('.')) != 0
+      || search('&\%(l\%#:\)\?\k\+', 'bcn', line('.')) != 0
+      || search('&\%(l:\)\?\%#\k\+', 'bcn', line('.')) != 0
+      || search('\<se\%[t[gl]]\>\s*\%#s*\k\+', 'bcn', line('.')) != 0
+enddef
+
+
+#---------------------------------------------------------------------------------------------
+# Go to File
 
 def GotoFile(): number
   #if search('\%#\f', 'bcn') != 0
@@ -1752,6 +1772,27 @@ def GotoFile(): number
   endtry
   return 0
 enddef
+
+
+#---------------------------------------------------------------------------------------------
+# Go to Definition
+
+def JumpToDefinition(): number
+  # keeppatterns normal! gd
+
+  const word = expand("<cword>")
+
+  if !searchdecl(word, 1, 1)
+    # 表示範囲を最適化 TODO
+
+    TempHighLightWord(word)
+    return 1
+  endif
+
+  return 0
+enddef
+
+
 
 function Unified_CR_00()
 
@@ -2068,6 +2109,14 @@ enddef
 # TempHighLight('def')
 
 
+# function! TempHighLight()
+#   let w = expand("<cword>")
+#   let g:TagMatch0 = matchadd('TagMatch', '\<'.w.'\>')
+#   let g:TimerTagMatch0 = timer_start(1500, 'QQQQ')
+#   let g:TagMatchI[g:TimerTagMatch0] = g:TagMatch0
+# endfunction
+
+
 #---------------------------------------------------------------------------------------------
 
 
@@ -2223,8 +2272,8 @@ nnoremap ga <Cmd>%yank<CR>
 
 #---------------------------------------------------------------------------------------------
 
-nnoremap ; <Cmd>hi CursorLineNr	guibg=#d0c589	guifg=#222222	gui=NONE<CR><Cmd>redraw<CR>:
-nnoremap ; <Cmd>hi CursorLineNr	guifg=#b8d3ef	guibg=#4444ee	gui=NONE<CR><Cmd>redraw<CR>:
+#nnoremap ; <Cmd>hi CursorLineNr	guibg=#d0c589	guifg=#222222	gui=NONE<CR><Cmd>redraw<CR>:
+#nnoremap ; <Cmd>hi CursorLineNr	guifg=#b8d3ef	guibg=#4444ee	gui=NONE<CR><Cmd>redraw<CR>:
 nnoremap : <Nop>
 
 
@@ -2243,20 +2292,23 @@ inoreab <silent> qqq const name = (a1: t1, a2: t2): type =>
 
 #---------------------------------------------------------------------------------------------
 
-#vsp tabline.vim.old
-#vsp tabline.old1.5
-#vsp tabline.vim.old2
-#vsp tabline.vim.old3
-#vsp tabline.vim.old4
-#vsp tabline.vim.old5
-#vsp tabline.vim.old6
-#vsp tabline.vim.old7
-#vsp tabline.vim.old8
-#vsp tabline.vim.old9
-#vsp tabline.vim.old.10
-#vsp tabline.vim.old11
-#vsp tabline.vim
 
+# vsp statusline.vim.old
+# vsp statusline.vim.old2
+# vsp statusline.vim.old3
+# vsp statusline.vim.old4
+# vsp statusline.vim.old5
+# vsp statusline.vim.old6
+# vsp statusline.vim.old7
+# vsp statusline.vim.old8
+# vsp statusline.vim.old9
+# vsp statusline.vim.old10
+# vsp statusline.vim.old11
+# vsp statusline.vim.old12
+# vsp statusline.vim.old13
+# vsp statusline.vim.old14
+# vsp statusline.vim.old15
+# vsp statusline.vim
 
 
 #---------------------------------------------------------------------------------------------
@@ -2265,21 +2317,10 @@ def CWord()
 enddef
 com! CWord CWord()
 
-def VimHelp_OnBIF(): bool
-  return search('\%#[^[:keyword:]]*\k\+(', 'bcn', line('.')) != 0
-enddef
 def VimHelp_OnBIF_Test()
   echo search('\%#[^[:keyword:]]*\k\+(', 'bcn', line('.'))
 enddef
 com! VimHelpOnBIF VimHelp_OnBIF_Test()
-
-def VimHelp_OnOpt(): bool
-  return search('\%#[^[:keyword:]]*&\%(l:\)\?\k\+', 'bcn', line('.')) != 0
-      || search('&\%#\%(l:\)\?\k\+', 'bcn', line('.')) != 0
-      || search('&\%(l\%#:\)\?\k\+', 'bcn', line('.')) != 0
-      || search('&\%(l:\)\?\%#\k\+', 'bcn', line('.')) != 0
-      || search('\<se\%[t[gl]]\>\s*\%#s*\k\+', 'bcn', line('.')) != 0
-enddef
 
 def VimHelp_OnOpt_Test()
   echo search('\%#[^[:keyword:]]*&\%(l:\)\?\k\+', 'bcn', line('.'))
@@ -2292,24 +2333,605 @@ com! VimHelpOnOpt VimHelp_OnOpt_Test()
 
 # &path
 
+
 #---------------------------------------------------------------------------------------------
 
-nnoremap <Leader>0 <Cmd>set relativenumber!<CR>
+def PFPF()
+  PushPosAll
+  normal! gF
+  #const b = bufnr()
+  const f = expand('%:p')
+  const l = line('.')
+  # redraw
+  # sleep 1
+  PopPosAll
+  #exe 'pedit +set\ nowrap +' .. l f
+  exe 'pedit +' .. l f
+  #normal! <C-o>
+enddef
+com! PFPF PFPF()
+if 0
+nnoremap <buffer> <CR> <Cmd>PFPF<CR>
+endif
 
-def SwitchLineNumber()
-  if !&l:number && !&l:relativenumber
-    &l:number = 1
-  elseif &l:number && !&l:relativenumber
-    &l:number = 1
-    &l:relativenumber = 1
+
+#---------------------------------------------------------------------------------------------
+
+set smoothscroll
+
+def Scroll_0(dir: number)
+  #const n = win_getid() -> getwininfo()[0].height * 1 / 3
+  const n = winheight(0) / 3
+
+  set nocursorcolumn
+  #set nocursorline
+
+  const k = dir > 0 ? "\<C-E>2gj" : "\<C-Y>2gk"
+
+  range(n) -> map((_, _) => { # TODO foreach
+    execute("normal! 2" .. k)
+    redraw
+    return 0
+  })
+
+  #range(n) -> map((_, _) => { # TODO foreach
+  #  execute("normal! 2\<c-e>2gj")
+  #  redraw
+  #  return 0
+  #})
+
+  #for i in range(n)
+  #  #execute "normal! 1\<c-d>"
+  #  execute "normal! \<c-e>gj"
+  #  redraw
+  #endfor
+
+  set cursorcolumn
+  #set cursorline
+enddef
+
+def Scroll_1(dir: number)
+  const n = winheight(0) / 3
+
+  set nocursorcolumn
+
+ #const k = dir > 0 ? "2\<C-E>2gj" : "2\<C-Y>2gk"
+  const k = dir > 0 ? "\<C-E>gj" : "\<C-Y>gk"
+
+  for i in range(n)
+    var u = getchar(1)
+    if dir > 0 && u == 'k' || dir < 0 && u =='j'
+      break
+    endif
+    execute("normal! " .. k)
+    redraw
+  endfor
+
+  set cursorcolumn
+enddef
+
+def Scroll_2(dir: number)
+  const n0 = winheight(0) / 3
+  var n = n0
+
+  set nocursorcolumn
+
+  const k = dir > 0 ? "2\<C-E>2gj" : "2\<C-Y>2gk"
+  # const k = dir > 0 ? "\<C-E>gj" : "\<C-Y>gk"
+
+  while true
+    while n > 0
+      var u = getchar(0) -> nr2char()
+      if dir > 0 && u == 'k' || dir < 0 && u == 'j'
+        return
+      endif
+      if dir < 0 && u == 'k' || dir > 0 && u == 'j'
+        n += n0
+      endif
+      execute("normal! " .. k)
+      redraw
+      sleep 1m
+      n -= 1
+    endwhile
+
+    var u = getchar(0) -> nr2char()
+    if dir > 0 && u == 'k' || dir < 0 && u == 'j'
+      return
+    endif
+    if dir < 0 && u == 'k' || dir > 0 && u == 'j'
+      n += n0
+    endif
+
+  endwhile
+
+  set cursorcolumn
+enddef
+
+
+#nnoremap <C-D> <ScriptCmd>Scroll(+1)<CR>
+#nnoremap <C-U> <ScriptCmd>Scroll(-1)<CR>
+nnoremap <Plug>(C-D) <ScriptCmd>Scroll(+1)<CR>
+nnoremap <Plug>(C-U) <ScriptCmd>Scroll(-1)<CR>
+
+#submode#enter_with('VertScrollDn', 'nv', '', 'gj', '<Cmd>Scroll(+1)<CR>')
+#submode#enter_with('VertScrollUp', 'nv', '', 'gk', '<Cmd>Scroll(-1)<CR>')
+#submode#map(       'VertScrollDn', 'nv', '',  'j', '<Cmd>Scroll(+1)<CR>')
+#submode#map(       'VertScrollUp', 'nv', '',  'k', '<Cmd>Scroll(-1)<CR>')
+#submode#enter_with('VertScrollDn', 'nv', '', 'gj', '<Plug>(C-D)')
+#submode#enter_with('VertScrollUp', 'nv', '', 'gk', '<Plug>(C-U)')
+#submode#map(       'VertScrollDn', 'nv', '',  'j', '<Plug>(C-D)')
+#submode#map(       'VertScrollUp', 'nv', '',  'k', '<Plug>(C-U)')
+
+
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+# EscEsc
+#=============================================================================================
+
+if 0
+
+com! -nargs=0 -bar EscEsc {
+    # 'noh'は自動コマンド内では(事実上)実行出来ないので、別途実行の要あり。
+    noh
+    doautocmd nomodeline User EscEsc
+  }
+
+# EscEsc内のdoautocmdがエラーにならないよう、1つは自動コマンドを設定しておく。
+augroup EscEscDefault
+  au!
+  # コマンドラインモードへの出入りを行うことで、iminsert(or imcmdline?)の効果で、IMEがOFFされる。
+  au User EscEsc normal! :<Esc>
+augroup end
+
+nnoremap <silent> <Plug>(EscEsc) <Cmd>EscEsc<CR>
+nnoremap <silent> <Plug>(EscEsc) <Cmd>EscEsc<CR><Cmd>noh<CR>
+
+
+#---------------------------------------------------------------------------------------------
+# EscEsc
+
+# EscEsc内のdoautocmdがエラーにならないよう、1つは自動コマンドを設定しておく。
+augroup EscEscDefault
+  au!
+  # コマンドラインモードへの出入りを行うことで、iminsert(or imcmdline?)の効果で、IMEがOFFされる。
+  au User EscEsc normal! :<Esc>
+augroup end
+
+# 'noh'は自動コマンド内では(事実上)実行出来ないので、別途実行の要あり。 TODO  doautocmd nomodeline User
+nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR>
+
+else
+
+
+nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR><Cmd>normal! :<lt>Esc><CR>
+
+
+endif
+
+
+#---------------------------------------------------------------------------------------------
+# Case Motion
+
+def CaseMotion_0(dir: number, mode: string)
+  #echo ""
+
+  #? if search('\%#\k', 'bcn', line('.')) == 0
+  #?   return
+  #? endif
+
+  # 記号列の先頭 (アンダーバー除く)
+  if search('\%#[_[:alnum:]]\+\zs\k\@=_\@![[:punct:]]', '', line('.')) != 0
+    #echo "$$$"
+    return
+  endif
+# abc_def  abc#def abc__def  abc###def abc-def G
+# RAMCheck RAM RR175 GET_MAN GET#REM  GET-K RR175BB Check___R Check###R Check###5
+# RAMCheck#RRT
+
+  # 記号の後の英数字
+  if search('\%#\k\{-}[[:punct:]]\zs\k\@<=[[:alnum:]]', '', line('.')) != 0
+    #echo "%%%"
+    return
+  endif
+
+  # パート先頭の大文字
+  if search('\%#\k\{-1,}\zs[A-Z]\k\@=[a-z]', '', line('.')) != 0
+    #echo "rrr1"
+    return
+  endif
+  if search('\%#\k\{-1,}\zs[^A-Z]\@<=[A-Z]', '', line('.')) != 0
+    #echo "rrr2"
+    return
+  endif
+
+  #if search('\%#\k\{-}\zs[A-Z]\@<![A-Z][^A-Z]', '', line('.')) != 0
+  #  echo "rrr"
+  #  return
+  #endif
+
+  #echo "######"
+  normal! w
+
+  # const cc = GetCursorChar()
+
+  # if cc =~# '[A-Z]'
+  #   echo "######"
+  #   if search('[A-Z]sakiyomi\k[^A-Z]', '', line('.')) == 0
+  #     normal! w
+  #   endif
+  # elseif cc =~# '[[:alnum:]]'
+  # else
+  #   # 記号の上
+  # endif
+enddef
+
+def CaseMotion_1(dir: number, mode: string)
+  echo ''
+
+  #? if search('\%#\k', 'bcn', line('.')) == 0
+  #?   return
+  #? endif
+
+  const or = '\|'
+  const b = '\%('
+  const e = '\)'
+
+  var pat = ''
+
+  # 記号列の先頭 (アンダーバー除く)
+  pat ..= b .. '\%#[_[:alnum:]]\+\zs\k\@=_\@![[:punct:]]' .. e
+
+  pat ..= or
+
+  # 記号の後の英数字
+  pat ..= b .. '\%#\k\{-}[[:punct:]]\zs\k\@<=[[:alnum:]]' .. e
+
+  pat ..= or
+
+  # パート先頭の大文字
+  pat ..= b .. '\%#\k\{-1,}\zs[A-Z]\k\@=[a-z]' .. e
+
+  # pat ..= or
+
+  if search(pat, 'z', line('.')) != 0
+    echo "%%%%%%"
+    return
+  endif
+
+  echo "######"
+  normal! w
+enddef
+
+def CaseMotion_W_0(dir: number, mode: string)
+  # echo ''
+
+  # if search('\%#\k', 'bcn', line('.')) == 0
+  #   return
+  # endif
+
+  const pat = [
+    # 記号列の先頭 (アンダーバー除く)
+    # TODO punctは句読点だけか？
+    #'\%#[_[:alnum:]]\+\zs\k\@=_\@![[:punct:]]',
+
+    # 記号の後の英数字
+    '\%#\k\{-}[[:punct:]]\zs\k\@<=[[:alnum:]]',
+
+    # パート先頭の大文字
+    '\C\%#\k\{-1,}\zs[A-Z]\k\@=[a-z]',
+  ]
+
+  const pos = pat -> mapnew((_, v) => searchpos(v, 'nz', line('.'))) -> map((_, v) => v[1]) -> filter((_, v) => v != 0)
+  #echo pos
+
+  const ini = col('$') + 1
+  const min_col = pos -> reduce((acc, val) => acc > val ? val : acc, ini)
+  #echo min_col
+
+  if min_col != ini
+    # echo "%%%%%%"
+    setpos('.', [bufnr(), line('.'), min_col, 0])
   else
-    &l:number = 0
-    &l:relativenumber = 0
+    # echo "######"
+    normal! w
+  endif
+
+  #if search(pat, 'z', line('.')) != 0
+  #  echo "%%%%%%"
+  #  return
+  #endif
+enddef
+
+def CaseMotion_B_0(dir: number, mode: string)
+  echo ''
+
+  #? if search('\%#\k', 'bcn', line('.')) == 0
+  #?   return
+  #? endif
+
+  const pat = [
+    # 記号列の先頭 (アンダーバー除く)
+    '\%#[_[:alnum:]]\+\zs\k\@=_\@![[:punct:]]',
+
+    # 記号の後の英数字
+    '\%#\k\{-}[[:punct:]]\zs\k\@<=[[:alnum:]]',
+
+    # パート先頭の大文字
+    '\%#\k\{-1,}\zs[A-Z]\k\@=[a-z]',
+  ]
+
+  const pos = pat -> mapnew((_, v) => searchpos(v, 'nz', line('.'))) -> map((_, v) => v[1]) -> filter((_, v) => v != 0)
+  #echo pos
+
+  const ini = col('$') + 1
+  const min_col = pos -> reduce((acc, val) => acc > val ? val : acc, ini)
+  #echo min_col
+
+  if min_col != ini
+    echo "%%%%%%"
+    setpos('.', [bufnr(), line('.'), min_col, 0])
+  else
+    echo "######"
+    normal! w
+  endif
+
+  #if search(pat, 'z', line('.')) != 0
+  #  echo "%%%%%%"
+  #  return
+  #endif
+enddef
+
+def CaseMotion_E_0(dir: number, mode: string)
+  # echo ''
+
+  # if search('\%#\k', 'bcn', line('.')) == 0
+  #   return
+  # endif
+
+  const pat = [
+    # # 記号列の先頭 (アンダーバー除く)
+    # #'\%#[_[:alnum:]]\+\zs\k\@=_\@![[:punct:]]',
+
+    # # 記号の後の英数字
+    # '\%#\k\{-}[[:punct:]]\zs\k\@<=[[:alnum:]]',
+
+    # # パート先頭の大文字
+    # '\%#\k\{-1,}\zs[A-Z]\k\@=[a-z]',
+
+
+    #'\%#\k\{-1,}\zs[[:alnum:]]_',
+    #'\%#\k\{-1,}\zs[[:keyword:]]\>',
+
+
+    # 大文字の手前の、小文字か数字
+    '\C\%#\k\{-1,}\zs[a-z0-9]\u',
+    '\C\%#\S\s\+\k\{-1,}\zs[a-z0-9]\u',
+
+    # 記号の手前の英数字
+    '\%#\w\{-1,}\zs\w[[:punct:]]\@=\k\@=',
+    '\%#\S\s\+\k\{-1,}\zs\w[[:punct:]]\@=\k\@=',
+
+
+    #'\%#\k\\+\zs[a-z0-9]',
+  ]
+
+  const pos = pat -> mapnew((_, v) => searchpos(v, 'nz', line('.'))) -> map((_, v) => v[1]) -> filter((_, v) => v != 0)
+  echo pos
+
+  const ini = col('$') + 1
+  const min_col = pos -> reduce((acc, val) => acc > val ? val : acc, ini)
+  echo min_col
+
+  if min_col != ini
+    #echo "%%%%%%"
+    setpos('.', [bufnr(), line('.'), min_col, 0])
+  else
+    #echo "######"
+    normal! e
+  endif
+
+  #if search(pat, 'z', line('.')) != 0
+  #  echo "%%%%%%"
+  #  return
+  #endif
+enddef
+
+def CaseMotion_W(dir: number, mode: string)
+  # echo ''
+
+  const pat = [
+    # 記号列の先頭 (アンダーバー除く)
+    # TODO punctは句読点だけか？
+    '\%#[_[:alnum:]]\+\zs\k\@=_\@![[:punct:]]',
+
+    # 記号の後の英数字
+    '\%#\k\{-}[[:punct:]]\zs\k\@<=[[:alnum:]]',
+
+    # パート先頭の大文字
+    '\C\%#\k\{-1,}\zs[A-Z]\k\@=[a-z]',
+  ]
+
+  const pos = pat -> mapnew((_, v) => searchpos(v, 'nz', line('.'))) -> map((_, v) => v[1]) -> filter((_, v) => v != 0)
+  #echo pos
+
+ #const ini = col('$') + 1
+  const ini = col('$')
+  const min_col = pos -> reduce((acc, val) => acc > val ? val : acc, ini)
+  #echo min_col
+
+  if min_col != ini
+    # echo "%%%%%%"
+    setpos('.', [bufnr(), line('.'), min_col, 0])
+  else
+    # echo "######"
+    normal! w
   endif
 enddef
 
-# nnoremap <silent> <Leader># <ScriptCmd>SwitchLineNumber()<CR>
-com! -bar SwitchLineNumber SwitchLineNumber()
+def CaseMotion_E(dir: number, mode: string)
+  # echo ''
+
+  const pat = [
+    # 大文字の手前の、小文字か数字
+    '\C\%#\k\{-1,}\zs[a-z0-9]\u',                # カーソルが単語内
+    '\C\%#\S\s\+\k\{-1,}\zs[a-z0-9]\u',          # カーソルが単語末尾。なので、次の単語で探す。
+
+    # 記号の手前の英数字
+    '\%#\w\{-1,}\zs\w[[:punct:]]\@=\k\@=',       # カーソルが単語内
+    '\%#\S\s\+\k\{-1,}\zs\w[[:punct:]]\@=\k\@=', # カーソルが単語末尾。なので、次の単語で探す。
+  ]
+
+  const pos = pat -> mapnew((_, v) => searchpos(v, 'nz', line('.'))) -> map((_, v) => v[1]) -> filter((_, v) => v != 0)
+  # echo pos
+
+ #const ini = col('$') + 1
+  const ini = col('$')
+  const min_col = pos -> reduce((acc, val) => acc > val ? val : acc, ini)
+  # echo min_col
+
+  if min_col != ini
+    #echo "%%%%%%"
+    setpos('.', [bufnr(), line('.'), min_col, 0])
+  else
+    #echo "######"
+    normal! e
+  endif
+enddef
+
+def CaseMotion_B(dir: number, mode: string)
+  # echo ''
+
+  const pat = [
+    # パート先頭の大文字 TODO
+    #'\C\u\%(\k\+\%#\)\@=\U\+\%#',                     # カーソルが単語内  OK
+    #'\C\u\%(\k\+\%#\)\@=\U\+[^[:punct:]]\%#',                     # カーソルが単語内  OK
+
+    #'\C\u\%(\k\+\%#\)\@=\k\+\[[:punct:]]\%#',                     # カーソルが単語内
+
+    #'\C\u\%(\k\+\%#\)\@=\k\+\u\@<!\[[:punct:]]\+\%#',                     # カーソルが単語内
+    #'\C\u\%(\k\+\%#\)\@=\%(\U\+\|\w\+\[[:punct:]]\)\%#',                     # カーソルが単語内
+    #'\C\%#\S\s\+\k\{-1,}\zs[a-z0-9]\u',          # カーソルが単語末尾。なので、次の単語で探す。
+
+   #'\C\u\%(\k\+\%#\)\@=[\u\d]\+[[:punct:]]\+\%#',    # カーソルが単語内
+
+    #'\C\U\zs\u\%(\k\+\s\+\%#\)\@=\U\+\s\+\%#',   # カーソルが単語内 TODO
+
+    # パート先頭の大文字 TODO
+    '\C\u\%(\k\+\%#\)\@=\U\+[[:punct:]]\+\%#',               # カーソルが単語内
+    '\C\U\zs\u\%(\k\+\%#\)\@=[0-9A-Z]*[[:punct:]]\+\%#',     # カーソルが単語内
+    '\C\zs\u\%(\k\+\%#\)\@=[0-9a-z]\+\%#',                   # カーソルが単語内
+
+    '\C\u\%(\k\+\s\+\%#\)\@=[0-9A-Z]*[[:punct:]]*\s\+\%#',   # カーソルが単語先頭。なので、前の単語で探す。
+    '\C\u\%(\k\+\s\+\%#\)\@=[0-9a-z]\+[[:punct:]]*\s\+\%#',  # カーソルが単語先頭。なので、前の単語で探す。
+
+    # 記号の後の英数字 TODO
+    '[[:punct:]]\@<=\k\@<=[[:alnum:]]\{-1,}\%#',      # カーソルが単語内
+    '[[:punct:]]\@<=\k\@<=[[:alnum:]]\k\{-}\%#',      # カーソルが単語内
+
+    '[[:punct:]]\@<=\k\@<=[[:alnum:]]\{-1,}\s\+\%#',  # カーソルが単語先頭。なので、前の単語で探す。
+    '[[:punct:]]\@<=\k\@<=[[:alnum:]]\k\{-}\s\+\%#',  # カーソルが単語先頭。なので、前の単語で探す。
+
+    # TODO 行頭 行末
+  ]
+
+  const pos = pat -> mapnew((_, v) => searchpos(v, 'bn', line('.'))) -> map((_, v) => v[1]) -> filter((_, v) => v != 0)
+  echo pos
+
+  const ini = 0
+  const min_col = pos -> reduce((acc, val) => acc < val ? val : acc, ini)
+  # echo min_col
+
+  if min_col != ini
+    #echo "%%%%%%"
+    setpos('.', [bufnr(), line('.'), min_col, 0])
+  else
+    #echo "######"
+    normal! b
+  endif
+enddef
+
+# abc_def  abc#def abc__def  abc###def abc-def G
+# RAMCheck RAM RR175 GET_MAN GET#REM  GET-K RR175BB Check___R Check###R Check###5
+# RAMCheck_RRT
+# RamCheck#RRT  KTR_WER_QAS  ktr_wer_qas
+# RamCheck_RRT RAMCheck Ram100Check100_RRT  KTR100_R_WER_QAS  k1tr_wer100_qas
+
+com! GGG CaseMotion_W(1, "")
+nnoremap W <Cmd>GGG<CR>
+
+nnoremap W <Cmd>call <SID>CaseMotion_W(1, "")<CR>
+nnoremap E <Cmd>call <SID>CaseMotion_E(1, "")<CR>
+nnoremap B <Cmd>call <SID>CaseMotion_B(1, "")<CR>
+
+
+#---------------------------------------------------------------------------------------------
+command! -nargs=+ -bang -complete=command CC CommnadOutputCapture <args>
+
+
+#---------------------------------------------------------------------------------------------
+
+augroup AAA
+  au!
+  #au QuickFixCmdPost * echo getqflist({'title': 0}).title
+  #au QuickFixCmdPost * redraw
+  #au QuickFixCmdPost * sleep 2
+augroup end
+
+
+#---------------------------------------------------------------------------------------------
+# from new vimrc
+
+if 0
+  set wildmode=list:full
+  set wildoptions-=pum
+else
+  set wildmode=full
+  set wildoptions+=pum
+  cnoremap <expr> j pumvisible() ? '<C-n>' : 'j'
+  cnoremap <expr> k pumvisible() ? '<C-p>' : 'k'
+  cnoremap <expr> J pumvisible() ? '<C-n>' : 'J'
+  cnoremap <expr> K pumvisible() ? '<C-p>' : 'K'
+  cnoremap <expr> <CR> pumvisible() ? '<C-y>' : '<CR>'
+endif
+
+# let g:winresizer_start_key = "U"
+# let g:winresizer_gui_enable = 1
+# let g:winresizer_gui_start_key = "!"
+
+
+
+# from ema.vim
+
+set mouse=a
+set formatoptions-=or
+setl formatoptions-=or
+#set mps=(:),<:>,[:],{:},（:）,＜:＞,［:］,｛:｝,｟:｠,｢:｣,〈:〉,《:》,「:」,『:』,【:】,〔:〕,〖:〗,〘:〙,〚:〛,⟦:⟧,⟨:⟩,⟪:⟫,⟬:⟭,⟮:⟯,⦃:⦄,⦅:⦆,⦇:⦈,⦉:⦊,⦋:⦌,⦍:⦎,⦏:⦐,⦑:⦒,⦗:⦘,⧼:⧽,❨:❩,❪:❫,❬:❭,❮:❯,❰:❱,❲:❳,❴:❵,⁽:⁾,₍:₎
+
+set ambiwidth=double
+
+set guioptions=
+
+set formatoptions-=r
+set formatoptions-=o
+
+nnoremap <silent> <C-]> g;
+nnoremap <silent> <C-\> g,
+
+# g:Dark = v:false
+
+
+
+#---------------------------------------------------------------------------------------------
+
+cnoremap <C-Q> <C-F>
+
+
+#---------------------------------------------------------------------------------------------
+
+
+
+#---------------------------------------------------------------------------------------------
 
 
 #---------------------------------------------------------------------------------------------
@@ -2320,4 +2942,9 @@ com! -bar SwitchLineNumber SwitchLineNumber()
 
 
 
+
+
 #---------------------------------------------------------------------------------------------
+
+
+
