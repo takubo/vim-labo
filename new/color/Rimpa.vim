@@ -8,7 +8,7 @@ if exists("syntax_on")
   syntax reset
 endif
 
-let colors_name = "Rimpa"
+let colors_name = "rimpa"
 
 
 "----------------------------------------------------------------------------------------
@@ -74,10 +74,14 @@ if v:true
 else
   hi CursorLineNr	guifg=#f8f0e0	guibg=bg	gui=NONE	ctermfg=yellow	cterm=bold,underline
 endif
-"hi LineNrAbove	guifg=#ff6666	guibg=NONE	gui=NONE
-hi LineNrAbove	guifg=#85b0df	guibg=NONE	gui=NONE
-hi LineNrBelow	guifg=#cf403d	guibg=NONE	gui=NONE
-
+if 0
+ "hi LineNrAbove	guifg=#ff6666	guibg=NONE	gui=NONE
+  hi LineNrAbove	guifg=#85b0df	guibg=NONE	gui=NONE
+  hi LineNrBelow	guifg=#cf403d	guibg=NONE	gui=NONE
+else
+  hi LineNrAbove	guifg=#cf403d	guibg=NONE	gui=NONE
+  hi LineNrBelow	guifg=#d0c5a9	guibg=NONE	gui=NONE
+endif
 
 "----------------------------------------------------------------------------------------
 " Statusline, Tabline, VertSplit
@@ -441,8 +445,7 @@ augroup ColorChangeAtMode
  "au ModeChanged *:[vV\x16]* hi CursorLineNr	guifg=#b8d3ef	guibg=#4444ee	gui=NONE	ctermfg=Blue	cterm=bold,underline
   au ModeChanged *:[vV\x16]* hi CursorLineNr	guibg=#d0c589	guifg=#222222	gui=NONE	ctermfg=Blue	cterm=bold,underline
  "au CmdlineEnter *          hi CursorLineNr	guibg=#d0c589	guifg=#222222	gui=NONE	ctermfg=Blue	cterm=bold,underline | redraw
-  au ModeChanged *:n* call hlset(s:CursorLineNrOrg)
- "au InsertLeave * call hlset(s:CursorLineNrOrg)
+  au ModeChanged *:n*        call hlset(s:CursorLineNrOrg)
 augroup END
 
 
