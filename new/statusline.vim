@@ -3,6 +3,7 @@ vim9script
 scriptencoding utf-8
 
 
+
 #----------------------------------------------------------------------------------------
 # Switch Statusline Contents
 
@@ -34,6 +35,7 @@ com! -nargs=1 -complete=customlist,CompletionStlContents Stl {
   StatuslineContentsSwitch['<args>'] = !StatuslineContentsSwitch['<args>']
   redrawstatus!
 }
+
 
 
 #----------------------------------------------------------------------------------------
@@ -98,7 +100,10 @@ def g:Statusline(): string
   const filetype = B('&filetype')
 
 
-  const gold = g:IsGold()
+  #const gold = g:IsGold()
+  const gold = !exists('g:RimpaGold') || g:RimpaGold
+
+
   const contents_switch = StatuslineContentsSwitch
 
 
@@ -108,7 +113,7 @@ def g:Statusline(): string
 
   #------------------------------------------------- {{{
   # Window Number & Buffer Number
-  if contents_switch['Winnr']
+  if contents_switch.Winnr
     stl ..= " [ " .. win_id2win(winid) .. " ] "
 
     if gold
@@ -125,7 +130,7 @@ def g:Statusline(): string
 
   #------------------------------------------------- {{{
   # Buffer Information
-  if contents_switch['Winnr']
+  if contents_switch.Winnr
     if gold
       stl ..= "%##"
     else
@@ -147,7 +152,7 @@ def g:Statusline(): string
     stl ..= "%#StlGoldLeaf#"
     stl ..= "%#StlGoldChar#"
     stl ..= "%#StlGoldChar#"
-  elseif contents_switch['Winnr']
+  elseif contents_switch.Winnr
     stl ..= "%##"
     stl ..= "%#StlFill#"
     stl ..= "%#StlGoldLeaf#"
@@ -170,11 +175,11 @@ def g:Statusline(): string
   stl ..= "%#StlFuncName#"
 
   if bufname =~ '^fugitive' || filetype == 'fugitive'
-    const StlFugitive = contents_switch['Branch'] ? ' [fugitive]' : ' fugitive'
+    const StlFugitive = contents_switch.Branch ? ' [fugitive]' : ' fugitive'
     stl ..= StlFugitive
   endif
 
-  if contents_switch['Branch'] && filetype != 'netrw'   #  bufname != 'NetrwTreeListing' && bufname !~ '^NERD_tree'
+  if contents_switch.Branch && filetype != 'netrw'   #  bufname != 'NetrwTreeListing' && bufname !~ '^NERD_tree'
       stl ..= ' [' .. BranchName(bufnr) .. '] '
   endif
   #------------------------------------------------- }}}
@@ -183,7 +188,7 @@ def g:Statusline(): string
   #------------------------------------------------- {{{
   # Path
   if gold
-    if contents_switch['Winnr']
+    if contents_switch.Winnr
       stl ..= "%##"
       #stl ..= "  %t  "
       stl ..= " %t "
@@ -192,7 +197,7 @@ def g:Statusline(): string
       stl ..= " %t "
     endif
   else
-    if contents_switch['Winnr']
+    if contents_switch.Winnr
       stl ..= "%##"
       stl ..= " %t "
     else
@@ -206,13 +211,13 @@ def g:Statusline(): string
 
   stl ..= "%#StlGoldChar# %<"
 
-  if contents_switch['ShadowDir'] && !nonamebuf
+  if contents_switch.ShadowDir && !nonamebuf
     stl ..= "%#StlNoNameDir#  "
 
     stl ..= bufname -> fnamemodify(':p:h')
   endif
 
-  if (contents_switch['ShadowDir'] || contents_switch['NoNameBufPath']) && nonamebuf
+  if (contents_switch.ShadowDir || contents_switch.NoNameBufPath) && nonamebuf
     # 無名バッファなら、cwdを常に表示。
     stl ..= "%#StlNoNameDir# "
 
@@ -223,7 +228,7 @@ def g:Statusline(): string
 
   #------------------------------------------------- {{{
   # Current Function Name
-  if contents_switch['FuncName']
+  if contents_switch.FuncName
    #stl ..= "%#StlFuncName#"
     stl ..= "%#StlGoldChar#"
 
@@ -244,7 +249,7 @@ def g:Statusline(): string
 
   #------------------------------------------------- {{{
   # Keyword Characters
-  if contents_switch['KeywordChars']
+  if contents_switch.KeywordChars
     #if 0
     #  stl ..= " ≪ " .. B('&isk') -> substitute('[^,]\zs,', ' ', 'g') -> substitute(',,', ', ', 'g') -> substitute('\d\+-\d\+,\?', '', 'g') .. "≫ "
     #else
@@ -278,14 +283,42 @@ def g:Statusline(): string
   stl ..= "%#StlFill#"
   stl ..= "%#StlGoldChar#"
 
-  if contents_switch['Wrap']
+  if contents_switch.Wrap
     stl ..= " " .. (W('&wrap') ? '  ' : '>>') .. " "
   endif
 
   stl ..= W('&scrollbind') ?  " $" : "  "
 
-  if contents_switch['TabStop']
+  if contents_switch.TabStop
     stl ..= " ⇒" .. B('&tabstop')
+  endif
+  #------------------------------------------------- }}}
+
+
+  #------------------------------------------------- {{{
+  # Under Cursor Information
+  if winwidth(winid) > 120
+
+    stl ..= "%#StlFill#"
+    stl ..= "%#StlGoldChar#"
+    stl ..= "%##"
+
+    if contents_switch.WordLen
+      stl ..= " ≪%{" .. "len(expand('<cword>'))" .. "}≫"
+    endif
+
+    if contents_switch.CharCode
+      stl ..= " %10(《%(0x%B%)》%)"
+    else
+      stl ..= "%#StlGoldChar#" .. "           "
+    endif
+
+    if contents_switch.CharCode10
+      stl ..= " %10(《%(%b%)》%)"
+    else
+      stl ..= "%#StlGoldChar#" .. "           "
+    endif
+
   endif
   #------------------------------------------------- }}}
 
@@ -297,34 +330,6 @@ def g:Statusline(): string
 
 
   #------------------------------------------------- {{{
-  # Under Cursor Information
-  if winwidth(0) > 130
-
-    stl ..= "%#StlFill#"
-    stl ..= "%#StlGoldChar#"
-    stl ..= "%##"
-
-    if contents_switch['WordLen']
-      stl ..= " ≪%{" .. "len(expand('<cword>'))" .. "}≫"
-    endif
-
-    if contents_switch['CharCode']
-      stl ..= " %10(《%(0x%B%)》%)"
-    else
-      stl ..= "%#StlGoldChar#" .. "           "
-    endif
-
-    if contents_switch['CharCode10']
-      stl ..= " %10(《%(%b%)》%)"
-    else
-      stl ..= "%#StlGoldChar#" .. "           "
-    endif
-
-  endif
-  #------------------------------------------------- }}}
-
-
-  #------------------------------------------------- {{{
   # Overall Buffer
   if gold
     stl ..= "%#StlGoldLeaf#"
@@ -332,11 +337,11 @@ def g:Statusline(): string
     stl ..= "%#StlFill#"
   endif
 
-  if contents_switch['LinePercent']
+  if contents_switch.LinePercent
     stl ..= " %3p%%"
     stl ..= " %6([%L]%)"
   endif
-  if contents_switch['ScreenPercent']
+  if contents_switch.ScreenPercent
    #stl ..= " %6([%P]%)"
     stl ..= " %4P"
     stl ..= " %6([%L]%)"
@@ -344,7 +349,7 @@ def g:Statusline(): string
   endif
 
 
-  if contents_switch['BytesOfFile']
+  if contents_switch.BytesOfFile
     stl ..= " %6oBytes"
   endif
 
@@ -356,14 +361,14 @@ def g:Statusline(): string
   # Line & Column
   stl ..= "%##"
 
-  if contents_switch['Line']
+  if contents_switch.Line
     stl ..= " %4l:L"
   endif
 
   stl ..= printf(" %3d:c", getcursorcharpos()[2])
   stl ..= " %3v:v"
 
-  if contents_switch['ColumnBytes']
+  if contents_switch.ColumnBytes
     stl ..= " %3c:b"
   endif
 
@@ -374,80 +379,9 @@ def g:Statusline(): string
 enddef
 
 
+
 #----------------------------------------------------------------------------------------
-# Initialize Statusline
+# Initialize
 
 set laststatus=2
 set statusline=%!Statusline()
-
-
-
-#----------------------------------------------------------------------------------------
-function! g:Statusline_O()
-
-  let StatuslineContents = {}
-
-  let StatuslineContents['Column'] = v:false
-  let StatuslineContents['Branch'] = v:false
-  let StatuslineContents['FuncName'] = v:false
-  let StatuslineContents['Keywords'] = v:false
-  let StatuslineContents['LineColumn'] = v:false
-  let StatuslineContents['Path'] = v:false
-  let StatuslineContents['TabStop'] = v:false
-
-  let statusline_contents = StatuslineContents
-
-  let stl = "  "
-  let stl ..= "%#StlFill#[ %{winnr()} ]%## ( %n ) "
-  let stl ..= "%##%m%r%{(!&autoread&&!&l:autoread)?'[AR]':''}%h%w "
-
-  let g:MyStlFugitive = statusline_contents['Branch'] ? ' [fugitive]' : ' fugitive'
-  let stl ..= "%#StlFuncName#%{bufname('') =~ '^fugitive' ? g:MyStlFugitive : ''}"
-  let stl ..= "%#StlFuncName#%{&filetype == 'fugitive' ? g:MyStlFugitive : ''}"
-
-  if statusline_contents['Branch']
-    let stl ..= "%#StlFuncName# %{FugitiveHead(7)}"
-  endif
-
-  if statusline_contents['Path']
-    let stl ..= "%<"
-    let stl ..= "%##%#StlFill# %F "
-  else
-    let stl ..= "%##%#StlFill# %t "
-    let stl ..= "%<"
-  endif
-
-  if statusline_contents['FuncName']
-    let stl ..= "%#StlFuncName# %{cfi#format('%s()', '')}"
-  endif
-
-
-  " ===== Separate Left Right =====
-  let stl ..= "%#StlFill#%="
-  " ===== Separate Left Right =====
-
-  if statusline_contents['Keywords']
-    let stl ..= " %{substitute(substitute(&isk, '\\\\d\\\\+-\\\\d\\\\+', '', 'g'), ',\\\\+', ' ', 'g')} "
-  endif
-
-  let stl ..= "%## %-4{&ft==''?'    ':&ft}  %-5{&fenc==''?'     ':&fenc}  %4{&ff} "
-
-  let stl ..= "%#StlFill# %{&l:scrollbind?'$':'@'} "
-  let stl ..= "%1{c_jk_local!=0?'L':'G'} %1{&l:wrap?'==':'>>'} %{g:clever_f_use_migemo?'(M)':'(F)'} %4{&iminsert?'Jpn':'Code'} "
-
-  let stl ..= "%#StlFill#  %{repeat(' ',winwidth(0)-178)}"
-
-  let stl ..= "%## %3p%% [%4L] "
-
-  if statusline_contents['LineColumn']
-    let stl ..= "%## %4lL, %3v(%3c)C "
-  elseif statusline_contents['Column']
-    let stl ..= "%## %3v,%3c "
-  endif
-
-  if statusline_contents['TabStop']
-    let stl ..= "%## %{&l:tabstop} "
-  endif
-
-  return stl
-endfunction
