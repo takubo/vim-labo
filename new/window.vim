@@ -7,15 +7,19 @@ scriptencoding utf-8
 # Focus Wrap Move
 #----------------------------------------------------------------------------------------
 
-const NotTerminal = (win: number): bool => (&l:buftype !~ 'terminal' || term_getstatus(winbufnr(win)) =~ 'normal')
+const NotTerminal = (win: number): bool => {
+  const bufnr = winbufnr(win)
+  return getbufvar(bufnr, '&l:buftype') !~ 'terminal' || term_getstatus(bufnr) =~ 'normal'
+}
 
-export def WindowFocus_WrapMove(dir_key: string, count: number, orth: bool = false): void
+export def WindowFocus_WrapMove(dir_key: string, count: number): void
+  const cur_win = winnr()
+
   # {{{ optimize
   if count == 1
-    const cur_win = winnr()
-    exe 'wincmd ' .. dir_key
-    const new_win = winnr()
+    const new_win = winnr(dir_key)
     if (cur_win != new_win) && NotTerminal(new_win)
+      exe 'wincmd ' .. dir_key
       return
     endif
   endif
@@ -23,114 +27,49 @@ export def WindowFocus_WrapMove(dir_key: string, count: number, orth: bool = fal
 
   const num_win = winnr('$')  # Windowの数
 
-  #? # Windowの数が2なら、もう一方へ移動することは自明。Windowの数が1なら、移動はない。
-  #? if num_win <= 2
-  #?   wincmd w
-  #?   return
-  #? endif
+  # 順方向へ移動した場合の情報を収集 & 順方向へ移動
+  const fwrd_wins = range(1, num_win) -> map((_, v) => winnr(v .. dir_key)) -> filter((_, v) => NotTerminal(v))
+  const fwrd_last_win = fwrd_wins[-1]
 
-  # 順方向へ移動
-  const fwrd = WindowFocus_WrapMove_Sub(dir_key, count)
-  if fwrd.done
+  var fwrd_wins_new = []
+  if fwrd_last_win != cur_win
+    const fwrd_idx = fwrd_wins ->  indexof((_, v) => v == fwrd_last_win)
+    if count - 1 <= fwrd_idx
+      # 順方向へ移動
+      exe ':' .. fwrd_wins[count - 1] .. 'wincmd w'
+      return
+    endif
+    fwrd_wins_new = fwrd_wins[0 : fwrd_idx]
+  endif
+
+  # 逆方向へ移動した場合の情報を収集
+  const rev_dir_key = {'h': 'l', 'j': 'k', 'k': 'j', 'l': 'h'}[dir_key]
+
+  const back_wins = range(1, num_win) -> map((_, v) => winnr(v .. rev_dir_key)) -> filter((_, v) => NotTerminal(v))
+  const back_last_win = back_wins[-1]
+
+  var back_wins_new = []
+  if back_last_win != cur_win
+    const back_idx = back_wins ->  indexof((_, v) => v == back_last_win)
+    back_wins_new = back_wins[0 : back_idx]
+  endif
+
+  const sum_len = len(fwrd_wins_new) + len(back_wins_new) + 1  # + 1は、カレントウィンドウの分
+  const count_pure = count % sum_len
+
+  if count_pure == 0
+    # カレントウィンドウに留まる
+    return
+  endif
+
+  if count_pure <= len(fwrd_wins_new)
+    # 順方向へ移動
+    exe ':' .. fwrd_wins_new[count_pure - 1] .. 'wincmd w'
     return
   endif
 
   # 逆方向へ移動
-  const rev_dir_key = {'h': 'l', 'j': 'k', 'k': 'j', 'l': 'h'}[dir_key]
-  # countをnum_win + とすることで、確実に端まで移動し、且つ、移動完了となってしまわないようにしている。
-  const back = WindowFocus_WrapMove_Sub(rev_dir_key, num_win + 1)
-
-  if fwrd.step == 0 &&  back.step == 0
-    #? if !orth
-    #?   # 直交移動
-    #?   WindowFocus_WrapMove({'h': 'k', 'j': 'l', 'k': 'h', 'l': 'j'}[dir_key], count, true)
-    #? endif
-    return
-  endif
-
-  const step_around = fwrd.step + back.step + 1  # +1はwrap分
-  const step_mod = count % step_around
-
-  if step_mod == 0
-  elseif step_mod <= fwrd.step
-    exe ':' .. fwrd.win[step_mod] .. 'wincmd ' .. dir_key
-  else
-    exe ':' .. back.win[back.step - (step_mod - fwrd.step - 1)] .. 'wincmd ' .. rev_dir_key
-  endif
-enddef
-
-def WindowFocus_WrapMove_Sub(dir_key: string, count: number): dict<any>
-  #var ret: dict<any> = {'done': false, 'step': 0, 'win': []}
-  var ret: dict<any> = {'done': false, 'step': 0, 'win': range(count)}
-
-  const org_win = winnr()
-
-  var old_win = org_win
-  var move_accum = 0
-  var move_num = 0
-
-  while true
-    move_num += MoveToNextWindow(dir_key)
-
-    const new_win = winnr()
-
-    if new_win == old_win
-      # もう動けないので、org_winに戻って終了。
-      exe ':' .. org_win .. 'wincmd w'
-
-      ret.done = false
-      ret.step = move_accum
-      return ret
-    endif
-
-    ++move_accum
-
-    ret.win->insert(move_num, move_accum)
-
-    if move_accum == count
-      # terminalでないwindowを見つけたので、移動して終了。
-      # 一旦戻って、直接移動にしないと、前Window(<C-W>p)が意図しないものとなる。
-      exe ':' .. org_win .. 'wincmd w'
-      exe ':' .. new_win .. 'wincmd w'
-
-      ret.done = true
-      ret.step = move_accum
-      return ret
-    endif
-
-    old_win = new_win
-  endwhile
-
-  return ret  # ここに到達することはないが、returnがないとビルドエラーになる。
-enddef
-
-# TODO 開始は、terminalではない前提。
-def MoveToNextWindow(dir_key: string): number
-  var old_win = winnr()
-  var move_accum = 0
-
-  while true
-    exe 'wincmd ' .. dir_key
-
-    const new_win = winnr()
-
-    const not_terminal = NotTerminal(new_win)
-
-    if new_win == old_win
-      # 端まで移動していた
-      return (not_terminal ? move_accum : 0)
-    endif
-
-    ++move_accum
-
-    if not_terminal
-      return move_accum
-    endif
-
-    old_win = new_win
-  endwhile
-
-  return 0  # ここに到達することはないが、returnがないとビルドエラーになる。
+  exe ':' .. back_wins_new[-(count_pure - len(fwrd_wins_new))] .. 'wincmd w'
 enddef
 
 
@@ -288,86 +227,6 @@ enddef
 
 
 #----------------------------------------------------------------------------------------
-# Best Scrolloff
-#----------------------------------------------------------------------------------------
-
-augroup MyVimrc_BestScrollOff
-  au!
-  # au WinResized * echo v:event
-  au WinResized * ExeBestScrolloff()
-augroup end
-
-# def BestScrolloff()
-#   map(v:event, (_, win_id) => { win_execute(win_id, 'echo winnr()')
-#                                 return 0
-#   } )
-# enddef
-
-def ExeBestScrolloff()
-  # var evt: list<number> = copy(v:event.windows)
-  # TODO foreach にしたら、str2nr2は不要になる。
-  map(v:event.windows, (_, win_id) => str2nr(win_execute(win_id, 'BestScrolloff()')))
-enddef
-
-def BestScrolloff()
-  const winheight = winheight(0)
-  # Quickfixでは、なぜかWinNewが発火しないので、exists()で変数の存在を確認せねばならない。
-  &l:scrolloff = (!TypewriterScroll && (!exists('w:TypewriterScroll') || !w:TypewriterScroll)) ?
-                   ( winheight < 10 ? 0 :
-                     winheight < 20 ? 2 :
-                     5 ) :
-                   9999
-enddef
-
-
-
-#----------------------------------------------------------------------------------------
-# Typewriter Scroll
-#----------------------------------------------------------------------------------------
-
-import autoload "./PopUpInfo.vim" as pui
-
-
-var TypewriterScroll = false
-
-# 削除 TODO 
-# augroup MyVimrc_TypewriterScroll
-#   au!
-#   au WinNew * call setwinvar(0, 'TypewriterScroll', false)
-#   # -o, -Oオプション付きで起動したWindowでは、WinNew, WinEnterが発火しないので、別途設定。
-#   au VimEnter * PushPosAll | exe "tabdo windo call setwinvar(0, 'TypewriterScroll', false) | call BestScrolloff()" | PopPosAll
-# augroup end
-
-def ToggleTypewriterScroll(global: bool)
-  # Quickfixでは、なぜかWinNewが発火しないので、ここで変数を定義する。
-  if !exists('w:TypewriterScroll')
-    w:TypewriterScroll = false
-  endif
-
-  if global
-    TypewriterScroll = !TypewriterScroll
-    exe TypewriterScroll ? 'normal! zz' : ''
-  else
-    w:TypewriterScroll = !w:TypewriterScroll
-    exe w:TypewriterScroll ? 'normal! zz' : ''
-  endif
-
-  call BestScrolloff()
-
-  pui.PopUpInfoM([
-    TypewriterScroll   ? 'Global    TypewriterScroll' : 'Global No TypewriterScroll',
-    '',
-    w:TypewriterScroll ? 'Local     TypewriterScroll' : 'Local  No TypewriterScroll'
-  ], 2000)
-enddef
-
-nnoremap z<Space> <ScriptCmd>ToggleTypewriterScroll(true)<CR>
-nnoremap g<Space> <ScriptCmd>ToggleTypewriterScroll(false)<CR>
-
-
-
-
-#----------------------------------------------------------------------------------------
 # RC
 #----------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------
@@ -404,6 +263,7 @@ import autoload '../impauto/window_ratio.vim' as wr
 
 #----------------------------------------------------------------------------------------
 # Initialize
+#----------------------------------------------------------------------------------------
 
 set noequalalways
 
@@ -412,6 +272,7 @@ set noequalalways
 
 #----------------------------------------------------------------------------------------
 # Trigger
+#----------------------------------------------------------------------------------------
 
 nmap <BS> <C-W>
 nmap <C-J> <C-W>
@@ -419,6 +280,7 @@ nmap <C-J> <C-W>
 
 #----------------------------------------------------------------------------------------
 # Split & New
+#----------------------------------------------------------------------------------------
 
 nnoremap  _     <C-W>s<Cmd>diffoff <Bar> setl noscrollbind<CR>
 nnoremap g_     <C-W>n
@@ -450,10 +312,11 @@ nmap M <Plug>(MyVimrc-Window-AutoNew)
 
 #----------------------------------------------------------------------------------------
 # Close
+#----------------------------------------------------------------------------------------
 
 # TODO NERDTreeも閉じられるようにする。
-# nnoremap q  <C-W>c
-nnoremap gq <C-W>c
+nnoremap q  <C-W>c
+# nnoremap gq <C-W>c
 
 # 補償
 nnoremap <C-Q> q
@@ -468,6 +331,7 @@ nnoremap <C-Q>; q:
 
 #----------------------------------------------------------------------------------------
 # Focus
+#----------------------------------------------------------------------------------------
 
 # Direction Focus
 nmap <Left>  <Plug>(Window-Focus-WrapMove-h)
@@ -497,6 +361,7 @@ nmap L <Plug>(Window-Focus-WrapMove-l)
 
 #----------------------------------------------------------------------------------------
 # Focus (補償)
+#----------------------------------------------------------------------------------------
 
 #--------------------------------------------
 # Join
@@ -533,6 +398,7 @@ nnoremap <Leader>L L
 
 #----------------------------------------------------------------------------------------
 # Window Move
+#----------------------------------------------------------------------------------------
 
 # ウィンドウを上端、下端に動かすと、ウィンドウ高さが最大になってしまうことの対策を入れている。
 # <C-W>J, <C-K>で、'horizontal wincmd ='が走ってしまうことの対策にもなっている。
@@ -571,9 +437,20 @@ nmap <C-W>J <Plug>(MyVimrc-Window-Move-J)
 nmap <C-W>K <Plug>(MyVimrc-Window-Move-K)
 nmap <C-W>L <Plug>(MyVimrc-Window-Move-L)
 
+nnoremap <C-W>h <C-W>H
+nnoremap <C-W>j <C-W>J
+nnoremap <C-W>k <C-W>K
+nnoremap <C-W>l <C-W>L
+
+nunmap <C-W>H
+nunmap <C-W>J
+nunmap <C-W>K
+nunmap <C-W>L
+
 
 #----------------------------------------------------------------------------------------
 # Resize
+#----------------------------------------------------------------------------------------
 
 #--------------------------------------------
 # 漸次
@@ -633,12 +510,14 @@ endif
 
 #----------------------------------------------------------------------------------------
 # <Plug> (他機能での再帰マップ用)
+#----------------------------------------------------------------------------------------
 
 nnoremap <Plug>(MyVimrc-WinCmd-p) <C-W>p
 
 
 #----------------------------------------------------------------------------------------
 # Reopen as Tab
+#----------------------------------------------------------------------------------------
 
 # TODO diffのバッファも再現する。
 
@@ -658,6 +537,7 @@ nnoremap <C-W>T     <C-W>T
 
 #----------------------------------------------------------------------------------------
 # Tab (Window Container)
+#----------------------------------------------------------------------------------------
 
 nnoremap  <C-T> <Cmd>tabnew<CR>
 nnoremap g<C-T> :<C-U>tabnew<Space>
@@ -680,6 +560,7 @@ nnoremap gt <Cmd>tabs<CR>:tabnext<Space>
 
 #----------------------------------------------------------------------------------------
 # Terminal
+#----------------------------------------------------------------------------------------
 
 # Escape Terminal
 # Windowから抜ける。 (Windowが１つしかないなら、Tabから抜ける。)
