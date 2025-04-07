@@ -426,7 +426,10 @@ function! s:on_entering_submode(submode)  "{{{2
   call s:set_up_options(a:submode)
 
   " set_up_options()を呼んだ後でないと、submode#current()が使えない。
-  exe 'doautocmd User SubmodeEnter' .. a:submode
+  let event_name = 'SubmodeEnter' .. a:submode
+  if autocmd_get(#{event: 'User', pattern: event_name})->len() != 0
+    exe 'doautocmd User ' .. event_name
+  endif
 
   return ''
 endfunction
@@ -468,7 +471,10 @@ function! s:on_leaving_submode(submode)  "{{{2
   endif
 
   " Enter側コマンドのとの釣り合い上、restore_options()の前に実行する。
-  exe 'doautocmd User SubmodeLeave' .. a:submode
+  let event_name = 'SubmodeLeave' .. a:submode
+  if autocmd_get(#{event: 'User', pattern: event_name})->len() != 0
+    exe 'doautocmd User ' .. event_name
+  endif
 
   call s:restore_options()
 
