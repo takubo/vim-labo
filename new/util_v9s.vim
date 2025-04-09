@@ -810,10 +810,10 @@ def MMM3(): string
   #const r = s -> copy() -> filter((k, _) => k % 2 != 0) -> reverse()
   const le = l -> join('\|')
   const re = r -> join('\|')
-  searchpairpos(le, '', re, 'bcW')
-  if r -> index(GetCursorChar()) >= 0
-    searchpairpos(le, '', re, 'bW')
-  endif
+  searchpairpos(le, '', re, 'bcW')  # カーソル移動
+  #if r -> index(GetCursorChar()) >= 0
+  #  searchpairpos(le, '', re, 'bW')
+  #endif
   return ''
 enddef
 com! MMM MMM3()
@@ -823,6 +823,57 @@ vnoremap <silent> is <Esc><Cmd>MMM<CR>v%hol
 # TODO 最後のoをなくす。
 vnoremap <silent> is <Esc><Cmd>call <SID>MMM3()<CR>v%holo
 
+#----------------------------------------------------------------------------------------------------
+def MoveToMatchPairStart(): string
+  const mps = &mps -> split(',\|:')
+  const left  = mps -> copy() -> filter((k, _) => k % 2 == 0)
+  const right = mps -> copy() -> filter((k, _) => k % 2 != 0)
+  const le = left  -> join('\|')
+  const re = right -> join('\|')
+  searchpairpos(le, '', re, 'bcW')        # カーソル移動
+  if right -> index(GetCursorChar()) >= 0 # カーソルが閉じ括弧の上にあるときは、上のsearchpairpos()で開始括弧へカーソルが移動しない。
+    searchpairpos(le, '', re, 'bW')
+  endif
+  return ''
+enddef
+
+def OperatorMatchPairInner()
+  MoveToMatchPairStart()
+  const whichwrap = &whichwrap
+  set whichwrap=hl
+  normal! v%hol
+  &whichwrap = whichwrap
+enddef
+
+def OperatorMatchPairAll()
+  MoveToMatchPairStart()
+  normal! v%
+enddef
+
+onoremap <silent> is      <ScriptCmd>OperatorMatchPairInner()<CR>
+# vi(などとの互換のため、最後のoを付けている。
+vnoremap <silent> is <Esc><ScriptCmd>OperatorMatchPairInner()<CR>o
+
+onoremap <silent> as      <ScriptCmd>MoveToMatchPairStart()<Bar>normal! v%<CR>
+vnoremap <silent> as <Esc><ScriptCmd>MoveToMatchPairStart()<CR>v%
+
+onoremap <silent> as      <ScriptCmd>OperatorMatchPairAll()<CR>
+vnoremap <silent> as <Esc><ScriptCmd>OperatorMatchPairAll()<CR>
+
+
+
+#onoremap <silent> as      <ScriptCmd>MoveToMatchPairStart()<CR>v%
+#onoremap <silent> as :<C-U>call <SID>MoveToMatchPairStart() <Bar> normal! v%<CR>
+#onoremap <silent> as      <ScriptCmd>MoveToMatchPairStart()<CR><Cmd>normal! v%<CR>
+
+#com! MoveToMatchPairStartTest MoveToMatchPairStart()
+#onoremap <silent> is :<C-U>call <SID>MoveToMatchPairStart() <Bar> normal! v%hol<CR>
+#onoremap <silent> is <ScriptCmd>MoveToMatchPairStart()<CR><ScriptCmd>OperatorMatchPairInner()<CR><CR>
+#vnoremap <silent> is <Cmd>normal! <Esc><CR><Cmd>call <SID>MoveToMatchPairStart<CR>v%hol
+#vnoremap <silent> is <Esc><Cmd>MMM<CR>v%hol
+# TODO 最後のoをなくす。
+#vnoremap <silent> is <Esc><Cmd>call <SID>MoveToMatchPairStart()<CR>v%holo
+#----------------------------------------------------------------------------------------------------
 
 if 0
 単語先頭
@@ -1498,6 +1549,8 @@ def Unified_CR(mode: string)
   #  return
   #endif
 
+  expand('<cword>') -> TempHighLightWord()
+
   # Tag Jump
   if TagJump(mode)
     return
@@ -1542,7 +1595,7 @@ enddef
 # Tag Jump
 
 def TagJump(mode: string): number
-  const cword = expand("<cword>")
+  const cword = expand('<cword>')
 
   if cword !~# '\<\i\+\>'
     return 0
@@ -1780,7 +1833,7 @@ enddef
 def JumpToDefinition(): number
   # keeppatterns normal! gd
 
-  const word = expand("<cword>")
+  const word = expand('<cword>')
 
   if !searchdecl(word, 1, 1)
     # 表示範囲を最適化 TODO
@@ -1864,7 +1917,7 @@ function! Unified_CR(mode)
     try
       exe 'help ' . expand('<cword>')
 
-      let g:TagMatch = matchadd('TagMatch', '\<' . expand("<cword>") . '\>')
+      let g:TagMatch = matchadd('TagMatch', '\<' . expand('<cword>') . '\>')
       let g:TimerTagMatch = timer_start(s:TagHighlightTime, 'TagHighlightDelete')
       let g:TagMatchI[g:TimerTagMatch] = g:TagMatch
       augroup ZZZZ
@@ -2079,20 +2132,20 @@ hi TempHighLight	guibg=#c0504d	guifg=white
 augroup TempHighLight
   au!
   au ColorScheme * hi TempHighLight	guibg=#c0504d	guifg=white
-  au WinLeave * Callback(0)
+  au WinLeave * TempHighLightDelete(0)
 augroup end
 
 def TempHighLight(str: string, time: number = 1500)
-  Callback(0)  # 古いのを一旦消す。
+  TempHighLightDelete(0)  # 古いのを一旦消す。
   MatchDelete = function('matchdelete', [matchadd('TempHighLight', str), win_getid()])
-  TimerId = timer_start(time, Callback)
+  TimerId = timer_start(time, TempHighLightDelete)
 enddef
 
 def TempHighLightWord(str: string, time: number = 1500)
   TempHighLight('\<' .. str .. '\>', time)
 enddef
 
-def Callback(_: number)
+def TempHighLightDelete(_: number)
   if MatchDelete != null_function
     MatchDelete()
     MatchDelete = null_function
@@ -2924,8 +2977,9 @@ nnoremap <silent> <C-\> g,
 
 #---------------------------------------------------------------------------------------------
 
+# CommandLine Windowを開く
 cnoremap <C-Q> <C-F>
-
+nnoremap : q:i
 
 #---------------------------------------------------------------------------------------------
 
