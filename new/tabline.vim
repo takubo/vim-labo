@@ -248,13 +248,13 @@ enddef
 
 
 def DiffOptStr(): string
-  const diffopts = split(&diffopt, ',')
+  const diffopt = split(&diffopt, ',')
 
-  const case = (index(diffopts, 'icase') == -1 ?  '%#TblDiffOn#' : '%#TblDiffOff#') ..  'Case'
+  const case = (index(diffopt, 'icase') == -1 ?  '%#TblDiffOn#' : '%#TblDiffOff#') ..  'Case'
 
   const white =
     ( ['iblank', 'iwhite', 'iwhiteall', 'iwhiteeol']
-        -> map((_, val) => index(diffopts, val))
+        -> map((_, val) => index(diffopt, val))
         -> reduce((acc, val) => acc && (val == -1), true)
       ?  '%#TblDiffOn#' : '%#TblDiffOff#'
     ) ..  'White'
