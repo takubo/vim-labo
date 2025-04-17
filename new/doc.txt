@@ -1,3 +1,45 @@
+  MRU
+    以下は、無条件に飛べばよい
+        if winnr() != winnum
+            " If not already in the window, jump to it
+            exe winnum . 'wincmd w'
+        endif
+    完全一致で開く場合
+      pat -> a:pat
+    MRU_Open_Window
+      save Window id
+      MRU_Window_Height は、動的に変更。
+      ↓は要らないのでは？
+        setlocal winfixheight
+      マッピングごとの開き方を変える
+    MRU_Open_File_In_Tab
+      右となりのタブで開く
+    MRU_Window_Edit_File
+      ↓は、多分バグ。ifの最初にないといけないはず。
+        elseif a:open_type ==# 'newtab' || g:MRU_Open_File_Use_Tabs
+      ↓preview windowがtopに来るのは、嫌だ。
+        exe 'topleft pedit ' . esc_fname
+
+  https://qiita.com/neras_1215/items/8e5412bf5a45a056e1fb
+  Plugin
+     1 doc-ja
+     2 submode
+     3 cfi
+     4 clever_f
+     5 Fugitive
+     6 BlockDiff
+     7 CamelCaseMotion
+     8 Rainbow Parentheses
+     9 ComfortableMotion
+    10 PrettyPrint
+    11 snippets
+    12 MRU
+    13 Easy Buffer
+    14 Tagbar
+    15 undotree
+    16 Surround
+
+
 #----------------------------------------------------------------------------------------
 # Doc
 
