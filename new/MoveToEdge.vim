@@ -27,7 +27,8 @@ nnoremap <Leader>k <Cmd>call <SID>BlockMove(-1)<CR>
 
 
 def BlockMove(dir: number, force: bool = false)
-  const pos = getcursorcharpos()
+  #const pos = getcursorcharpos()
+  var pos = getcursorcharpos()
 
   const row = pos[1]
   const col0 = pos[2] + pos[3]
@@ -40,7 +41,7 @@ def BlockMove(dir: number, force: bool = false)
 
   var crow = row
 
-  var rev = 0	# バッファの最下行、最上行まで行ったことで、ループを抜けるとき以外、戻しは不要
+  var rev = 0   # バッファの最下行、最上行まで行ったことで、ループを抜けるとき以外、戻しは不要
 
   while 0 < crow && crow <= line('$')
     crow += dir
@@ -59,8 +60,20 @@ def BlockMove(dir: number, force: bool = false)
 
   const lrow = crow - rev
 
-  repeat(dir > 0 ? 'j' : 'k', abs(lrow - row))->feedkeys('ni')
-  #exe 'normal! ' .. repeat(dir > 0 ? 'j' : 'k', abs(lrow - row))
+  if 0
+    var new_pos = pos[1 : ]
+    new_pos[0] = lrow
+    setcursorcharpos(new_pos)
+  elseif 1
+    const n = (lrow - row) -> abs()
+    if n > 0
+      #(n .. (dir > 0 ? 'j' : 'k')) -> feedkeys('ni')
+      exe 'normal!' (n .. (dir > 0 ? 'j' : 'k'))
+    endif
+  else
+    repeat(dir > 0 ? 'j' : 'k', abs(lrow - row))->feedkeys('ni')
+    #exe 'normal! ' .. repeat(dir > 0 ? 'j' : 'k', abs(lrow - row))
+  endif
 enddef
 
 
