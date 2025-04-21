@@ -62,6 +62,24 @@ vnoremap ` m
 nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR><Cmd>normal! :<lt>Esc><CR>
 nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR>:<Esc>
 
+if 0
+
+com! -nargs=0 -bar EscEsc {
+    # 'noh'は自動コマンド内では(事実上)実行出来ないので、別途実行の要あり。
+    noh
+    doautocmd nomodeline User EscEsc
+  }
+
+# EscEsc内のdoautocmdがエラーにならないよう、1つは自動コマンドを設定しておく。
+augroup EscEscDefault
+  au!
+  # コマンドラインモードへの出入りを行うことで、iminsert(or imcmdline?)の効果で、IMEがOFFされる。
+  au User EscEsc normal! :<Esc>
+augroup end
+
+nnoremap <silent> <Plug>(EscEsc) <Cmd>EscEsc<CR><Cmd>noh<CR>
+
+endif
 
 #---------------------------------------------------------------------------------------------
 # 保存

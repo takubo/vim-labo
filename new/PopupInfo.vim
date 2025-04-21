@@ -9,12 +9,16 @@ scriptencoding utf-8
 #
 
 
-hi Mode		guifg=#cf302d	guibg=#282828	gui=none	ctermfg=159
-hi Mode		guifg=#eeeeee	guibg=#282828	gui=none	ctermfg=159
-hi Mode		guifg=#878787	guibg=NONE	gui=NONE	ctermfg=102	ctermbg=NONE	cterm=NONE
-hi Mode		guifg=#C7C7C7	guibg=NONE	gui=NONE	ctermfg=102	ctermbg=NONE	cterm=NONE
-hi Mode      	guifg=#d0c589	guibg=#282828
-hi Mode		guifg=#d7d0c7	guibg=NONE	gui=NONE	ctermfg=102	ctermbg=NONE	cterm=NONE
+def PopUpInfoHighlight()
+  hi PopUpInfo	guifg=#d7d0c7	guibg=NONE	gui=NONE	ctermfg=102	ctermbg=NONE	cterm=NONE
+enddef
+
+augroup PopUpInfoHighlight
+  au!
+  au Colorscheme * PopUpInfoHighlight()
+augroup end
+
+PopUpInfoHighlight()
 
 
 var PopUpWindowId = []
@@ -96,7 +100,7 @@ def PopUpInfo_Internal(cont: list<string>, time: number = 2500, line_off: number
       #'dragall':            ,
       #'resize':             ,
       #'close':              ,
-      'highlight':          'Mode', #'SLFilename', 'Pmenu', 'Mode', 'Special', 'String',
+      'highlight':          'PopUpInfo',
 
       #'padding':            [1, 2, 1, 3],
 
