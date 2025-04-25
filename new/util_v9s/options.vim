@@ -300,8 +300,8 @@ set undoreload=-1  # リロードするときにアンドゥのためにバッ�
 #set wrapmargin=0
 set backspace=indent,eol,start  # バックスペースでインデントや改行を削除できるようにする
 #set comments
-set formatoptions?
-set formatlistpat?
+SetFlagOption('formatoptions', 'MBj', 'roa')  # set formatoptions
+# TODO set formatlistpat
 #set formatexpr
 #set complete  #@ completion
 #set completeopt  #@ completion
@@ -607,4 +607,28 @@ set viewdir=$HOME/vim_view
 #       る) 場合、"search hit BOTTOM, continuing at TOP" および
 #       "search hit TOP, continuing at BOTTOM" メッセージは、検索件数
 #       統計の前に "W" (覚え方: Wrapped) 文字のみで示される。
+
+
 #
+# formatoptions
+#
+# n   t
+# n   c
+# -   r
+# -   o
+# ?   /
+# ?   q
+# ?   w
+# -   a
+# ?   n
+# ?   2
+# n   v
+# n   b
+# n   l
+# n   m
+# +   M
+# +   B
+# n   1
+# n   ]
+# +   j
+# n   p
