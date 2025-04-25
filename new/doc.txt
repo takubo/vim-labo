@@ -40,20 +40,224 @@
     16 Surround
 
 
+  2025年4月7日 12:03
+    以下を更新
+      rimpa
+      Statusline
+      Tabline
+      submode
+      PopUpInfo
+      cursor_scroll.vim
+      util_v9s
+      Completion
+      impauto/WindowRatio
+      Window
+      multihighlight
+      search
+
+
+  2025年4月4日 18:03
+    以下を更新
+      misc
+      util_cmd
+
+  TODO
+    qf
+    misc
+    tag jump
+    case motion
+
+  ftplugin
+    要
+        完 vim.vim
+        完 diff.vim
+        完 sh.vim
+        完 qf.vim
+        完 c.vim
+    vimfiles
+        不要 awk.vim
+        完 c.vim
+        完 diff.vim
+        不要 help.vim
+        qf.vim
+        完 vim.vim
+    vim-labo
+        完 c
+        qf
+        完sh
+        完 vim
+
+  新バッファで、コマンド結果取込
+  MakeTags 
+  tag_only
+  clever_f
+  Swap_Exists
+  MRU
+  " Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+  snipet
+
+
+2025年3月19日   13時50分
+    全て更新。
+    残りは
+      doc
+      rimpa
+      submode
+      comfortable-motion
+    のみ。
+    vimrc は？
+    CSS-resize
+
+
+言語
+     1. アセンブリ
+     2. C
+     3. C++
+     4. Ada
+     5. Forth
+     6. Rust
+     7. VimScript
+     8. AWK
+     9. sed
+    10. sh / Zsh
+
+1228の主要残り
+    MakeTags
+    tag_only
+    JumpToDefine
+
+新機能
+    ラウンドの拡張
+    テキストオブジェクト dis, das
+    edgemove.vim
+    いくつかのユーティリティコマンド
+    PopUpInfo.vim
+    カラーチェンジ(金、暗)
+    HHLコマンド
+
+
+pack
+    1. rc
+    2. doc / ext / std / contrib
+    3. infra
+    4. mypackage
+    5. expackage
+    6. dev
+    7. (lib)
+
+pack
+    1. default, std
+       1. _rc
+       2. infra
+       3. std_plugins
+       4. (lib)
+    2. mypackage, expackageg
+    4. necesaary
+          fugitive
+          clever-f
+          cfi
+    3. expackage, otherpackages
+          MRU
+    5. doc
+       1. ja-doc
+    6. dev
+
+# TODO
+  Statusline
+  Tabline
+  Color
+  Window Wrap
+  Unified_CR
+
+----------------------------------------------------------------------------------------------------
+
+Winnr
+  Not       OK
+  Gold      OK
+
+Not Winnr
+  Not       OK
+  Gold      OK
+
+通常
+Help
+無名
+
+編集なし
+編集あり
+
+----------------------------------------------------------------------------------------------------
+1.  submode
+2.  clever-f
+3.  comfortable scroll
+4.  current function info
+5.  fugitive
+6.  user text object
+7.    under score
+8.  rainbow
+9.  snippets
+10. toggle case
+11. MRU
+12. PrettyPrint
+13. 
+14. 
+15. 
+16. 
+----------------------------------------------------------------------------------------------------
+Window split
+Asterisk
+Completion
+f motion
+----------------------------------------------------------------------------------------------------
+
+
+2024年12月27日 12時15分 plugin全て更新
+  次は、まだ。
+   jindent
+   cfi vim9
+   Colorscheme
+   impauto
+
+2024年12月26日 13時00分 アスキーコード順で、plugin/util,vimまで更新
+  次は、まだ。
+   Completion
+   jindent
+   PopUpInfo
+   util_v9s
+
+2024年12月16日 12時48分 アスキーコード順で、plugin/search,vimまで更新
+pluginディレクトリ以外は未更新
+  cfi vim9
+  Colorscheme
+  impauto
+
+
+
+# TODO
+
+Search          Line-Search
+Statusline
+Tabline
+
+
+
 #----------------------------------------------------------------------------------------
 # Doc
 
 
+
 # 複雑化
+#
 #  補完
 #  CWordSearch
 #  Tag
 #  Window Focus
 #  Visual, Stl, Tabline
-#
+
 
 
 # Grep
+#
 #   2 grep vimgrep
 #   2 new add
 #   2 qfix location
@@ -61,6 +265,7 @@
 #   3 プロジェクト全体 カレントディレクトリのみ カレントディレクトリと下
 #   6 文字列入力 カーソル下単語 カーソル下文字列 検索文字列 レジスタ 単語境界で自由入力
 #   72 * 6 = 432
+
 
 
 # 重点実施
@@ -72,22 +277,24 @@
 #    4. Tag & Browse
 #    5. Clever-f
 #    6. Block Visual
-#
+
 
 
 # packages
 #
-#  begin        vimrc内で呼び出すプラグイン
-#  lib          ライブラリ
-#  util         細かいユーティリティ
-#  dev          vim scriptのデバッグ用
-#  mypackage    submodule化しないプラグイン
-#  default      必須のプラグイン
-#  plugin       なくてもよいプラグイン
-#
-#
+#  begin         o vimrc内で呼び出すプラグイン
+#  lib           o ライブラリ
+#  util         s  細かいユーティリティ
+#  dev          s  vim scriptのデバッグ、vimのカスタマイズ用
+#  mypackage    so submodule化しないプラグイン vimrcで直接使う    (defaultでもよい)
+#  default      so 必須のプラグイン    (mypackageでもよい)
+#  plugin       so なくてもよいプラグイン
+#  doc          so vim-jp doc など doc
 
 
+
+# Category
+#
 #	 1	Basic
 #	 2	Battery
 #	 3	Buffer
@@ -126,23 +333,34 @@
 #	36	Vertical-f
 #	37	Visual_Mode
 #	38	Window
-#	
+#
 #	39	BlockMove
 #	40	CursorJumped
-#	41	Circle Number
+#	41	Circled Number
 #	42	mode popup
 #	43	Numbers
-#	
-#	
+
+
+
+# Plugins
+#
 #	1	submode
 #	2	cfi
-#	3	PrettyPrint
-#	4	clever-f
-#	5	Rainbow Parentheses
-#	6	fugitive
+#
+#	3	fugitive
+#
+#	4	PrettyPrint
+#
+#	5	clever-f
+#	6	Rainbow Parentheses
+#	7	Battery
+#	8	numbers
+#	9	smooth Scroll
+
 
 
 #  lib          ライブラリ
+#
 #	1. PushposPopPos
 #	2. CursorJumped
 #	3. WindowRatio
@@ -150,6 +368,124 @@
 #
 #	5. popup
 #	6. func name
+#	7. basic
 
 
 
+# Vim 本体
+#
+# CursorJumped
+# ModeChangePre ModeLeave
+
+
+
+
+# Category New Temp
+#
+#	 1	Basic & Emacs
+#	 3	Buffer & Mru & NERDTree
+#	 5	Completion
+#	 7	Cursor Move, CursorLine, CursorColumn, and Scroll & Clever-f
+#	 8	Diff
+#	13	Grep
+#	19	Search
+#	22	Statusline
+#	23	Substitute
+#	26	Tabline
+#	27	Tag, Jump, and Unified CR
+#	33	Util
+#	37	Visual_Mode
+#	38	Window & Tab
+#	44	plugin
+#	45	Unified_CR
+#	46	Unified_Tab
+#       47      Misc
+#	48	GUI
+#       49      insert & Snippets & i_Esc
+#	49	Make Tag
+#
+#	 2	Battery
+#	 6	Configuration
+#	18	Quickfix and Locationlist
+#	11	EscEsc
+#	12	FuncName
+#	20	SetPath
+#	24	Swap Exists
+#	28	Terminal
+#	29	Text_Objects
+#	31	Undo Redo
+#	42	mode popup
+
+
+
+# Category New
+#
+#	 1	Basic & Emacs
+#	 7	Cursor Move, CursorLine, CursorColumn, and Scroll & Clever-f
+#	29	Text_Objects
+#	11	EscEsc
+#	37	Visual_Mode
+#	31	Undo Redo
+#	24	Swap Exists
+#	26	Tabline
+#	22	Statusline
+#	19	Search
+#	13	Grep
+#	23	Substitute
+#	 8	Diff
+#	18	Quickfix and Locationlist
+#	38	Window & Tab
+#	 3	Buffer & Mru & NERDTree
+#	20	SetPath
+#	49	Make Tag
+#	27	Tag, Jump
+#       49      insert & Snippets & i_Esc
+#	 5	Completion
+#	28	Terminal
+#	45	Unified_CR
+#	46	Unified_Tab
+#	 6	Configuration
+#	42	mode popup
+#	33	Util
+#       47      Misc
+#	44	plugin
+#	 2	Battery
+#	12	FuncName
+#	48	GUI
+
+
+
+# Category New 0307
+#
+#	1	Basic & Emacs
+    #	3	Text_Objects
+    #	6	Undo Redo
+    #	7	Swap Exists
+#	2	Cursor Move, CursorLine, CursorColumn, and Scroll & Clever-f
+#	4	EscEsc
+#	5	Visual_Mode
+r	8	Tabline
+r	9	Statusline
+r	10	Search
+r	11	Grep
+r	12	Substitute
+r	13	Diff
+#	14	Quickfix and Locationlist
+r	15	Window & Tab
+#	16	Buffer & Mru & NERDTree
+r	17	SetPath
+#	18	Make Tag
+#	19	Tag, Jump
+#	20	insert & Snippets & i_Esc
+r	21	Completion
+#	22	Terminal
+#	23	Unified_CR
+#	24	Unified_Tab
+#	25	Configuration
+#	26	mode popup
+#	27	Util Cmd
+#	28	Misc
+#	29	plugin
+#	30	Battery
+#	31	FuncName
+#	32	GUI

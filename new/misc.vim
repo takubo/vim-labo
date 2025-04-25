@@ -4,15 +4,6 @@ scriptencoding utf-8
 
 
 #---------------------------------------------------------------------------------------------
-# Leader
-
-legacy let mapleader = "\<Space>"
-
-# Leader(Space)の空打ちで、カーソルが一つ進むのが鬱陶しいので。
-nnoremap <Leader> <Nop>
-
-
-#---------------------------------------------------------------------------------------------
 # Invalidate
 
 nnoremap <silent> ZZ <Nop>
@@ -51,6 +42,18 @@ vnoremap " '
 
 nnoremap ` m
 vnoremap ` m
+
+
+#---------------------------------------------------------------------------------------------
+# Timeoutlen
+
+set timeoutlen=1100
+
+augroup Timeoutlen
+  au!
+  au InsertEnter * set timeoutlen=700
+  au InsertLeave * set timeoutlen=1100
+augroup end
 
 
 #---------------------------------------------------------------------------------------------
@@ -135,7 +138,10 @@ call submode#map(       'undo/redo', 'n', '',  '+', 'g+')
 #---------------------------------------------------------------------------------------------
 # MRU
 
-nnoremap <Space>o <Cmd>MRU<Space>
+nnoremap <Space>o :<C-U>Mru<Space>
+nnoremap       go  <Cmd>MRU<CR>
+nnoremap <Space>o  <Cmd>MRU<CR>
+nnoremap    <C-O> :<C-U>Mru<Space>
 
 
 #---------------------------------------------------------------------------------------------
@@ -254,7 +260,6 @@ com! SwapSelect {
 # 折り畳みトグル (現在行)
 #com! ToggleFold if foldclosed(line('.')) != -1 | foldopen | else | foldclose | endif
 
-
 # 折り畳みトグル (ファイル)
 #def ToggleFolding()
 #  normal! zi
@@ -265,12 +270,11 @@ com! SwapSelect {
 #nnoremap zi <Cmd><SID>ToggleFolding()<CR>
 #nnoremap ZZ zi
 
-
 # Move to Hunk
 #nnoremap ]z <Cmd>try <Bar> exe 'normal! ]z' <Bar> catch exe 'normal! zj' <Bar> endtry<CR>
 #nnoremap [z <Cmd>try <Bar> exe 'normal! [z' <Bar> catch exe 'normal! zk' <Bar> endtry<CR>
-nnoremap ]z zj
-nnoremap [z zk
+#nnoremap ]z zj
+#nnoremap [z zk
 
 
 
@@ -343,15 +347,15 @@ cnoremap <Plug>(Cmap-C-O-S) <C-\>e(getcmdtype() == '/' <Bar><Bar> getcmdtype() =
 
 #---------------------------------------------------------------------------------------------
 # CommnadOutputCapture 付きで実行する
-cnoremap <Plug>(Cmap-C-O-C) <C-\>e(getcmdtype() == ':'                               ) ? 'CC ' .. getcmdline() : getcmdline()<CR><End>
-cnoremap <Plug>(Cmap-C-O-X) <C-\>e(getcmdtype() == ':'                               ) ? 'CommnadOutputCapture ' .. getcmdline() : getcmdline()<CR><End><CR>
-cnoremap <Plug>(Cmap-C-O-V) <C-\>e(getcmdtype() == ':'                               ) ? 'verbose ' .. getcmdline() : getcmdline()<CR><End>
+cnoremap <Plug>(Cmap-C-O-C) <C-\>e(getcmdtype() == ':') ? 'CC ' .. getcmdline() : getcmdline()<CR><End><CR>
+cnoremap <Plug>(Cmap-C-O-X) <C-\>e(getcmdtype() == ':') ? 'CommnadOutputCapture ' .. getcmdline() : getcmdline()<CR><End>
+cnoremap <Plug>(Cmap-C-O-V) <C-\>e(getcmdtype() == ':') ? 'verbose ' .. getcmdline() : getcmdline()<CR><End>
 
 #---------------------------------------------------------------------------------------------
 # Unified c_Ctrl-O
-cnoremap <C-O> <Plug>(Cmap-C-O-S)<Plug>(Cmap-C-O-X)
-cnoremap <C-J> <Plug>(Cmap-C-O-X)
-cnoremap <C-G> <Plug>(Cmap-C-O-V)
+cnoremap <expr> <C-O> getcmdtype() == ':' ? '<Plug>(Cmap-C-O-S)' : '<Plug>(Cmap-C-O-C)'
+cnoremap <expr> <C-J> getcmdtype() == ':' ? '<Plug>(Cmap-C-O-X)' : ''
+cnoremap <expr> <C-G> getcmdtype() == ':' ? '<Plug>(Cmap-C-O-V)' : ''
 
 
 #---------------------------------------------------------------------------------------------
@@ -388,7 +392,7 @@ augroup end
 #---------------------------------------------------------------------------------------------
 # TBC
 
-nnoremap <C-O> <C-L>
+#nnoremap <C-O> <C-L>
 
 
 nnoremap <silent> gl           <Cmd>setl nowrap!<CR>
