@@ -113,15 +113,16 @@ set showfulltag  # TODO
 #set smoothscroll  #@ cursor_move_and_scroll
 #set scrolloff  #@ cursor_move_and_scroll
 set wrap  # 長い行を折り返して表示
-set linebreak?
-set breakindent?
-set breakindentopt?
-set breakat?
-set showbreak?
+#set linebreak
+# TODO set breakindent
+# TODO set breakindentopt
+#set breakat
+set showbreak=<  # TODO 再考
 #set sidescroll  #@ cursor_move_and_scroll
 #set sidescrolloff  #@ cursor_move_and_scroll
-set display?
-set fillchars?
+set display=lastline  # TODO 再確認
+# TODO set fillchars=vert:\|,fold:-,eob:~,lastline:@
+set fillchars=vert:$,fold:-,eob:~,lastline:@
 set cmdheight=2  # TODO Windows用gvim使用時はgvimrcを編集すること
 #set columns  #@ GUI
 #set lines  #@ GUI
@@ -207,17 +208,17 @@ set tabpagemax=50
 #set ttyfast
 # TODO set xtermcodes
 #set weirdinvert
-set keyprotocol?
+# TODO set keyprotocol
 # TODO set esckeys
 #set scrolljump=1
 # TODO set ttyscroll
-set guicursor?
-set title?
-set titlelen?
-set titlestring?
-set titleold?
-set icon?
-set iconstring?
+#set guicursor  #@ Rimpa, vimrc
+# TODO set title
+# TODO set titlelen
+# TODO set titlestring
+# TODO set titleold
+# TODO set icon
+# TODO set iconstring
 set restorescreen
 
 #  9 マウスの使用
@@ -428,24 +429,21 @@ set updatecount=100  # TODO
 # 21 コマンドライン編集
 
 set history=10000  # 最大値
-set wildchar?
-set wildcharm?
-set wildmode?
-set suffixes?
-set suffixesadd?
-set wildignore?
-set fileignorecase?
-set wildignorecase?
-set wildmenu?
+# TODO set wildchar=<Tab>
+# TODO set wildcharm
+set wildmode=full
+set wildoptions=fuzzy,pum,tagfile  # TODO options コマンドで出て来なかった。 TODO fuzzyの有効か？tagfileの効果もよくわからない。
+# TODO set suffixes
+# TODO set suffixesadd
+set wildignore+=**/.git/**,**/.svn/**,*.o,*.obj,*.exe
+#set fileignorecase
+# TODO set wildignorecase
+set wildmenu
 exe "set cedit=\<C-Q>"
 set cmdwinheight=20  # TODO 動的変更
 
 # 22 外部コマンドの実行
 
-if has('win32')
-  set shell=c:/cygwin64/bin/zsh
-  set shellcmdflag=-c\ 
-endif
 #set shell  #@ vim_local
 # TODO set shellquote
 #set shellxquote  #@ vim_local
