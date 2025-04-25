@@ -2,25 +2,42 @@ vim9script
 # vim: set ts=8 sts=2 sw=2 tw=0 et:
 scriptencoding utf-8
 
-
-# restore pos.vim
-
-
 #=============================================================================================
-# PushposPopPos
+# PushposPopPos TODO restore pos.vim
 #=============================================================================================
 
 
-var org_win_view: dict<number>
+
+#---------------------------------------------------------------------------------------------
+# Inner Window
+
+var WinView: list<dict<number>>
 
 def PushPos()
-  org_win_view = winsaveview()  # カレントウィンドウのビューを取得
+  WinView -> add( winsaveview() )     # カレントウィンドウのビューを取得
 enddef
 
 def PopPos()
-  winrestview(org_win_view)  # カレントウィンドウのビューを復元
+  WinView -> remove(-1) -> winrestview()  # カレントウィンドウのビューを復元
 enddef
 
+#------------------
+# Test
+#
+#def Test()
+#  PushPos()
+#  normal! G
+#  redraw
+#  sleep 1
+#  PopPos()
+#enddef
+#
+#Test()
+
+
+
+#---------------------------------------------------------------------------------------------
+# All
 
 ### データ構造定義 ###############
 #  dict {
@@ -30,43 +47,76 @@ enddef
 ##################################
 var PosAll = []
 
-var org_win_id: number
-var org_buf_nr: number
-
 def PushPosAll()
-  PushPos
-  org_buf_nr = bufnr()
-  org_win_id = win_getid()
+  PushPos()
+  PosAll -> add(
+    {
+      'org_win_id': win_getid(),
+      'org_buf_nr': bufnr(),
+    }
+  )
 enddef
 
 def PopPosAll()
-  win_gotoid(org_win_id)
-  exe 'buffer' org_buf_nr
-  PopPos
+  const pos_all = PosAll -> remove(-1)
+  win_gotoid(pos_all.org_win_id)
+  exe 'buffer' pos_all.org_buf_nr
+  PopPos()
 enddef
 
-com PPP {
-    PushPosAll()
-    tabdo wind echon
-    PopPosAll()
-  }
-if 0
+#------------------
+# Test
+#
+#def TestAll()
+#    PushPosAll()
+#    tabdo windo echo 100
+#    PopPosAll()
+#enddef
+#
+#TestAll()
+
+
+
+#---------------------------------------------------------------------------------------------
+# Commands
+
 com! -bar -nargs=0 PushPos    call PushPos()
 com! -bar -nargs=0 PopPos     call PopPos()
 
 com! -bar -nargs=0 PushPosAll call PushPosAll()
 com! -bar -nargs=0 PopPosAll  call PopPosAll()
-endif
-#=============================================================================================
 
-#inoreab pppos const org_win_view = winsaveview()  # カレントウィンドウのビューを取得<CR>winrestview(org_win_view)           # カレントウィンドウのビューを復元
-#inoreab <silent> pppos const org_win_view = winsaveview()  # カレントウィンドウのビューを取得<CR>winrestview(org_win_view)           # カレントウィンドウのビューを復元<C-R>=Eatchar('\s')<CR>
-inoreab <silent> pppos const org_win_view = winsaveview()   # push win view<CR>winrestview(org_win_view)   # pop win view<C-R>=Eatchar('\s')<CR>
 
-#inoreab ppwin const org_win_id = win_getid()<CR>PushPoswin  win_gotoid(org_win_id)
-inoreab <silent> ppwin const org_win_id = win_getid()  # push window<CR>win_gotoid(org_win_id)   # pop window<C-R>=Eatchar('\s')<CR>
 
-inoreab <silent> ppbuf const org_buf_nr = bufnr(  # push buffer)<CR>exe 'buffer' org_buf_n  # pop bufferr<C-R>=Eatchar('\s')<CR>
+#---------------------------------------------------------------------------------------------
+# Abbreviations
 
-# defer winrestview('winsaveview()')
-# defer win_gotoid('win_getid()')
+
+inoreab <silent> pppos const org_win_view = winsaveview()   # save win view<CR>winrestview(org_win_view)   # restore win view<C-R>=Eatchar('\s')<CR>
+inoreab <silent> ppwin const org_win_id = win_getid()  # save window<CR>win_gotoid(org_win_id)   # restore window<C-R>=Eatchar('\s')<CR>
+inoreab <silent> pptab const org_win_id = win_getid()  # save window<CR>win_gotoid(org_win_id)   # restore window<C-R>=Eatchar('\s')<CR>
+inoreab <silent> ppbuf const org_buf_nr = bufnr()  # save buffer<CR>exe 'buffer' org_buf_nr  # restore buffer<C-R>=Eatchar('\s')<CR>
+
+inoreab <silent> ppdef defer winrestview(winsaveview())<CR>defer win_gotoid(win_getid())<CR>defer execute('buffer ' .. bufnr())<C-R>=Eatchar('\s')<CR>
+
+#inoreab <silent> pppos defer winrestview(winsaveview())
+#inoreab <silent> ppwin defer win_gotoid(win_getid())
+#inoreab <silent> ppbuf defer execute('buffer ' .. bufnr())
+
+
+#  defer winrestview(winsaveview())
+#  defer win_gotoid(win_getid())
+#  defer execute('buffer ' .. bufnr())
+
+
+#def TestAbb()
+#  defer winrestview(winsaveview())
+#  defer win_gotoid(win_getid())
+#  defer execute('buffer ' .. bufnr())
+#
+#  normal! G
+#  redraw
+#  sleep 1
+#  tabdo windo echo 100
+#enddef
+#TestAbb()

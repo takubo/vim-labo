@@ -28,11 +28,11 @@ nnoremap <Leader><A-n> <ScriptCmd>NextNonameBuf(+1, REGARDLESS_OF_MODIFY)<CR>
 
 
 # バッファ削除 (指定)
-nnoremap <Leader>z :<C-U>bdel<Space>
-nnoremap <Leader>Z :<C-U>bdel!<Space>
+nnoremap <Leader>z :<C-U>CloseBuffer<Space>
+nnoremap <Leader>Z :<C-U>CloseBuffer!<Space>
 
 # バッファ削除 (選択)
-nnoremap <Leader><C-K> :<C-U>ls <CR>:bdel<Space>
+nnoremap <Leader><C-K> :<C-U>ls <CR>:CloseBuffer<Space>
 
 
 #---------------------------------------------------------------------------------------------
@@ -51,6 +51,17 @@ com! -bar -bang CloseBuffer {
         #bprevious
         bnext
         exe 'bdelete<bang>' bufnr
+      }
+
+com! -bar -bang -nargs=* -complete=buffer CloseBuffer {
+        if '<args>' == ''
+          const bufnr = bufnr('%')
+          #bprevious
+          bnext
+          exe 'bdelete<bang>' bufnr
+        else
+          bdelete<bang> <args>
+        endif
       }
 
 

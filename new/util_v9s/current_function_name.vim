@@ -38,6 +38,3 @@ else
   com! -bar -nargs=0 CFIPopup
   com! -bar -nargs=0 CFIPopupAuto
 endif
-
-
-com! -bar -nargs=0 CursorJumped CFIPopupAuto

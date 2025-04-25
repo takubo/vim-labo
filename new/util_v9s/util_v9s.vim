@@ -121,12 +121,6 @@ enddef
 
 #---------------------------------------------------------------------------------------------
 
-set cursorlineopt=screenline,number
-
-
-
-#---------------------------------------------------------------------------------------------
-
 #?? augroup SearchMultiHighLightOnOff
 #??   au!
 #??   # au OptionSet hlsearch {
@@ -277,7 +271,7 @@ set guioptions=
 nnoremap <silent> <C-]> g;
 nnoremap <silent> <C-\> g,
 
-set vb t_vb=
+#set visualbell t_vb=
 
 
 #---------------------------------------------------------------------------------------------
@@ -408,8 +402,6 @@ nnoremap <Space> <Nop>
 
 set nrformats=bin,hex #,blank
 set nrformats=bin,hex,unsigned
-
-set shortmess+=cC
 
 
 

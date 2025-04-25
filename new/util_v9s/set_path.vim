@@ -60,7 +60,7 @@ com! -bang -bar -nargs=0 SetPath {
       if '<bang>' == '!'
         setl path&
       endif
-      &l:path ..= (&l:path[-1] != ',' ? ',' : '') .. GetPrjRootPath() .. GetIncludePath()
+      &l:path ..= (&l:path[-1] != ',' ? ',' : '') .. <SID>GetPrjRootPath() .. <SID>GetIncludePath()
       echo &l:path
     }
 

@@ -1,0 +1,1040 @@
+" それぞれの "set" 行はオプションの現在の値を(左側に)示しています。
+" "set" 行で <Enter> を打つとそれが実行されます。
+"            切替オプションは切り替えられます。
+"            その他のオプションは <Enter> を打つ前に値を編集することができます。
+" ヘルプ行で <Enter> を打つと、このオプションのへルプウィンドウが開きます。
+" インデックス行で <Enter> を打つと、そこにジャンプします。
+" "set" 行で <Spece> を打つと、最新の値が読込まれます。
+
+ 1 重要
+ 2 移動、検索とパターン
+ 3 タグ
+ 4 テキストの表示
+ 5 構文ハイライトとスペルチェック
+ 6 複数ウィンドウ
+ 7 複数タブページ
+ 8 端末
+ 9 マウスの使用
+10 GUI
+11 印刷
+12 メッセージと情報
+13 テキスト選択
+14 テキスト編集
+15 タブとインデント
+16 折畳み
+17 差分モード
+18 マッピング
+19 ファイルの読み書き
+20 スワップファイル
+21 コマンドライン編集
+22 外部コマンドの実行
+23 make の実行とエラーへのジャンプ (quickfix)
+24 システム固有
+25 言語固有
+26 マルチバイト文字
+27 その他
+
+
+ 1 重要
+
+compatible	Vi との互換性を非常に高くする (望ましくない)
+ 	set nocp	cp
+cpoptions	Vi との互換性を指定するフラグのリスト
+ 	set cpo=aABceFs
+insertmode	挿入モードを既定のモードとして使う
+ 	set noim	im
+paste	paste モード、タイプされたテキストをそのまま挿入する
+ 	set paste	nopaste
+pastetoggle	paste モードを切り替えるためのキー列
+ 	set pt=
+runtimepath	ランタイムファイルとプラグインに使われるディレクトリのリスト
+ 	set rtp=C:\\Users\\U351376/vimfiles,C:/Users/U351376/vimfiles/pack/new/start/vim-prettyprint,C:/Users/U351376/vimfiles/pack/new/start/split_util,C:/Users/U351376/vimfiles/pack/new/start/new,C:/Users/U351376/vimfiles/pack/new/start/mru.vim,C:/Users/U351376/vimfiles/pack/new/start/current-func-info.vim,C:/Users/U351376/vimfiles/pack/new/start/clever-f.vim,C:/Users/U351376/vimfiles/pack/new/start/CamelCaseMotion,C:/Users/U351376/vimfiles/pack/new/start/BlockDiff,C:/Users/U351376/vimfiles/pack/doc-ja/start/vimdoc-ja,C:/Users/U351376/vimfiles/pack/new/start/vim-submode,C:\\Program\ Files\\Vim/vimfiles,C:\\Program\ Files\\Vim\\vim91,C:\\Users\\U351376/vimfiles/after,C:\\Program\ Files\\Vim/vimfiles/after
+packpath	プラグインパッケージに使われるディレクトリのリスト
+ 	set pp=C:\\Users\\U351376/vimfiles,C:\\Program\ Files\\Vim/vimfiles,C:\\Program\ Files\\Vim\\vim91,C:\\Users\\U351376/vimfiles/after,C:\\Program\ Files\\Vim/vimfiles/after
+helpfile	メインのヘルプファイルの名前
+ 	set hf=C:\\Program\ Files\\Vim\\vim91\\doc\\help.txt
+
+ 2 移動、検索とパターン
+
+whichwrap	どのコマンドが行をまたぐかを指定するフラグのリスト
+ 	set ww=b,s
+startofline	多くのジャンプ命令で、カーソルが行内の最初の非空白文字に移動する
+ 	set nosol	sol
+paragraphs	段落を分けるための nroff マクロの名前
+ 	set para=IPLPPPQPP\ TPHPLIPpLpItpplpipbp
+sections	章を分けるための nroff マクロの名前
+ 	set sect=SHNHH\ HUnhsh
+path	ファイルの検索に用いられるディレクトリ名のリスト
+	(グローバル／バッファについてローカル)
+ 	set pa=.,,/Users/U351376/vimfiles/**,
+cdhome	引数無しの :cd でホームディレクトリに移動する
+ 	set nocdh	cdh
+cdpath	:cd に用いられるディレクトリ名のリスト
+ 	set cd=,,
+autochdir	バッファ内のファイルのディレクトリに変更する
+ 	set acd	noacd
+autoshelldir	端末バッファ内のシェルの pwd に変更する
+ 	set noasd	asd
+wrapscan	検索コマンドがバッファの末尾/先頭をまたぐ
+ 	set nows	ws
+incsearch	部分的に入力された検索コマンドのマッチを表示する
+ 	set is	nois
+magic	検索パターン内のバックスラッシュの扱いを変更する
+ 	set magic	nomagic
+regexpengine	既定で使われる正規表現エンジンを選択する
+ 	set re=0
+ignorecase	検索パターンにおいて大文字と小文字を区別しない
+ 	set ic	noic
+smartcase	検索パターンが大文字を含んでいたら 'ignorecase' を上書きする
+ 	set scs	noscs
+casemap	大文字・小文字を変更する際にどの方法を使うか
+ 	set cmp=internal,keepascii
+maxmempattern	パターンマッチングに使う最大メモリ量 (Kbyte)
+ 	set mmp=1000
+define	マクロ定義行のためのパターン
+	(グローバル／バッファについてローカル)
+ 	set def=^\\s*#\\s*define
+include	include 行のためのパターン
+	(バッファについてローカル)
+ 	set inc=\\v^\\s*import\\s*(autoload)?
+includeexpr	include 行をファイル名に変換するために使われる式
+	(バッファについてローカル)
+ 	set inex=
+
+ 3 タグ
+
+tagbsearch	tags ファイル内で二分探索を使う
+ 	set tbs	notbs
+taglength	タグ名で有効になる文字数、あるいはゼロ
+ 	set tl=0
+tags	tags を検索するファイル名のリスト
+	(グローバル／バッファについてローカル)
+ 	set tag=./tags,./tags;
+tagcase	タグファイル内を検索するときに大文字小文字をどう扱うか:
+	'ignorecase' に従うなら "followic"、あるいは "ignore" か "match"
+	(グローバル／バッファについてローカル)
+ 	set tc=followic
+tagrelative	tags ファイル内のファイル名は tags ファイルからの相対パス
+ 	set tr	notr
+tagstack	:tag コマンドはタグスタックを使う
+ 	set tgst	notgst
+showfulltag	挿入モードでタグを補完するときにより多くの情報を表示する
+ 	set nosft	sft
+tagfunc	タグの検索を実行する際に使われる関数
+	(バッファについてローカル)
+ 	set tfu=
+cscopeprg	cscope を実行するコマンド
+ 	set csprg=cscope
+cscopetag	tag コマンドに cscope を使う
+ 	set nocst	cst
+cscopetagorder	0 か 1; ":cstag" が検索を実行する際の順序
+ 	set csto=0
+cscopeverbose	cscope のデータベースに追加する際にメッセージを表示
+ 	set nocsverb	csverb
+cscopepathcomp	パスの要素を何個まで表示するか
+ 	set cspc=0
+cscopequickfix	cscope のために quickfix ウィンドウをいつ開くか
+ 	set csqf=
+cscoperelative	cscope ファイル内のファイル名はそのファイルからの相対パス
+ 	set nocsre	csre
+
+ 4 テキストの表示
+
+scroll	CTRL-U と CTRL-D でスクロールする行数
+	(ウィンドウについてローカル)
+ 	set scr=7
+smoothscroll	スクリーン行でスクロールする
+	(ウィンドウについてローカル)
+ 	set sms	nosms
+scrolloff	カーソルの上下に表示されるスクリーン行数
+ 	set so=0
+wrap	長い行を折り返して表示する
+	(ウィンドウについてローカル)
+ 	set wrap	nowrap
+linebreak	'breakat' の文字で長い行を折り返す
+	(ウィンドウについてローカル)
+ 	set nolbr	lbr
+breakindent	折り返されたテキストでインデントを保持する
+	(ウィンドウについてローカル)
+ 	set nobri	bri
+breakindentopt	breakindent の挙動を調整する
+	(ウィンドウについてローカル)
+ 	set briopt=
+breakat	どの文字のところで行が折り返されるか
+ 	set brk=\ \	!@*-+;:,./?
+showbreak	折り返されたスクリーン行の前に表示される文字列
+ 	set sbr=
+sidescroll	水平スクロールの最小桁数
+ 	set ss=1
+sidescrolloff	カーソルの左右に表示する最小桁数
+ 	set siso=0
+display	最後の行が収まらない場合でも表示するには "lastline" を含めること
+	表示できない文字を 16 進数で表示するには "uhex" を含めること
+ 	set dy=lastline
+fillchars	ステータス行、折畳み、フィラー行に使われる文字
+ 	set fcs=vert:\|,fold:-,eob:~,lastline:@
+cmdheight	コマンドラインに使われる行数
+ 	set ch=2
+columns	画面の幅
+ 	set co=210
+lines	画面の行数
+ 	set lines=67
+window	CTRL-F と CTRL-B でスクロールする行数
+ 	set window=66
+lazyredraw	マクロを実行中に再描画しない
+ 	set nolz	lz
+redrawtime	'hlsearch' と :match のハイライト処理のタイムアウト (ミリ秒)
+ 	set rdt=2000
+writedelay	それぞれの文字が画面に描かれるまでの遅延時間 (ミリ秒)
+	(デバッグ用)
+ 	set wd=0
+list	<Tab> を ^I として表示し、改行を $ として表示する
+	(ウィンドウについてローカル)
+ 	set list	nolist
+listchars	リストモードで使われる文字列のリスト
+ 	set lcs=tab:>_,trail:$,extends:>,precedes:<
+number	それぞれの行に行番号を表示する
+	(ウィンドウについてローカル)
+ 	set nu	nonu
+relativenumber	それぞれの行に相対行番号を表示する
+	(ウィンドウについてローカル)
+ 	set rnu	nornu
+numberwidth	行番号に使われる桁数
+	(ウィンドウについてローカル)
+ 	set nuw=4
+conceallevel	conceal 可能なテキストを隠すかどうかを制御する
+	(ウィンドウについてローカル)
+ 	set cole=0
+concealcursor	カーソル行のテキストを conceal 表示するモード
+	(ウィンドウについてローカル)
+ 	set cocu=
+
+ 5 構文ハイライトとスペルチェック
+
+background	"dark" か "light"; 背景色の明るさ
+ 	set bg=dark
+filetype	ファイルのタイプ; セットされると FileType イベントが発生する
+	(バッファについてローカル)
+ 	set ft=vim
+syntax	使用される構文ハイライトの名前
+	(バッファについてローカル)
+ 	set syn=vim
+synmaxcol	構文アイテムを検索する最大桁数
+	(バッファについてローカル)
+ 	set smc=3000
+highlight	様々な対象に対してどのハイライト表示を使うか
+ 	set hl=8:SpecialKey,~:EndOfBuffer,@:NonText,d:Directory,e:ErrorMsg,i:IncSearch,l:Search,y:CurSearch,m:MoreMsg,M:ModeMsg,n:LineNr,a:LineNrAbove,b:LineNrBelow,N:CursorLineNr,G:CursorLineSign,O:CursorLineFold,r:Question,s:StatusLine,S:StatusLineNC,c:VertSplit,t:Title,v:Visual,V:VisualNOS,w:WarningMsg,W:WildMenu,f:Folded,F:FoldColumn,A:DiffAdd,C:DiffChange,D:DiffDelete,T:DiffText,>:SignColumn,-:Conceal,B:SpellBad,P:SpellCap,R:SpellRare,L:SpellLocal,+:Pmenu,=:PmenuSel,[:PmenuKind,]:PmenuKindSel,{:PmenuExtra,}:PmenuExtraSel,x:PmenuSbar,X:PmenuThumb,*:TabLine,#:TabLineSel,_:TabLineFill,!:CursorColumn,.:CursorLine,o:ColorColumn,q:QuickFixLine,z:StatusLineTerm,Z:StatusLineTermNC
+hlsearch	最後の検索パターンに対する全てのマッチをハイライト表示する
+ 	set hls	nohls
+wincolor	このウィンドウに使うハイライトグループ
+	(ウィンドウについてローカル)
+ 	set wcr=
+cursorcolumn	カーソルのある画面上の桁をハイライト表示する
+	(ウィンドウについてローカル)
+ 	set nocuc	cuc
+cursorline	カーソルのある画面上の行をハイライト表示する
+	(ウィンドウについてローカル)
+ 	set nocul	cul
+cursorlineopt	'cursorline' がどの領域をハイライト表示するか指定する
+	(ウィンドウについてローカル)
+ 	set culopt=screenline,number
+colorcolumn	ハイライト表示する桁
+	(ウィンドウについてローカル)
+ 	set cc=
+spell	スペルミスをハイライト表示する
+	(ウィンドウについてローカル)
+ 	set nospell	spell
+spelllang	受け付ける言語のリスト
+	(バッファについてローカル)
+ 	set spl=en
+spellfile	"zg" で正しい単語を追加するファイル
+	(バッファについてローカル)
+ 	set spf=
+spellcapcheck	文の末尾を見つけるのに使うパターン
+	(バッファについてローカル)
+ 	set spc=[.?!]\\_[\\])'\"\	\ ]\\+
+spelloptions	どのようにスペルチェックが動作するかを変更するフラグ
+	(バッファについてローカル)
+ 	set spo=
+spellsuggest	修正を提案する際に使われる方法
+ 	set sps=best
+mkspellmem	圧縮の前に :mkspell で使われるメモリ量
+ 	set msm=460000,2000,500
+
+ 6 複数ウィンドウ
+
+laststatus	0, 1 または 2; 最後のウィンドウのステータス行がいつ使われるか
+ 	set ls=2
+statusline	ステータス行に使われる書式
+ 	set stl=%!Statusline()
+equalalways	ウィンドウを追加/削除するときに全ウィンドウのサイズを等しくする
+ 	set noea	ea
+eadirection	どの方向に 'equalalways' が働くか: "ver", "hor" または "both"
+ 	set ead=both
+winheight	現在のウィンドウに使われる最小行数
+ 	set wh=1
+winminheight	任意のウィンドウに使われる最小行数
+ 	set wmh=1
+winfixheight	ウィンドウの高さを保つ
+	(ウィンドウについてローカル)
+ 	set nowfh	wfh
+winfixwidth	ウィンドウの幅を保つ
+	(ウィンドウについてローカル)
+ 	set nowfw	wfw
+winwidth	現在のウィンドウに使われる最小桁数
+ 	set wiw=20
+winminwidth	任意のウィンドウに使われる最小桁数
+ 	set wmw=1
+helpheight	ヘルプウィンドウの開始時の高さ
+ 	set hh=20
+previewpopup	プレビューにポップアップウィンドウを使用する
+ 	set pvp=
+previewheight	プレビューウィンドウの既定の高さ
+ 	set pvh=12
+previewwindow	プレビューウィンドウを識別する
+	(ウィンドウについてローカル)
+ 	set nopvw	pvw
+hidden	バッファがウィンドウに表示されていないときにアンロードしない
+ 	set hid	nohid
+switchbuf	"useopen" かつ/または "split"; バッファにジャンプするときに
+	どのウィンドウを使うか
+ 	set swb=
+splitbelow	新しいウィンドウは現在のものの下に置かれる
+ 	set sb	nosb
+splitkeep	ウィンドウ分割のスクロール動作を決める
+ 	set spk=cursor
+splitright	新しいウィンドウは現在のものの右に置かれる
+ 	set spr	nospr
+scrollbind	このウィンドウは他の同調ウィンドウと一緒にスクロールする
+	(ウィンドウについてローカル)
+ 	set noscb	scb
+scrollopt	"ver", "hor" かつ/または "jump"; 'scrollbind' のオプションの
+	リスト
+ 	set sbo=ver,jump
+cursorbind	このウィンドウのカーソルは他の同調ウィンドウと一緒に動く
+	(ウィンドウについてローカル)
+ 	set nocrb	crb
+termwinsize	端末ウィンドウのサイズ
+	(ウィンドウについてローカル)
+ 	set tws=
+termwinkey	端末ウィンドウで Vim のコマンドの前に入力するキー
+	(ウィンドウについてローカル)
+ 	set twk=
+termwinscroll	端末ウィンドウでスクロールバックのために保持する最大行数
+	(ウィンドウについてローカル)
+ 	set twsl=10000
+termwintype	端末ウィンドウで使う pty の種類
+ 	set twt=
+winptydll	winpty 動的ライブラリの名前
+ 	set winptydll=winpty64.dll
+
+ 7 複数タブページ
+
+showtabline	0, 1 または 2; タブページ行をいつ使うか
+ 	set stal=2
+tabpagemax	-p と "tab all" で開かれるタブページの最大数
+ 	set tpm=10
+tabline	カスタムのタブページ行
+ 	set tal=%!TabLine()
+guitablabel	カスタムの GUI のタブページラベル
+ 	set gtl=
+guitabtooltip	カスタムの GUI のタブページツールチップ
+ 	set gtt=
+
+ 8 端末
+
+term	使用されている端末の名前
+ 	set term=builtin_gui
+ttytype	'term' の別名
+ 	set tty=builtin_gui
+ttybuiltin	組込みの termcap を最初にチェックする
+ 	set tbi	notbi
+ttyfast	端末の接続が高速である
+ 	set tf	notf
+xtermcodes	xtermを検出したときに端末のキーコードを要求する
+ 	set xtermcodes	noxtermcodes
+weirdinvert	追加の再描画が必要な端末
+ 	set nowiv	wiv
+keyprotocol	どの端末に何のキーボードプロトコルを使うか
+ 	set kpc=kitty:kitty,foot:kitty,wezterm:kitty,xterm:mok2
+esckeys	挿入モードで <Esc> で始まるキーを認識する
+ 	set ek	noek
+scrolljump	一度にスクロールする最小行数
+ 	set sj=1
+ttyscroll	再描画ではなくスクロールを使う最大行数
+ 	set tsl=999
+guicursor	それぞれのモード内でのカーソルの外観を指定
+ 	set gcr=n-v-c:ver20-blinkwait1000-blinkon600-blinkoff400-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:hor30-Cursor/lCursor,r-cr:Block-Cursor/lCursor
+title	ウィンドウタイトルに情報を表示
+ 	set title	notitle
+titlelen	ウィンドウタイトルに使われる 'columns' の割合 (パーセント単位)
+ 	set titlelen=85
+titlestring	空でないとき、ウィンドウタイトルに使われる文字列
+ 	set titlestring=
+titleold	Vim の終了時にタイトルに復元する文字列
+ 	set titleold=Thanks\ for\ flying\ Vim
+icon	このウィンドウのアイコンのテキストを設定
+ 	set icon	noicon
+iconstring	空でないとき、このウィンドウのアイコンに使われるテキスト
+ 	set iconstring=
+restorescreen	Vim の終了時に画面の内容を復元する
+ 	set rs	nors
+
+ 9 マウスの使用
+
+mouse	マウスを使うためのフラグのリスト
+ 	set mouse=a
+mousefocus	マウスポインタのあるウィンドウがアクティブになる
+ 	set nomousef	mousef
+scrollfocus	マウスポインタのあるウィンドウがマウスホイールでスクロールする
+ 	set noscf	scf
+mousehide	文字の入力中にマウスポインタを隠す
+ 	set mh	nomh
+mousemoveevent	マウスの移動イベントを報告する
+ 	set nomousemev	mousemev
+mousemodel	"extend", "popup" あるいは "popup_setpos"; マウスの右ボタンを
+	何に使うか
+ 	set mousem=popup
+mousetime	ダブルクリックとして認識する最大時間 (ミリ秒)
+ 	set mouset=500
+ttymouse	"xterm", "xterm2", "sgr" など; マウスの種類
+ 	set ttym=
+mouseshape	それぞれのモード内でのマウスポインタの外観を指定
+ 	set mouses=i-r:beam,s:updown,sd:udsizing,vs:leftright,vd:lrsizing,m:no,ml:up-arrow,v:rightup-arrow
+
+10 GUI
+
+guifont	GUI で使われるフォント名のリスト
+ 	set gfn=BIZ_UDゴシック:h11:cSHIFTJIS:qDRAFT
+guifontwide	全角文字に使われるフォント名のリスト
+ 	set gfw=
+guioptions	GUI がどう動くかを指定するフラグのリスト
+ 	set go=
+renderoptions	テキストレンダリングのためのオプション
+ 	set rop=type:directx,scrlines:1
+guipty	外部コマンドの I/O に疑似 tty を使う
+ 	set guipty	noguipty
+browsedir	"last", "buffer" あるいは "current": ファイルブラウザでどの
+	ディレクトリを使うか
+ 	set bsdir=last
+langmenu	メニューで使われる言語
+ 	set langmenu=
+menuitems	1 個のメニューの最大項目数
+ 	set mis=25
+winaltkeys	"no", "yes" または "menu"; ALT キーをどう使うか
+ 	set wak=menu
+linespace	行間の幅のピクセル数
+ 	set lsp=1
+balloondelay	バルーン表示が出るまでの時間 (ミリ秒)
+ 	set bdlay=600
+ballooneval	GUI でバルーン評価を使う
+ 	set nobeval	beval
+balloonexpr	バルーン評価に表示する式
+ 	set bexpr=
+
+11 印刷
+
+printoptions	:hardcopy 出力の書式を制御する要素のリスト
+ 	set popt=
+printdevice	:hardcopy で使われるプリンタの名前
+ 	set pdev=
+printfont	:hardcopy で使われるフォントの名前
+ 	set pfn=Courier_New:h10
+printheader	:hardcopy のヘッダで使われる書式
+ 	set pheader=%<%f%h%m%=Page\ %N
+printmbcharset	:hardcopy の出力の中の CJK 文字に使われる文字集合
+ 	set pmbcs=
+printmbfont	:hardcopy の出力の中の CJK 文字に使われるフォント名のリスト
+ 	set pmbfn=
+
+12 メッセージと情報
+
+terse	's' フラグを 'shortmess' に追加 (検索メッセージを表示しない)
+ 	set noterse	terse
+shortmess	メッセージを短くするためのフラグのリスト
+ 	set shm=filnxtToOScC
+showcmd	コマンド (の一部) を 'showcmdloc' で指定された場所に表示
+ 	set sc	nosc
+showcmdloc	'showcmd' でコマンド (の一部) を表示する場所
+ 	set sloc=last
+showmode	現在のモードをステータス行に表示
+ 	set smd	nosmd
+ruler	カーソル位置をそれぞれのウィンドウの下に表示
+ 	set noru	ru
+rulerformat	ルーラーに使われる代替書式
+ 	set ruf=
+report	変更された行の数の報告が出る閾値
+ 	set report=2
+verbose	値が大きいほど詳細なメッセージが表示される
+ 	set vbs=0
+verbosefile	メッセージを書込むファイル
+ 	set vfile=
+more	画面が一杯になったとき一覧表示を一時停止
+ 	set more	nomore
+confirm	コマンドが失敗したときにダイアログを開く
+ 	set nocf	cf
+errorbells	エラーメッセージでベルを鳴らす
+ 	set noeb	eb
+visualbell	ビープ音の代わりにビジュアルベルを使う
+ 	set vb	novb
+belloff	これらの理由にはベルを鳴らさない
+ 	set belloff=
+helplang	ヘルプを見つける際の望ましい言語のリスト
+ 	set hlg=ja
+
+13 テキスト選択
+
+selection	"old", "inclusive" または "exclusive"; テキスト選択がどう
+	振舞うか
+ 	set sel=inclusive
+selectmode	"mouse", "key" かつ/または "cmd"; いつビジュアルモードでは
+	なく選択モードを開始するか
+ 	set slm=
+clipboard	"unnamed"; * レジスタを無名レジスタと同じように使う
+	"autoselect"; 常に選択されたテキストをクリップボードにコピー
+ 	set cb=unnamed
+keymodel	"startsel" かつ/または "stopsel"; 特別なキーが何をするか
+ 	set km=
+
+14 テキスト編集
+
+undolevels	アンドゥ可能な変更の最大値
+	(グローバル／バッファについてローカル)
+ 	set ul=1000
+undofile	アンドゥ履歴を自動で保存・復元
+ 	set noudf	udf
+undodir	アンドゥファイル用のディレクトリのリスト
+ 	set udir=.
+undoreload	バッファのリロード時にアンドゥのために保存する最大行数
+ 	set ur=-1
+modified	変更が行われたがファイルに書込まれていない
+	(バッファについてローカル)
+ 	set nomod	mod
+readonly	バッファは書込まれない
+	(バッファについてローカル)
+ 	set noro	ro
+modifiable	テキストの変更が可能
+	(バッファについてローカル)
+ 	set ma	noma
+textwidth	これより長い行は改行される
+	(バッファについてローカル)
+ 	set tw=0
+wrapmargin	改行する際の右からのマージン
+	(バッファについてローカル)
+ 	set wm=0
+backspace	挿入モードで <BS>, CTRL-W 等が何をできるかを指定
+ 	set bs=2
+comments	コメント行がどうなっているかの定義
+	(バッファについてローカル)
+ 	set com=sO:#\ -,mO:#\ \ ,eO:##,:#,sO:\"\ -,mO:\"\ \ ,eO:\"\",:\"
+formatoptions	自動整形がどのように動作するかを決めるフラグのリスト
+	(バッファについてローカル)
+ 	set fo=croql
+formatlistpat	数字付きの箇条書きを認識するパターン
+	(バッファについてローカル)
+ 	set flp=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+formatexpr	"gq" で行を整形するときに使われる式
+	(バッファについてローカル)
+ 	set fex=
+complete	挿入モード補完が CTRL-N と CTRL-P でどう動作するかを指定
+	(バッファについてローカル)
+ 	set cpt=.,i,t,w,b,u
+completeopt	挿入モード補完でポップアップメニューを使うかどうか
+ 	set cot=menuone,noselect
+completepopup	挿入モード補完の情報ポップアップ用のオプション
+ 	set cpp=
+pumheight	ポップアップメニューの最大高
+ 	set ph=30
+pumwidth	ポップアップメニューの最大幅
+ 	set pw=15
+completefunc	挿入モード補完用のユーザー定義関数
+	(バッファについてローカル)
+ 	set cfu=
+omnifunc	ファイルタイプ固有の挿入モード補完用関数
+	(バッファについてローカル)
+ 	set ofu=
+dictionary	キーワード補完用の辞書ファイルのリスト
+	(グローバル／バッファについてローカル)
+ 	set dict=
+thesaurus	キーワード補完用の同義語ファイルのリスト
+	(グローバル／バッファについてローカル)
+ 	set tsr=
+thesaurusfunc	同義語補完で使われる関数
+	(グローバル／バッファについてローカル)
+ 	set tsrfu=
+infercase	キーワード補完のマッチで大文字小文字を調整
+	(バッファについてローカル)
+ 	set noinf	inf
+digraph	c1 <BS> c2 でダイグラフを入力可能にする
+ 	set nodg	dg
+tildeop	"~" コマンドがオペレータのようにふるまう
+ 	set notop	top
+operatorfunc	"g@" オペレータで呼ばれる関数
+ 	set opfunc=C_A
+showmatch	括弧を入力したときに、対応する括弧にわずかの間ジャンプ
+ 	set nosm	sm
+matchtime	'showmatch' で対応を表示する時間 (0.1秒単位)
+ 	set mat=2
+matchpairs	"%" コマンドでマッチするペアのリスト
+	(バッファについてローカル)
+ 	set mps=(:),<:>,[:],{:},（:）,＜:＞,［:］,｛:｝,｟:｠,｢:｣,〈:〉,《:》,「:」,『:』,【:】,〔:〕,〖:〗,〘:〙,〚:〛,⟦:⟧,⟨:⟩,⟪:⟫,⟬:⟭,⟮:⟯,⦃:⦄,⦅:⦆,⦇:⦈,⦉:⦊,⦋:⦌,⦍:⦎,⦏:⦐,⦑:⦒,⦗:⦘,⧼:⧽,❨:❩,❪:❫,❬:❭,❮:❯,❰:❱,❲:❳,❴:❵,⁽:⁾,₍:₎
+joinspaces	行を連結するときに '.' の後に空白を 2 個入れる
+ 	set js	nojs
+nrformats	"alpha", "octal", "hex", "bin" かつ/または "unsigned";
+	CTRL-A と CTRL-X コマンドで認識する数字の書式
+	(バッファについてローカル)
+ 	set nf=bin,hex,unsigned
+
+15 タブとインデント
+
+tabstop	1 つの <Tab> に対応する空白の数
+	(バッファについてローカル)
+ 	set ts=2
+shiftwidth	(自動)インデントの各段階に使われる空白の数
+	(バッファについてローカル)
+ 	set sw=2
+vartabstop	1 つのタブが相当する空白の数のリスト
+	(バッファについてローカル)
+ 	set vts=
+varsofttabstop	1 つのソフトタブストップに相当する空白の数のリスト
+	(バッファについてローカル)
+ 	set vsts=
+smarttab	インデント内での <Tab> は 'shiftwidth' 個の空白を挿入
+ 	set nosta	sta
+softtabstop	0 でないとき、1 つの <Tab> で挿入される空白の数
+	(バッファについてローカル)
+ 	set sts=0
+shiftround	"<<" と ">>" で 'shiftwidth' に丸める
+ 	set sr	nosr
+expandtab	挿入モードで <Tab> を空白に展開
+	(バッファについてローカル)
+ 	set noet	et
+autoindent	新しい行のインデントを自動的に設定
+	(バッファについてローカル)
+ 	set noai	ai
+smartindent	賢い自動インデントを行う
+	(バッファについてローカル)
+ 	set nosi	si
+cindent	C コードに特有のインデントを有効にする
+	(バッファについてローカル)
+ 	set nocin	cin
+cinoptions	C インデント処理用のオプション
+	(バッファについてローカル)
+ 	set cino=
+cinkeys	挿入モードで C インデント処理を引き起こすキー
+	(バッファについてローカル)
+ 	set cink=0{,0},0),0],:,0#,!^F,o,O,e
+cinwords	さらなる C インデントを発生させる単語のリスト
+	(バッファについてローカル)
+ 	set cinw=if,else,while,do,for,switch
+cinscopedecls	cino-g に用いられるスコープ宣言名のリスト
+	(バッファについてローカル)
+ 	set cinsd=public,protected,private
+indentexpr	行のインデントを得るために使われる式
+	(バッファについてローカル)
+ 	set inde=vimindent.Expr()
+indentkeys	挿入モードで 'indentexpr' によるインデントを引き起こすキー
+	(バッファについてローカル)
+ 	set indk=0{,0},0),0],!^F,o,O,e,=endif,=enddef,=endfu,=endfor,=endwh,=endtry,=endclass,=endinterface,=endenum,=},=else,=cat,=finall,=END,0\\,0=\"\\\ ,0=#\\\ 
+copyindent	前の行からインデントの空白をコピー
+	(バッファについてローカル)
+ 	set noci	ci
+preserveindent	インデントを変更するときに空白の種類を保持
+	(バッファについてローカル)
+ 	set nopi	pi
+lisp	lisp モードを有効化
+	(バッファについてローカル)
+ 	set nolisp	lisp
+lispwords	lisp インデント処理の動作を変更する単語のリスト
+ 	set lw=defun,define,defmacro,set!,lambda,if,case,let,flet,let*,letrec,do,do*,define-syntax,let-syntax,letrec-syntax,destructuring-bind,defpackage,defparameter,defstruct,deftype,defvar,do-all-symbols,do-external-symbols,do-symbols,dolist,dotimes,ecase,etypecase,eval-when,labels,macrolet,multiple-value-bind,multiple-value-call,multiple-value-prog1,multiple-value-setq,prog1,progv,typecase,unless,unwind-protect,when,with-input-from-string,with-open-file,with-open-stream,with-output-to-string,with-package-iterator,define-condition,handler-bind,handler-case,restart-bind,restart-case,with-simple-restart,store-value,use-value,muffle-warning,abort,continue,with-slots,with-slots*,with-accessors,with-accessors*,defclass,defmethod,print-unreadable-object
+lispoptions	list インデント処理用のオプション
+ 	set lop=
+
+16 折畳み
+
+foldenable	全ての折畳みを開いて表示するにはオフにする
+	(ウィンドウについてローカル)
+ 	set fen	nofen
+foldlevel	この数値よりもレベルの高い折畳みは閉じられる
+	(ウィンドウについてローカル)
+ 	set fdl=0
+foldlevelstart	ファイルを編集開始する際の 'foldlevel' の値
+ 	set fdls=-1
+foldcolumn	折畳みを表示するのに使われる列幅
+	(ウィンドウについてローカル)
+ 	set fdc=0
+foldtext	閉じられた折畳みのテキストを表示するのに使われる式
+	(ウィンドウについてローカル)
+ 	set fdt=foldtext()
+foldclose	カーソルが折畳みを離れたときに閉じるには "all" に設定
+ 	set fcl=
+foldopen	どのコマンドが折畳みを開くかを指定
+ 	set fdo=block,hor,mark,percent,quickfix,search,tag,undo
+foldminlines	折畳みが閉じられる画面上の最小行数
+	(ウィンドウについてローカル)
+ 	set fml=1
+commentstring	コメント用のテンプレート; マーカーを中に置くために使われる
+ 	set cms=\"%s
+foldmethod	折畳みの種類: "manual", "indent", "expr", "marker",
+	"syntax" または "diff"
+	(ウィンドウについてローカル)
+ 	set fdm=manual
+foldexpr	'foldmethod' が "expr" の際に使われる式
+	(ウィンドウについてローカル)
+ 	set fde=0
+foldignore	'foldmethod' が "indent" の際に行を無視するために使われる
+	(ウィンドウについてローカル)
+ 	set fdi=#
+foldmarker	'foldmethod' が "marker" の際に使われるマーカー
+	(ウィンドウについてローカル)
+ 	set fmr={{{,}}}
+foldnestmax	'foldmethod' が "indent" または "syntax" の際の折畳みの
+	最大の深さ
+	(ウィンドウについてローカル)
+ 	set fdn=20
+
+17 差分モード
+
+diff	現在のウィンドウで差分モードを使う
+	(ウィンドウについてローカル)
+ 	set nodiff	diff
+diffopt	差分モードを使うためのオプション
+ 	set dip=internal,filler,closeoff
+diffexpr	差分ファイルを取得するために使われる式
+ 	set dex=
+patchexpr	ファイルにパッチを当てるために使われる式
+ 	set pex=
+
+18 マッピング
+
+maxmapdepth	マッピングの最大の深さ
+ 	set mmd=1000
+remap	マップされたキーに対するマッピングを認識する
+ 	set remap	noremap
+timeout	マッピングの途中でのタイムアウトを許可
+ 	set to	noto
+ttimeout	キーコードの途中でのタイムアウトを許可
+ 	set nottimeout	ttimeout
+timeoutlen	'timeout' の時間 (ミリ秒)
+ 	set tm=1100
+ttimeoutlen	'ttimeout' の時間 (ミリ秒)
+ 	set ttm=-1
+
+19 ファイルの読み書き
+
+modeline	ファイル読込み時にモードラインからの設定の使用を有効にする
+	(バッファについてローカル)
+ 	set ml	noml
+modelineexpr	モードラインから式であるオプションを設定することを許可する
+ 	set nomle	mle
+modelines	モードライン用にチェックする行数
+ 	set mls=5
+binary	バイナリファイルの編集
+	(バッファについてローカル)
+ 	set nobin	bin
+endofline	ファイルの最終行に改行がある
+	(バッファについてローカル)
+ 	set eol	noeol
+endoffile	ファイルの最終行が CTRL-Z で終わる
+	(バッファについてローカル)
+ 	set noeof	eof
+fixendofline	テキストファイルの末尾に改行がない場合に修正する
+	(バッファについてローカル)
+ 	set fixeol	nofixeol
+bomb	バイト順マーク (BOM) をファイル先頭につける
+	(バッファについてローカル)
+ 	set nobomb	bomb
+fileformat	改行の形式: "dos", "unix" または "mac"
+	(バッファについてローカル)
+ 	set ff=dos
+fileformats	ファイル編集時に調べる改行形式のリスト
+ 	set ffs=dos,unix
+textmode	廃止、'fileformat' を使うこと
+	(バッファについてローカル)
+ 	set tx	notx
+textauto	廃止、'fileformats' を使うこと
+ 	set ta	nota
+write	ファイルの書込みが許可されている
+ 	set write	nowrite
+writebackup	ファイルを上書きする前にバックアップに書込む
+ 	set wb	nowb
+backup	ファイルの上書き後にバックアップを保持
+ 	set nobk	bk
+backupskip	どのファイルでバックアックが作られないかを指定するパターン
+ 	set bsk=C:\Users\U351376\AppData\Local\Temp\*
+backupcopy	バックアップを既存のファイルのコピーとするかリネームするか
+	(グローバル／バッファについてローカル)
+ 	set bkc=auto
+backupdir	バックアップファイルを置くディレクトリのリスト
+ 	set bdir=C:\\Users\\U351376/vim_buckup
+backupext	バックアップファイルの拡張子
+ 	set bex=~
+autowrite	変更されたバッファを離れる際に自動的にファイルに書込む
+ 	set noaw	aw
+autowriteall	'autowrite' と同様だが、より多くのコマンドで動作する
+ 	set noawa	awa
+writeany	常に確認無しに書込む
+ 	set nowa	wa
+autoread	Vim の外でファイルが変更された際に自動的に読込む
+	(グローバル／バッファについてローカル)
+ 	set noar	ar
+patchmode	ファイルの最古のバージョンを保持; ファイルの拡張子を指定
+ 	set pm=
+fsync	ファイルを書込んだ後に強制的にディスクに同期させる
+ 	set nofs	fs
+shortname	8.3 形式のファイル名を使う
+	(バッファについてローカル)
+ 	set nosn	sn
+cryptmethod	ファイル書込みのための暗号化方式: zip, blowfish または blowfish2
+	(バッファについてローカル)
+ 	set cm=blowfish2
+
+20 スワップファイル
+
+directory	スワップファイル用のディレクトリのリスト
+ 	set dir=C:\\Users\\U351376/vim_swap
+swapfile	このバッファでスワップファイルを使う
+	(バッファについてローカル)
+ 	set swf	noswf
+swapsync	"sync", "fsync" または空; どのようにスワップファイルを
+	ディスクに掃き出すか
+ 	set sws=fsync
+updatecount	何文字入力したらスワップファイルを更新するか
+ 	set uc=200
+updatetime	スワップファイルを更新するまでの時間 (ミリ秒)
+ 	set ut=4000
+maxmem	1 つのバッファ当たりの最大メモリ量 (Kbyte)
+ 	set mm=6159884
+maxmemtot	全てのバッファで使われる最大メモリ量 (Kbyte)
+ 	set mmt=6159884
+
+21 コマンドライン編集
+
+history	コマンドラインを何個まで記憶するか
+ 	set hi=50
+wildchar	コマンドライン展開を引き起こすキー
+ 	set wc=9
+wildcharm	'wildchar' と同様だがマッピング内でも使用できる
+ 	set wcm=0
+wildmode	どのようにコマンドライン補完が動作するかを指定
+ 	set wim=full
+suffixes	低い優先度を持つ拡張子のリスト
+ 	set su=.bak,~,.o,.h,.info,.swp,.obj
+suffixesadd	ファイル検索時に追加される拡張子のリスト
+	(バッファについてローカル)
+ 	set sua=
+wildignore	ファイル名補完の際に無視するファイルパターンのリスト
+ 	set wig=**/.git/**,**/.svn/**
+fileignorecase	ファイル名を使う際に大文字小文字の違いを無視
+ 	set fic	nofic
+wildignorecase	ファイル名補完の際に大文字小文字の違いを無視
+ 	set nowic	wic
+wildmenu	コマンドライン補完はマッチの一覧を表示する
+ 	set wmnu	nowmnu
+cedit	コマンドラインウィンドウを開くためのキー
+ 	set cedit=
+cmdwinheight	コマンドラインウィンドウの高さ
+ 	set cwh=7
+
+22 外部コマンドの実行
+
+shell	外部コマンドに使われるシェルプログラムの名前
+ 	set sh=C:\\WINDOWS\\system32\\cmd.exe
+shellquote	シェルコマンドを囲む引用符
+ 	set shq=
+shellxquote	'shellquote' と同様だがリダイレクトを含む
+ 	set sxq=(
+shellxescape	'shellxquote' が ( の時にエスケープされる文字
+ 	set sxe=\"&\|<>()@^
+shellcmdflag	コマンドを実行する際の 'shell' の引数
+ 	set shcf=/c
+shellredir	コマンドの出力をファイルにリダイレクトする際に使われる
+ 	set srr=>%s\ 2>&1
+shelltemp	シェルコマンドにパイプを使わずに一時ファイルを使う
+ 	set stmp	nostmp
+equalprg	"=" コマンドに使われるプログラム
+	(グローバル／バッファについてローカル)
+ 	set ep=
+formatprg	"gq" コマンドで行を整形する際に使われるプログラム
+ 	set fp=
+keywordprg	"K" コマンドに使われるプログラム
+ 	set kp=:help
+warn	バッファに変更がありシェルコマンドが実行された際に警告する
+ 	set warn	nowarn
+
+23 make の実行とエラーへのジャンプ (quickfix)
+
+errorfile	エラーメッセージが入っているファイルの名前
+ 	set ef=errors.err
+errorformat	エラーメッセージの書式のリスト
+	(グローバル／バッファについてローカル)
+ 	set efm=%f(%l):\ %t%*\\D%n:\ %m,%f(%l\\,%c):\ %t%*\\D%n:\ %m,%f(%l)\ \\=:\ %t%*\\D%n:\ %m,%*[^\"]\"%f\"%*\\D%l:\ %m,%f(%l)\ \\=:\ %m,%*[^\ ]\ %f\ %l:\ %m,%f:%l:%c:%m,%f(%l):%m,%f:%l:%m,%f\|%l\|\ %m
+makeprg	":make" コマンドに使われるプログラム
+	(グローバル／バッファについてローカル)
+ 	set mp=make
+shellpipe	":make" の出力をエラーファイルに書込むために使われる文字列
+ 	set sp=>%s\ 2>&1
+makeef	'makeprg' コマンド用のエラーファイルの名前
+ 	set mef=
+grepprg	":grep" コマンドに使われるプログラム
+	(グローバル／バッファについてローカル)
+ 	set gp=git\ grep\ --no-index\ -I\ --line-number
+grepformat	'grepprg' の出力用の書式のリスト
+ 	set gfm=%f:%l:%m,%f:%l%m,%f\ \ %l%m
+makeencoding	":make" と ":grep" の出力のエンコーディング
+	(グローバル／バッファについてローカル)
+ 	set menc=
+quickfixtextfunc	quickfix ウィンドウにテキストを表示するための関数
+ 	set qftf=
+
+24 システム固有
+
+shellslash	ファイル名でスラッシュを使う; Unix ライクなシェル用
+ 	set ssl	nossl
+completeslash	補完に salsh/backslash のどちらを使うか指定
+ 	set csl=
+
+25 言語固有
+
+isfname	ファイル名に使われる文字を指定
+ 	set isf=@,48-57,/,\\,.,-,_,+,,,#,$,%,{,},[,],@-@,!,~,=
+isident	識別子に使われる文字を指定
+ 	set isi=@,48-57,_,128-167,224-235
+iskeyword	キーワードに使われる文字を指定
+	(バッファについてローカル)
+ 	set isk=@,48-57,_,192-255,#
+isprint	表示可能な文字を指定
+ 	set isp=@,~-255
+quoteescape	文字列内のエスケープ文字を指定
+	(バッファについてローカル)
+ 	set qe=\\
+rightleft	バッファを右から左に表示
+	(ウィンドウについてローカル)
+ 	set norl	rl
+rightleftcmd	いつコマンドラインを右から左に編集するか
+	(ウィンドウについてローカル)
+ 	set rlc=search
+revins	文字を逆方向に挿入
+ 	set nori	ri
+allowrevins	挿入・コマンドラインモードで CTRL-_ で 'revins' の切り替えを許可
+ 	set noari	ari
+aleph	ヘブライ語アルファベットの最初の文字を表す ASCII コード
+ 	set al=224
+hkmap	ヘブライキーボードのマッピングを使用
+ 	set nohk	hk
+hkmapp	音声ヘブライキーボードのマッピングを使用
+ 	set nohkp	hkp
+arabic	アラビア語のテキストを編集する準備
+	(ウィンドウについてローカル)
+ 	set noarab	arab
+arabicshape	アラビア文字の字形処理を行う
+ 	set arshape	noarshape
+termbidi	端末が双方向 (bidi) の処理を行う
+ 	set notbidi	tbidi
+keymap	キーボードマッピングの名前
+ 	set kmp=
+langmap	ノーマルモードで変換される文字のリスト
+ 	set lmap=
+langremap	'langmap' をマップされた文字に適用
+ 	set lrm	nolrm
+iminsert	挿入モード時: 1: :lmap を使用; 2: IM を使用; 0: どちらも不使用
+	(ウィンドウについてローカル)
+ 	set imi=0
+imstyle	IM のスタイル、0: on-the-spot, 1: over-the-spot
+ 	set imst=0
+imsearch	検索パターン入力時: 1: :lmap を使用; 2: IM を使用;
+	0: どちらも不使用
+	(ウィンドウについてローカル)
+ 	set ims=-1
+
+26 マルチバイト文字
+
+encoding	Vim で使用する文字エンコーディング: "latin1", "utf-8",
+	"euc-jp", "big5" など
+ 	set enc=utf-8
+fileencoding	現在のファイルの文字エンコーディング
+	(バッファについてローカル)
+ 	set fenc=utf-8
+fileencodings	文字エンコーディングを自動検出
+ 	set fencs=ucs-bom,utf-8,default,latin1
+termencoding	端末で使われる文字エンコーディング
+ 	set tenc=
+charconvert	文字エンコーディング変換に使われる式
+ 	set ccv=
+delcombine	結合文字そのものを削除
+ 	set nodeco	deco
+maxcombine	表示の際の結合文字の最大数
+ 	set mco=2
+ambiwidth	あいまい幅文字の幅
+ 	set ambw=double
+emoji	絵文字の幅は全角
+ 	set emo	noemo
+
+27 その他
+
+virtualedit	いつ仮想編集を使うか: "block", "insert", "all"
+	かつ/または "onemore"
+ 	set ve=
+eventignore	自動コマンドイベントで無視するもののリスト
+ 	set ei=
+loadplugins	起動時にプラグインスクリプトを読込む
+ 	set lpl	nolpl
+exrc	カレントディレクトリにある .vimrc/.exrc/.gvimrc の読込みを
+	有効化
+ 	set noex	ex
+secure	カレントディレクトリのスクリプトファイルを安全に扱う
+ 	set nosecure	secure
+gdefault	":substitute" に 'g' フラグを使う
+ 	set nogd	gd
+edcompatible	":substitute" の 'g' と 'c' フラグを切り替える
+ 	set noed	ed
+opendevice	デバイスからの読み書きを許可する
+ 	set noodev	odev
+maxfuncdepth	関数呼出しの最大の深さ
+ 	set mfd=100
+sessionoptions	セッションファイルに何を保存するかを指定する単語のリスト
+ 	set ssop=blank,buffers,curdir,folds,help,options,tabpages,winsize,terminal,unix,slash
+viewoptions	:mkview で何を保存するかを指定する単語のリスト
+ 	set vop=folds,options,cursor,curdir
+viewdir	:mkview でファイルを保存するディレクトリ
+ 	set vdir=C:\\Users\\U351376/vimfiles/view
+viminfo	viminfo ファイルに何を書くかを指定するリスト
+ 	set vi='100,<50,s10,h,rA:,rB:
+viminfofile	viminfo ファイルに使われるファイル名
+ 	set vif=
+bufhidden	バッファがウィンドウに表示されなくなった時の挙動
+	(バッファについてローカル)
+ 	set bh=
+buftype	空, "nofile", "nowrite", "quickfix" など: バッファの種別
+	(バッファについてローカル)
+ 	set bt=
+buflisted	バッファをバッファ一覧に表示するかどうか
+	(バッファについてローカル)
+ 	set bl	nobl
+debug	全てのエラーメッセージを見るには "msg" に設定
+ 	set debug=
+signcolumn	目印桁を表示するかどうか
+	(ウィンドウについてローカル)
+ 	set scl=auto
+luadll	Lua 動的ライブラリの名前
+ 	set luadll=lua54.dll
+perldll	Perl 動的ライブラリの名前
+ 	set perldll=perl532.dll
+pyxversion	Python 2 と 3 のどちらを使うか
+ 	set pyx=0
+pythondll	Python 2 動的ライブラリの名前
+ 	set pythondll=python27.dll
+pythonhome	Python 2 ホームディレクトリの名前
+ 	set pythonhome=
+pythonthreedll	Python 3 動的ライブラリの名前
+ 	set pythonthreedll=python3.dll
+pythonthreehome	Python 3 ホームディレクトリの名前
+ 	set pythonthreehome=
+rubydll	Ruby 動的ライブラリの名前
+ 	set rubydll=x64-ucrt-ruby320.dll
+tcldll	Tcl 動的ライブラリの名前
+ 	set tcldll=
+mzschemedll	MzScheme 動的ライブラリの名前
+ 	set mzschemedll=libracket3m_dcgt6o.dll
+mzschemegcdll	MzScheme GC 動的ライブラリの名前
+ 	set mzschemegcdll=libracket3m_dcgt6o.dll

@@ -1,0 +1,48 @@
+set encoding=utf-8
+
+" テキスト挿入中の自動折り返しを日本語に対応させる
+set formatoptions+=mM
+set formatoptions-=o
+"set gp=grep\ -n
+set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+if !&hlsearch
+  " ReVimrcする度にハイライトされるのを避ける。
+  set hlsearch
+endif
+set nostartofline
+
+"trail:末尾のスペース, eol:改行, extends:, precedes:, nbsp:
+set listchars=tab:>_,trail:$,extends:>,precedes:< | ",eol:,extends:,precedes:,nbsp:
+" タイトルを表示
+set title
+"実際に文字がないところにもカーソルを置けるようにする
+set virtualedit=block,onemore
+set virtualedit=onemore
+set wildmenu
+"set wildmode=longest:full,full
+"set wildmode=longest,list:longest,full
+set wildmode=longest,full
+set nrformats=bin,hex
+"set tag+=;
+set tags=./tags,./tags;
+
+"set viminfo+='100,c
+" set_end set end
+
+set display+=lastline
+
+
+filetype on
+
+syntax enable
+
+" 最後に置かないと、au ColorScheme が実行されないので、最後へ移動した。
+"colorscheme Rimpa
+" TODO hi CursorLine ctermbg=NONE guibg=NONE
+
+
+" from default
+filetype plugin indent on
+
+
+set timeoutlen=1100
