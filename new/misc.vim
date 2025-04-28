@@ -353,7 +353,7 @@ cnoremap <Plug>(Cmap-C-O-V) <C-\>e(getcmdtype() == ':') ? 'verbose ' .. getcmdli
 
 #---------------------------------------------------------------------------------------------
 # Unified c_Ctrl-O
-cnoremap <expr> <C-O> getcmdtype() == ':' ? '<Plug>(Cmap-C-O-S)' : '<Plug>(Cmap-C-O-C)'
+cnoremap <expr> <C-O> getcmdtype() == ':' ? '<Plug>(Cmap-C-O-C)' : '<Plug>(Cmap-C-O-S)'
 cnoremap <expr> <C-J> getcmdtype() == ':' ? '<Plug>(Cmap-C-O-X)' : ''
 cnoremap <expr> <C-G> getcmdtype() == ':' ? '<Plug>(Cmap-C-O-V)' : ''
 
