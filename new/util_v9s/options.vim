@@ -121,8 +121,8 @@ set showbreak=<  # TODO 再考
 #set sidescroll  #@ cursor_move_and_scroll
 #set sidescrolloff  #@ cursor_move_and_scroll
 set display=lastline  # TODO 再確認
-# TODO set fillchars=vert:\|,fold:-,eob:~,lastline:@
-set fillchars=vert:$,fold:-,eob:~,lastline:@
+set fillchars=vert:\|,fold:-,eob:~,lastline:@
+# TODO set fillchars=vert:@,fold:-,eob:~,lastline:@
 set cmdheight=2  # TODO Windows用gvim使用時はgvimrcを編集すること
 #set columns  #@ GUI
 #set lines  #@ GUI
@@ -145,7 +145,10 @@ set numberwidth=3
 #set syntax
 # TODO set synmaxcol
 #set highlight
-#set hlsearch
+if !&hlsearch
+  # sourceする度にハイライトされるのを避ける。
+  set hlsearch
+endif
 #set wincolor
 #set cursorcolumn  # cursor_move_and_scroll
 #set cursorline  # cursor_move_and_scroll
@@ -212,7 +215,11 @@ set tabpagemax=50
 # TODO set esckeys
 #set scrolljump=1
 # TODO set ttyscroll
-#set guicursor  #@ Rimpa, vimrc
+#set guicursor  #@ vimrc, Rimpa
+# vimrc, 1228
+#set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+# Rimpa
+#set guicursor=n-v-c:ver20-blinkwait1000-blinkon600-blinkoff400-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:hor30-Cursor/lCursor,r-cr:Block-Cursor/lCursor
 # TODO set title
 # TODO set titlelen
 # TODO set titlestring
