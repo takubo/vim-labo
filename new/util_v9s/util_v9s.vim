@@ -338,35 +338,6 @@ com! HL HL()
 
 
 #---------------------------------------------------------------------------------------------
-# Gold
-
-g:RimpaGold = true
-
-com! Gold {
-  g:RimpaGold = !g:RimpaGold
-  colorscheme rimpa
-}
-
-def g:IsGold(): bool
-  return g:RimpaGold
-enddef
-
-nnoremap , <Cmd>Gold<CR><Cmd>redrawtabline<CR><Cmd>redrawstatus!<CR>
-
-#---------------------------------------------------------------------------------------------
-# Dark
-
-g:RimpaDark = true
-
-com! Dark {
-  g:RimpaDark = !g:RimpaDark
-  colorscheme rimpa
-}
-
-nnoremap @ <Cmd>Dark<CR>
-
-
-#---------------------------------------------------------------------------------------------
 
 # com! -bang -nargs=0 ScrollBind setl scrollbind
 
