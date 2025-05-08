@@ -4,16 +4,6 @@ scriptencoding utf-8
 
 
 #---------------------------------------------------------------------------------------------
-# Invalidate
-
-nnoremap <silent> ZZ <Nop>
-nnoremap <silent> ZQ <Nop>
-
-# IME状態の切り替えをさせない。
-inoremap <C-^> <Nop>
-
-
-#---------------------------------------------------------------------------------------------
 # Basic
 
 nnoremap Y y$
@@ -42,18 +32,6 @@ vnoremap " '
 
 nnoremap ` m
 vnoremap ` m
-
-
-#---------------------------------------------------------------------------------------------
-# Timeoutlen
-
-set timeoutlen=1100
-
-augroup Timeoutlen
-  au!
-  au InsertEnter * set timeoutlen=700
-  au InsertLeave * set timeoutlen=1100
-augroup end
 
 
 #---------------------------------------------------------------------------------------------
@@ -234,23 +212,6 @@ nnoremap <C-n> <C-I><Cmd>CursorJumped<CR>
 # 変更リスト
 nnoremap <silent> <C-]> g;<Cmd>CursorJumped<CR>
 nnoremap <silent> <C-\> g,<Cmd>CursorJumped<CR>
-
-
-#---------------------------------------------------------------------------------------------
-# Swap_Exists
-
-var swap_select = true
-
-augroup MyVimrc_SwapExists
-  au!
-  au SwapExists * if !swap_select | v:swapchoice = 'o' | endif
-augroup END
-
-com! SwapSelect {
-      swap_select = true
-      edit %
-      swap_select = false
-    }
 
 
 #---------------------------------------------------------------------------------------------

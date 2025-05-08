@@ -279,29 +279,12 @@ def g:Statusline(): string
 
 
   #------------------------------------------------- {{{
-  # Buffer Local Options
-  stl ..= "%#StlFill#"
-  stl ..= "%#StlGoldChar#"
-
-  if contents_switch.Wrap
-    stl ..= " " .. (W('&wrap') ? '  ' : '>>') .. " "
-  endif
-
-  stl ..= W('&scrollbind') ?  " $" : "  "
-
-  if contents_switch.TabStop
-    stl ..= " ⇒" .. B('&tabstop')
-  endif
-  #------------------------------------------------- }}}
-
-
-  #------------------------------------------------- {{{
   # Under Cursor Information
   if winwidth(winid) > 120
 
-    stl ..= "%#StlFill#"
     stl ..= "%#StlGoldChar#"
     stl ..= "%##"
+    stl ..= "%#StlFill#"
 
     if contents_switch.WordLen
       stl ..= " ≪%{" .. "len(expand('<cword>'))" .. "}≫"
@@ -316,9 +299,27 @@ def g:Statusline(): string
     if contents_switch.CharCode10
       stl ..= " %10(《%(%b%)》%)"
     else
-      stl ..= "%#StlGoldChar#" .. "           "
+    # stl ..= "%#StlGoldChar#" .. "           "
     endif
 
+    stl ..= "  "
+  endif
+  #------------------------------------------------- }}}
+
+
+  #------------------------------------------------- {{{
+  # Buffer Local Options
+  stl ..= "%#StlFill#"
+  stl ..= "%#StlGoldChar#"
+
+  if contents_switch.Wrap
+    stl ..= " " .. (W('&wrap') ? '  ' : '>>') .. " "
+  endif
+
+  stl ..= W('&scrollbind') ?  " $" : "  "
+
+  if contents_switch.TabStop
+    stl ..= " ⇒" .. B('&tabstop')
   endif
   #------------------------------------------------- }}}
 
