@@ -65,10 +65,20 @@ hi MatchParen		guifg=#f6f3e8	guibg=#857b6f	gui=bold	cterm=bold
 "   LineNrBelow
 "
 if ! s:dark
+  hi LineNr		guifg=#6c6a5f	guibg=white	gui=NONE	cterm=NONE
+else
+  hi LineNr		guifg=#5c5a4f	guibg=#efd3b8	gui=NONE	cterm=NONE
+endif
+
+if ! s:dark
+  hi LineNr	guifg=#6c6a5f	guibg=NONE	gui=NONE	ctermfg=239	ctermbg=232
   hi LineNr		guifg=#6c6a5f	guibg=NONE	gui=NONE	cterm=NONE
 else
+  hi LineNr	guifg=#5c5a4f	guibg=NONE	gui=NONE	ctermfg=239	ctermbg=232
   hi LineNr		guifg=#5c5a4f	guibg=NONE	gui=NONE	cterm=NONE
 endif
+"hi LineNr		guifg=#6c6a5f	guibg=white	gui=NONE	cterm=NONE
+
 if v:true
   hi CursorLineNr	guifg=#efd3b8	guibg=#7f1f1a	gui=NONE	cterm=NONE
 else
