@@ -151,3 +151,75 @@ augroup EscEscSearch
   au!
   au User EscEsc mh.Suspend()
 augroup end
+
+
+#----------------------------------------------------------------------------------------
+# 行検索
+#----------------------------------------------------------------------------------------
+
+nnoremap <Leader>*  ^"xy$/\C\V<C-r>=escape(@x, '/\|\\')<CR><CR>
+nnoremap <Leader>g* 0"xy$/\C\V\_^<C-r>=escape(@x, '/\|\\')<CR>\_$<CR>
+
+
+#----------------------------------------------------------------------------------------
+# 選択内容検索
+#----------------------------------------------------------------------------------------
+
+vnoremap <Leader>* "xy/\C\V<C-r>=escape(@x, '/\|\\')<CR><CR>
+
+
+#----------------------------------------------------------------------------------------
+# 検索選択追加
+#----------------------------------------------------------------------------------------
+
+# 末尾が\|でないときだけ、\|を追加するようにしておかないと、\|の後でEscでキャンセルすると、\|が溜まっていってしまう。
+nnoremap g/ /<C-p><C-r>=match(getcmdline(), '\|$') == -1 ? '\\|' : ''<CR>
+
+
+#----------------------------------------------------------------------------------------
+# シンボル名のPart
+#----------------------------------------------------------------------------------------
+
+#nnoremap z* <Cmd> setl isk-=_ <Bar> let @/ = expand("<cword>")            <Bar> set hlsearch <Bar> setl isk+=_ <CR>
+#nnoremap z# <Cmd> setl isk-=_ <Bar> let @/ ..= '\\|' .. expand("<cword>") <Bar> set hlsearch <Bar> setl isk+=_ <CR>
+
+#nmap z* "xyiv/\C<C-r>x<CR>
+nmap z* "xyiv/<C-r>x<CR>
+nmap z# "xyiv/<C-p>\\|<C-r>x<CR>
+
+
+
+finish
+
+
+
+#----------------------------------------------------------------------------------------
+# 検討
+#----------------------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------------------
+# CWord
+
+# nmap  * <Plug>(Search-CWord-New-Word-Keep-Strict)
+# nmap z* <Plug>(Search-CWord-New-Word-Keep-Option)
+# nmap z* <Plug>(Search-CWord-New-Word-Keep-Ignore)
+# nmap  # <Plug>(Search-CWord-New-Part-Keep-Strict)
+# nmap z# <Plug>(Search-CWord-New-Part-Keep-Option)
+# nmap  & <Plug>(Search-CWord-Add-Word-Keep-Option)
+# nmap z& <Plug>(Search-CWord-Add-Part-Keep-Option)
+
+
+#----------------------------------------------------------------------------------------
+# シンボル名のPart
+
+#nmap     g8 :<C-u>setl isk-=_<CR>#:setl isk+=_<CR>
+#nnoremap g8 :<C-u>setl isk-=_<CR>:let @/=expand("<cword>")<CR>:set hlsearch<CR>:setl isk+=_<CR>
+#nnoremap g8 :<C-u>setl isk-=_<CR>/<C-r><C-w><CR>:setl isk+=_<CR>
+
+
+#----------------------------------------------------------------------------------------
+# 検討
+
+#nnoremap <Leader>& <Plug>(Search-TopUnderScore)
+#nnoremap <Leader>@ <Plug>(MySearchT-ToggleMultiHighLight)

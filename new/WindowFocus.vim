@@ -539,6 +539,8 @@ nnoremap <C-W>T     <C-W>T
 # Tab (Window Container)
 #----------------------------------------------------------------------------------------
 
+# set tabclose=uselast FIXME
+
 nnoremap  <C-T> <Cmd>tabnew<CR>
 nnoremap g<C-T> :<C-U>tabnew<Space>
 #nnoremap <silent>  <C-T> <Cmd>tabnew<Bar>SetpathSilent<CR>
@@ -556,6 +558,24 @@ nnoremap <A-F>  <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove 
 nnoremap <A-B>  <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
 
 nnoremap gt <Cmd>tabs<CR>:tabnext<Space>
+
+
+#--------------------------------------------
+# Select Tab
+
+def SelectTab()
+  tabs
+
+  var n = input('#Tab#> ')
+
+  if n =~# '\d\+'
+    exe ':' n 'tabnext'
+  endif
+enddef
+
+com! -nargs=0 -bar SelectTab SelectTab()
+
+nnoremap <Leader>t <Cmd>SelectTab<CR>
 
 
 #----------------------------------------------------------------------------------------
