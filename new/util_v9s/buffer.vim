@@ -36,6 +36,15 @@ nnoremap <Leader><C-K> :<C-U>ls <CR>:CloseBuffer<Space>
 
 
 #---------------------------------------------------------------------------------------------
+# Buffer Select Filter
+
+com! -bang -nargs=* Buf {
+      exe 'browse filter %\c' .. substitute(<q-args>, '[ *]', '.*', 'g') .. '% ls<bang>'
+      feedkeys(':b ', 'n')
+    }
+
+
+#---------------------------------------------------------------------------------------------
 # EasyBuffer
 
 if 0

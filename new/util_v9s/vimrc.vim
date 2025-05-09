@@ -154,8 +154,8 @@ com! SwapSelect {
 augroup MyVimrc_QickFix
   au!
   # grepする際に'|cwindow'を付けなくても、Quickfixに結果を表示する
-  au QuickfixCmdPost make,grep,grepadd,vimgrep,cbuffer,cfile exe 'botright cwindow ' .. (&lines / 4)
-  au QuickfixCmdPost lmake,lgrep,lgrepadd,lvimgrep,lcbuffer,lcfile exe 'lwindow ' .. (winheight(0) / 4)
+  au QuickfixCmdPost make,grep,grepadd,vimgrep,helpgrep,cbuffer,cfile exe 'botright cwindow ' .. (&lines / 4)
+  au QuickfixCmdPost lmake,lgrep,lgrepadd,lvimgrep,lhelpgrep,lcbuffer,lcfile exe 'lwindow ' .. (winheight(0) / 4)
 augroup end
 
 

@@ -131,7 +131,7 @@ set cmdheight=2  # TODO Windows用gvim使用時はgvimrcを編集すること
 #set redrawtime
 #set writedelay=0
 set list
-set listchars=tab:>_,trail:$,extends:>,precedes:<,conceal:?,nbsp:~
+set listchars=tab:>_,trail:$,extends:>,precedes:<,conceal:?,nbsp:X
 set number
 set relativenumber
 set numberwidth=3
@@ -308,7 +308,7 @@ set undoreload=-1  # リロードするときにアンドゥのためにバッ�
 #set wrapmargin=0
 set backspace=indent,eol,start  # バックスペースでインデントや改行を削除できるようにする
 #set comments
-SetFlagOption('formatoptions', 'MBj', 'roa')  # set formatoptions
+SetFlagOption('formatoptions', 'mMBj', 'roa')  # set formatoptions  # テキスト挿入中の自動折り返しを日本語に対応させる
 # TODO set formatlistpat
 #set formatexpr
 #set complete  #@ completion
@@ -332,7 +332,7 @@ set matchpairs+=(:),<:>,[:],{:},（:）,＜:＞,［:］,｛:｝,｟:｠,｢:｣,
 set matchpairs+=?::
 #set matchpairs+==:;
 set nojoinspaces  # TODO
-#set nrformats=hex,bin,blank  # TODO unsigned  blankは最新バージョンのみ
+#set nrformats=hex,bin,blank  # FIXME unsigned  blankは最新バージョンのみ
 set nrformats=hex,bin,unsigned
 
 # 15 タブとインデント
