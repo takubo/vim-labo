@@ -1,0 +1,965 @@
+set runtimepath^=~/vim/runtime
+let $VIM = '~/vim/runtime'
+
+
+
+"let OSTYPE = system('uname')
+"if OSTYPE == "Darwin\n" 
+"  :set term=xterm-256color 
+"  :syntax on 
+"endif 
+
+
+
+" Search {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+
+"----------------------------------------------------------------------------------------
+" General Mapping
+
+cmap <expr> <CR> ( getcmdtype() == '/' ) ?
+               \ ( '<Plug>(Search-SlashCR)' ) :
+               \ ( '<CR>' )
+
+nmap n  <Plug>(Search-n)
+nmap N  <Plug>(Search-N)
+
+" 末尾が\|でないときだけ、\|を追加するようにしておかないと、\|の後でEscでキャンセルすると、\|が溜まっていってしまう。
+"nnoremap ? /<C-p><C-\>e getcmdline() . ( match(getcmdline(), '\|$') == -1 ? '\\|' : '') <CR>
+nnoremap g/ /<C-p><C-r>=match(getcmdline(), '\|$') == -1 ? '\\|' : ''<CR>
+
+
+"----------------------------------------------------------------------------------------
+" CWord
+
+nmap  * <Plug>(Search-CWord-New-Word-Keep-Strict)
+nmap  U <Plug>(Search-CWord-New-Word-Keep-Strict)
+"nmap z* <Plug>(Search-CWord-New-Word-Keep-Option)
+nmap z* <Plug>(Search-CWord-New-Word-Keep-Ignore)
+nmap  # <Plug>(Search-CWord-New-Part-Keep-Strict)
+nmap z# <Plug>(Search-CWord-New-Part-Keep-Option)
+nmap  & <Plug>(Search-CWord-Add-Word-Keep-Option)
+nmap z& <Plug>(Search-CWord-Add-Part-Keep-Option)
+
+nmap z8 z*
+nmap z3 z#
+nmap z7 z&
+
+
+"----------------------------------------------------------------------------------------
+" 補償
+
+nnoremap g9 g8
+nnoremap 8g9 8g8
+nnoremap 9g9 8g8
+
+
+"----------------------------------------------------------------------------------------
+" シンボル名のPart
+
+"nnoremap z* :<C-u>setl isk-=_ <Bar> let @/=expand("<cword>") <Bar> set hlsearch <Bar> setl isk+=_<CR>
+"nnoremap z& :<C-u>setl isk-=_ <Bar> let @/.='\\|'.expand("<cword>") <Bar> set hlsearch <Bar> setl isk+=_<CR>
+
+nmap g* "xyiv/\C<C-r>x<CR>
+nmap g# "xyiv/<C-r>x<CR>
+nmap g& "xyiv/<C-p>\\|<C-r>x<CR>
+
+nmap g8 g*
+nmap g3 g#
+nmap g7 g&
+
+
+"----------------------------------------------------------------------------------------
+" 行検索
+
+nnoremap <Leader>* ^y$:let lstmp = @"<CR>/\C\V<C-r>=escape(lstmp, '/\|\\')<CR><CR>
+nnoremap <Leader>* ^y$/\C\V<C-r>=escape(@", '/\|\\')<CR><CR>
+nmap     <Leader>8 <Leader>*
+
+nnoremap <Leader>& 0y$/\C\V\_^<C-r>=escape(@", '/\|\\')<CR>\_$<CR>
+nmap     <Leader>7 <Leader>&
+
+vnoremap <Leader>* y:let lstmp = @"<CR>/\C\V<C-r>=escape(lstmp, '/\|\\')<CR><CR>
+vnoremap         * y:let lstmp = @"<CR>/\C\V<C-r>=escape(lstmp, '/\|\\')<CR><CR>
+vmap     <Leader>8 <Leader>*
+"vnoremap         *   y:let lstmp = @"<CR>/\C\V<C-r>=escape(lstmp, '/\|\\')<CR><CR>
+"vnoremap <Leader>#   y:let lstmp = @"<CR>/\C\V<C-r>=escape(lstmp, '/\|\\')<CR><CR>
+"vnoremap         #   y:let lstmp = @"<CR>/\C\V<C-r>=escape(lstmp, '/\|\\')<CR><CR>
+
+
+"----------------------------------------------------------------------------------------
+" 検討
+
+"nnoremap ? /<C-p>\<Bar>
+
+"nnoremap <Leader>& <Plug>(Search-TopUnderScore)
+"nnoremap <Leader>@ <Plug>(MySearchT-ToggleMultiHighLight)
+
+" clear status
+"nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
+
+"nmap g8 :<C-u>setl isk-=_<CR>#:setl isk+=_<CR>
+"nnoremap g8 :<C-u>setl isk-=_<CR>:setl isk+=_<CR>
+"nnoremap g8 :<C-u>setl isk-=_<CR>:let @/=expand("<cword>")<CR>:set hlsearch<CR>:setl isk+=_<CR>
+"nnoremap g8 :<C-u>setl isk-=_<CR>/<C-r><C-w><CR>:setl isk+=_<CR>
+
+
+" Search }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+
+
+" Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+let c_jk_local = 0
+
+nnoremap <silent> <Plug>(MyVimrc-Toggle-Qf-Ll) :<C-u>let c_jk_local = !c_jk_local<CR>
+
+"例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+nnoremap <silent> <Plug>(MyVimrc-CNext) :<C-u>try <Bar> exe (c_jk_local ? ":lnext" : "cnext") <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+nnoremap <silent> <Plug>(MyVimrc-CPrev) :<C-u>try <Bar> exe (c_jk_local ? ":lprev" : "cprev") <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+
+"例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+nnoremap <silent> <Plug>(MyVimrc-QfNext) :<C-u>try <Bar> cnext <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+nnoremap <silent> <Plug>(MyVimrc-QfPrev) :<C-u>try <Bar> cprev <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+
+"例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+nnoremap <silent> <Plug>(MyVimrc-LlNext) :<C-u>try <Bar> lnext <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+nnoremap <silent> <Plug>(MyVimrc-LlPrev) :<C-u>try <Bar> lprev <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+
+nmap <silent> <Del> <Plug>(MyVimrc-QfNext)
+nmap <silent> <Ins> <Plug>(MyVimrc-QfPrev)
+"nmap <silent> <A-n> <Plug>(MyVimrc-LlNext)
+"nmap <silent> <A-m> <Plug>(MyVimrc-LlPrev)
+
+" Quickfix & Locationlist }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+
+
+" MRU {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+augroup MyVimrc_MRU
+  au!
+ "au VimEnter,VimResized * let MRU_Window_Height = max([8, &lines / 3 ])
+  au VimEnter,VimResized * let MRU_Window_Height = max([8, &lines / 2 ])
+augroup end
+
+nnoremap <Leader>o :<C-u>MRU<Space>
+nnoremap <C-o> :<C-u>MRU<Space>
+
+" MRU }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+
+
+" Snippets {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" ru snipMate.vim
+if exists('*TriggerSnippet')
+  inoremap <silent> <Tab>   <C-R>=<SID>TriggerSnippet()<CR>
+endif
+
+" Snippets }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+
+
+" Clever-f {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+let g:clever_f_smart_case = 1
+
+let g:clever_f_use_migemo = 1
+
+com! CleverfUseMigemoToggle let g:clever_f_use_migemo = !g:clever_f_use_migemo | echo g:clever_f_use_migemo ? 'clever-f Use Migemo' : 'clever-f No Migemo'
+
+" fは必ず右方向に移動，Fは必ず左方向に移動する
+"let g:clever_f_fix_key_direction = 1
+
+" 任意の記号にマッチする文字を設定する
+let g:clever_f_chars_match_any_signs = "\<BS>"
+
+" 過去の入力の再利用
+"let g:clever_f_repeat_last_char_inputs = ["\<CR>"]	" ["\<CR>", "\<Tab>"]
+
+" タイムアウト
+let g:clever_f_timeout_ms = 3000
+
+augroup MyVimrc_cleverf
+  au!
+  au ColorScheme * hi My_cleverf_Cursor guifg=yellow guibg=black
+  au ColorScheme * hi My_cleverf_Char   guifg=#cff412 guibg=black
+  "au ColorScheme * hi My_cleverf_Cursor guifg=cyan guibg=black
+  "au ColorScheme * hi My_cleverf_Char   guifg=yellow guibg=black
+augroup end
+let g:clever_f_mark_cursor_color = 'My_cleverf_Cursor'
+let g:clever_f_mark_char_color   = 'My_cleverf_Char'
+"let g:clever_f_mark_cursor = 1
+"let g:clever_f_mark_char = 1
+
+" TODO !!! clever-fが重い !!!
+let g:clever_f_mark_char = 0
+"   とするか、
+"let g:clever_f_use_migemo = 0
+"   とするかすれば、重いのが解消される。
+
+" Clever-f }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+
+
+set renderoptions=type:directx,scrlines:1
+
+
+
+" {{{
+hi HlWord	guifg=#4050cd	guibg=white
+hi HlWord	guibg=#4050cd	guifg=white
+hi HlWord	guibg=NONE	guifg=NONE
+hi HlWord	gui=reverse
+hi HlWord	gui=NONE
+hi HlWord	guibg=gray30	guifg=gray80
+nnoremap <silent> <leader>` :<C-u>match HlWord /\<<C-r><C-w>\>/<CR>
+"call EscEsc_Add('PushPosAll')
+"call EscEsc_Add('windo match')
+"call EscEsc_Add('PopPosAll')
+augroup MyHiLight
+  au!
+  au WinLeave * match
+augroup end
+" `}}}
+
+
+
+" Refactoring  {{{
+
+" 関数内のシンボルだけを置換
+function!  RefactorLocalSymbol()
+  let srch = @/
+  let word = expand('<cword>')
+
+  call PushPos()
+
+  " 2jは、関数の先頭に居た時用
+  " 2kは、関数定義行を含むため
+  " いずれも暫定
+  keepjumps normal! 2j[[2k
+  let fl = line('.')
+  keepjumps normal! ][
+  let ll = line('.')
+
+  let c_l = fl . ',' . ll
+  "echo c_l
+
+  let c_c = 's/' . srch . '/' . word . '/g'
+  "echo c_c
+
+  let c_u = c_l . c_c
+  "echo c_u
+  exe c_u
+
+  call PopPos()
+endfunction
+
+"nnorema <silent> <Leader>d :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+nnoremap <silent> <Leader>d :<C-u>call RefactorLocalSymbol()<CR>
+nnorema <silent> <Leader>D :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+
+" Refactoring  }}}
+
+
+
+nnoremap <silent> <C-]> g;:FuncNameStl<CR>
+nnoremap <silent> <C-\> g,:FuncNameStl<CR>
+
+
+
+let plugin_dicwin_disable = v:true
+
+
+
+ru! ftplugin/man.vim
+
+
+
+"nnoremap  ]]  ]]f(bzt
+"nnoremap g]]  ]]f(b
+"nnoremap  [[  [[f(bzt
+"nnoremap g[[  [[f(b
+"nnoremap  ][  ][zb
+"nnoremap g][  ][
+"nnoremap  []  []zb
+"nnoremap g[]  []
+
+
+
+highlight link MRUFileName Identifier
+highlight link MRUFileName Statement
+highlight link MRUFileName MyMru
+highlight link MRUFileName DirectoryMyMru
+highlight link MRUFileName String
+
+
+
+cabb f find
+
+
+
+"com! -nargs=+ F
+"      \ exe 'sfind ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*'
+
+
+com! -nargs=+ F
+      \ try | exe 'find' <q-args> | catch |
+      \ try | exe 'find ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*' | catch |
+      \ call feedkeys(':find *' . substitute('<args>', ' ', '*', 'g') . '*<Tab><Tab><Tab>', 'nt') | endtry | endtry
+
+com! -nargs=+ S
+      \ try | exe 'sfind' <q-args> | catch |
+      \ try | exe 'sfind ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*' | catch |
+      \ call feedkeys(':sfind *' . substitute('<args>', ' ', '*', 'g') . '*<Tab><Tab><Tab>', 'nt') | endtry | endtry
+
+com! -nargs=+ T
+      \ try | exe 'tab sfind' <q-args> | catch |
+      \ try | exe 'tab sfind ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*' | catch |
+      \ call feedkeys(':tab sfind *' . substitute('<args>', ' ', '*', 'g') . '*<Tab><Tab><Tab>', 'nt') | endtry | endtry
+
+
+if 0
+  com! -nargs=+ S
+        \ try | exe 'sfind' <q-args> | catch
+        \ try | exe 'sfind ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*' | 
+        \ catch | call feedkeys(':sfind *' . substitute('<args>', ' ', '*', 'g') . '*<Tab>', 'nt') | endtry
+
+  com! -nargs=+ T
+        \ try | exe 'tab sfind' <q-args> | catch
+        \ try | exe 'tab sfind ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*' | 
+        \ catch | call feedkeys(':tab sfind *' . substitute('<args>', ' ', '*', 'g') . '*<Tab>', 'nt') | endtry
+endif
+
+"com! -nargs=+ F
+"      \ exe 'find ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*'
+
+
+"com! -nargs=+ F
+"     \ call feedkeys(':find *' . substitute('<args>', ' ', '*', 'g') . '*<Tab>', 'nt')
+"     \ try | exe 'find' <q-args> | catch
+"     \ try | exe 'find ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*' | endtry |
+"     \ catch | call feedkeys(':find *' . substitute('<args>', ' ', '*', 'g') . '*<Tab>', 'nt') | endtry
+
+
+
+"match CursorLineNr /\%#./
+
+
+" TODO 不正なプリプロ命令をハイライト
+
+
+" nnoremap <silent> <F9>  :exe 'winpos' getwinposx() - 1 ' ' getwinposy() - 0<CR>
+" nnoremap <silent> <F10> :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 1<CR>
+" nnoremap <silent> <F11> :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 1<CR>
+" nnoremap <silent> <F12> :exe 'winpos' getwinposx() + 1 ' ' getwinposy() + 0<CR>
+" 
+" nnoremap <silent> <S-F9>  :let &columns -= 1<CR>
+" nnoremap <silent> <S-F10> :let &lines   += 1<CR>
+" nnoremap <silent> <S-F11> :let &lines   -= 1<CR>
+" nnoremap <silent> <S-F12> :let &columns += 1<CR>
+
+
+
+nnoremap <Leader>9 :<C-u>RainbowParenthesesToggle<CR>
+
+
+
+com! WinOptimalWidth PushPosAll | exe 'silent windo call Window#Resize#SetOptimalWidth()' | PopPosAll
+
+com! WinOptimalWidthRev PushPosAll | for i in reverse(range(1, winnr('$'))) | exe i 'wincmd w' | sile call Window#Resize#SetOptimalWidth() | endfor | PopPosAll
+
+
+
+" iab IF0 #if 0
+" #else
+" #endif<C-R>=Eatchar('\s')<CR>
+
+augroup MyVimrc_ChDir
+  au!
+ "au DirChanged window,tabpage,global pwd
+  au DirChanged global pwd
+augroup end
+
+
+
+command! -nargs=* BUF exe 'browse filter %\c' . substitute(<q-args>, '[ *]', '.*', 'g') . '% ls' | call feedkeys(':b ', 'n')
+
+"nnoremap K :<C-u>BUF<Space>
+
+
+
+"? nnoremap <silent> <Leader>O :<C-u>MyExplore<CR>
+
+
+
+" test.vim {{{
+
+
+
+function! s:GoToDeclaration()
+  let cl0 = line(".")
+  let bn0 = bufnr(0)
+
+  set tags=./tags
+  try
+    "tjump
+    "exe "normal! \<C-]>"
+    normal! 
+  catch
+  endtry
+  let cl = line(".")
+  let bn = bufnr(0)
+  if cl0 != cl || bn0 != bn | return | endif
+
+  set tags=tags;
+  try
+    "tjump
+    "exe "normal! \<C-]>"
+    normal! 
+  catch
+  endtry
+  let cl = line(".")
+  let bn = bufnr(0)
+  if cl0 != cl || bn0 != bn | return | endif
+
+  try
+    normal! gD
+    let cl = line(".")
+    let bn = bufnr(0)
+  catch
+  endtry
+  if cl0 != cl || bn0 != bn | return | endif
+
+  try
+    normal! gd
+    let cl = line(".")
+    if cl0 != cl | return | endif
+  catch
+  endtry
+
+  " echoe 'Declaration not found.'
+  echo 'Declaration not found.'
+endfunction
+"call <SID>GoToDeclaration()
+"nnoremap <buffer> <silent> <CR> :<C-u>call <SID>GoToDeclaration()<CR>
+"nnoremap  <CR> :<C-u>call <SID>GoToDeclaration()<CR>
+
+" TODO
+" 念のため、バッファが変わったことも確認する。
+" なぜか、statusline用のauが効かないので、独自にbuf_name_lenの設定を行う。
+"
+
+
+
+" ver 0.1
+" function! s:GoToDeclaration()
+" 	let cl0 = line(".")
+" 
+" 	try
+" 		normal! 
+" 	catch
+" 	endtry
+" 	let cl = line(".")
+" 	if cl0 != cl | return | endif
+" 
+" 	normal! gD
+" 	let cl = line(".")
+" 	if cl0 != cl | return | endif
+" 
+" 	normal! gd
+" 	let cl = line(".")
+" 	if cl0 != cl | return | endif
+" 
+" 	echoe 'Declaration not found.'
+" endfunction
+" "call <SID>GoToDeclaration()
+" nnoremap <silent> <CR> :<C-u>call <SID>GoToDeclaration()<CR>
+
+
+
+""" Form Vimrc
+
+
+" Cscope
+" nnoremap <C-j><C-a> :<C-u>cscope add cscope.out<CR>
+" nnoremap <C-j><C-j> :<C-u>cscope find 
+" nnoremap <C-j>c     :<C-u>cscope find c 
+" nnoremap <C-j>d     :<C-u>cscope find d 
+" nnoremap <C-j>e     :<C-u>cscope find e 
+" nnoremap <C-j>f     :<C-u>cscope find f 
+" nnoremap <C-j>g     :<C-u>cscope find g 
+" nnoremap <C-j>i     :<C-u>cscope find i 
+" nnoremap <C-j>s     :<C-u>cscope find s 
+" nnoremap <C-j>t     :<C-u>cscope find t 
+" nnoremap <C-j>C     :<C-u>cscope find c <C-r><C-w><CR>
+" nnoremap <C-j>D     :<C-u>cscope find d <C-r><C-w><CR>
+" nnoremap <C-j>E     :<C-u>cscope find e <C-r><C-w><CR>
+" nnoremap <C-j>F     :<C-u>cscope find f <C-r><C-w><CR>
+" nnoremap <C-j>G     :<C-u>cscope find g <C-r><C-w><CR>
+" nnoremap <C-j>I     :<C-u>cscope find i <C-r><C-w><CR>
+" nnoremap <C-j>S     :<C-u>cscope find s <C-r><C-w><CR>
+" nnoremap <C-j>T     :<C-u>cscope find t <C-r><C-w><CR>
+
+
+if exists('*smartchr#one_of')
+  "TODO 行末
+  inoremap <expr> , smartchr#one_of(', ', ',')
+
+  " 演算子の間に空白を入れる
+  inoremap <expr> + smartchr#one_of(' = ', ' == ', '=')
+  inoremap <expr> + smartchr#one_of(' + ', '++', '+')
+  inoremap <expr> - smartchr#one_of(' - ', '--', '-')
+  inoremap <expr> * smartchr#one_of(' * ', '*')
+  inoremap <expr> / smartchr#one_of(' / ', '/')
+  inoremap <expr> % smartchr#one_of(' % ', '%')
+  inoremap <expr> & smartchr#one_of(' & ', ' && ', '&')
+  inoremap <expr> <Bar> smartchr#one_of(' <Bar> ', ' <Bar><Bar> ', '<Bar>')
+
+  if &filetype == "c"
+    " 下記の文字は連続して現れることがまれなので、二回続けて入力したら改行する
+    inoremap <buffer><expr> } smartchr#one_of('}', '}<cr>')
+    inoremap <buffer><expr> ; smartchr#one_of(';', ';<cr>')
+  endif
+  inoremap <expr> + smartchr#one_of(' = ', ' == ', '=')
+endif
+
+
+"nnoremap s f_l
+"nnoremap S F_h
+"nnoremap ci s
+"nnoremap cI S
+
+
+" test.vim }}}
+
+
+
+" 起動速度
+
+" どうしようもない時間は、170ms程度。余裕を見て180～200msくらいか。
+
+"let did_install_default_menus = 1
+" TODO $VIMRUNTIME/menu.vimを削除する。
+
+" 以下を削除。
+" $VIM\gvimrc
+" $HOME\_gvimrc
+" $VIMRUNTIME\gvimrc_example.vim
+
+
+
+" Bug Issue
+"     ・E443のメッセージ
+"     ・NerdTreeVCS が無限ループ
+"     ・zl zh が動かなくなる
+"     ・find でワイルドカードを使用すると、E480のエラー。
+"     ・CursorLineがONで、改行を含む文字列を検索したとき、hlsearchでの改行のハイライトがカレント行のときだけになるのは、おかしい。
+"
+
+com! QfStl setlocal stl=%#SLFileName#[\ %{winnr()}\ ]%##\ (\ %n\ )\ %t%{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}\ %=%-15(%l,%c%V%)\ %P
+
+
+
+set cedit=<C-q>
+
+augroup MyVimrc_CmdWin
+  au!
+  au CmdwinEnter * call s:init_cmdwin()
+augroup end
+function! s:init_cmdwin()
+  "nnoremap <buffer> q :<C-u>quit<CR>
+  "nnoremap <buffer> <TAB> :<C-u>quit<CR>
+  "inoremap <buffer><expr><CR> pumvisible() ? "\<C-y>\<CR>" : "\<CR>"
+  "inoremap <buffer><expr><C-h> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
+  "inoremap <buffer><expr><BS> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
+
+  "" Completion.
+  "inoremap <buffer><expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
+  "startinsert!
+
+  nnoremap <buffer> <CR> <CR>
+endfunction
+
+
+hi PPP	guifg=#f6f3f0	guibg=#292927	gui=none	ctermfg=254	ctermbg=235
+set previewpopup=height:30,width:120,highlight:PPP
+
+
+
+"nunmap gU
+
+"? Substitute nmap S *
+"? Substitute 
+"? Substitute nnoremap <C-s>           :<C-u>g$.$s    %%<Left>
+"? Substitute vnoremap <C-s>                    :s    %%<Left>
+
+nnoremap gs              :<C-u>g$.$s    %<C-R>/%%g<Left><Left>
+vnoremap gs                       :s    %<C-R>/%%g<Left><Left>
+
+
+vnoremap ga :EasyAlign<Space>//<Left>
+vnoremap g= :EasyAlign<Space>//<Left>
+vnoremap A  :EasyAlign<Space>//<Left>
+
+
+
+let NumWin = function('winnr',     ['$'])
+let NumTab = function('tabpagenr', ['$'])
+
+
+
+let g:EmAutoState = v:false
+
+
+
+nnoremap <Leader>D :<C-u>e .<CR>
+
+
+
+if 0
+  set shellpipe=2>\&1\|iconv\ -f\ cp932\ -t\ utf-8\ -c>%s
+  set shellpipe=2>\&1\|iconv\ -f\ cp932\ -t\ utf-8\ -c\ 2>\&1\|tee\ >%s
+  set shellpipe=2>\&1\|iconv\ -f\ cp932\ -t\ utf-8\ -c\ 2>\&1\|tee
+else
+  "set shellpipe&
+  set shellpipe=2>\&1\|tee
+endif
+
+
+
+" Gdiffsplit
+" :ReVimrc
+" ":!git
+" :e
+
+
+
+" nmap alt 使用済み <A-
+" f b o n p
+" h j k l
+
+
+
+"nnoremap <Leader>t :<C-u>tabs<CR>:let g:tabbb = input('> ')<CR>:exe 'normal!' g:tabbb 'gt'<CR>
+"nnoremap <Leader>t :<C-u>tabs<CR>:exe 'normal!' input('#Tab#> ', 21) 'gt'<CR>
+
+function! s:select_tab()
+  tabs
+
+  if 0
+    let num_tab = tabpagenr('$')
+    if num_tab < 10
+      echo '#Tab#> '
+      let n = GetKey()
+    else
+      let n = input('#Tab#> ')
+    endif
+  else
+    let n = input('#Tab#> ')
+  endif
+
+  if n =~# '\d\+'
+   "exe 'normal!' n 'gt'
+    exe n 'tabnext'
+   "echo '^'.n.'$'
+  endif
+endfunction
+nnoremap <Leader>t :<C-u>call <SID>select_tab()<CR>
+
+
+
+if g:UseHHKB
+  inoremap <Down>   <C-n>
+  inoremap <Up>     <C-p>
+  "cnoremap <Down>   <C-n>
+  "cnoremap <Up>     <C-p>
+endif
+
+
+
+"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+" from Unified_Tab.vim
+
+
+function Unified_Tab(m)
+  if &diff
+    if a:m > 0
+      " Next Hunk
+      normal! ]c
+    else
+      " Previouse Hunk
+      normal! [c
+    endif
+    normal! ^
+
+  "elseif win_getid()->getwininfo()[0].loclist == 1
+  elseif IsLocationlistWindowOpen()
+    "例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+    try
+      if a:m > 0
+        lnext
+      else
+        lprev
+      endif
+    catch /:E553/
+      " TODO Popup Windowにする？
+      echohl Search
+      echo a:m > 0 ?  'Last location list.' : '1st location list.'
+      echohl None
+    endtry
+
+  else
+    "例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+    try
+      if a:m > 0
+        cnext
+      else
+        cprev
+      endif
+    catch /:E553/
+      " TODO Popup Windowにする？
+      echohl Search
+      echo a:m > 0 ?  'Last error list.' : '1st error list.'
+      echohl None
+    endtry
+  endif
+
+  FuncNameStl
+  return
+endfunction
+
+
+function! GetLocationlistWinid()
+  return getloclist(winnr(), {'winid' : 0}).winid
+endfunction
+
+function! IsLocationlistWindowOpen()
+  return GetLocationlistWinid() != 0
+endfunction
+
+
+
+"---------------------------------------------------------------------------------------------
+nnoremap <silent>         t :<C-u>call Unified_Tab( 1)<CR>
+nnoremap <silent>         T :<C-u>call Unified_Tab(-1)<CR>
+nnoremap <silent>        gt :<C-u>cfirst<CR>
+nnoremap <silent>        gT :<C-u>clast<CR>
+nnoremap <silent> <Leader>T :<C-u>cc<CR>
+
+
+nnoremap <silent>       m :<C-u>call Unified_Tab( 1)<CR>
+nnoremap <silent>       M :<C-u>call Unified_Tab(-1)<CR>
+
+nnoremap <silent>         <Tab> :<C-u>call Unified_Tab( 1)<CR>
+nnoremap <silent>       <S-Tab> :<C-u>call Unified_Tab(-1)<CR>
+nnoremap <silent>        g<Tab> :<C-u>cfirst<CR>
+nnoremap <silent>        g<Tab> :<C-u>clast<CR>
+nnoremap <silent> <Leader><Tab> :<C-u>cc<CR>
+
+"nnoremap <silent>       t ^
+"nnoremap <silent>       T $
+
+"nnoremap <silent>       m J
+
+
+
+"---------------------------------------------------------------------------------------------
+iab FORI for ( uint32_t i = 0U; i < N; i++ ) {<CR><CR>}
+iab <silent> FORI for ( uint32_t i = 0U; i < N; i++ ) {<CR><CR>}<C-R>=Eatchar('\s')<CR>
+
+
+
+"---------------------------------------------------------------------------------------------
+nnoremap <Leader><C-s>           :<C-u>g%<C-r>/%s    %%%g<Left><Left><Left>
+vnoremap <Leader><C-s>                :g%<C-r>/%s     %%%g<Left><Left><Left>
+
+nnoremap <Leader><C-s>           :<C-u>g!<C-r>/!<Space>
+vnoremap <Leader><C-s>                :g!<C-r>/!<Space>
+
+
+
+"---------------------------------------------------------------------------------------------
+
+" ^に、|の機能を付加
+"nnoremap <silent> U <Esc>:exe v:prevcount ? ('normal! ' . v:prevcount . '<Bar>') : 'normal! ^'<CR>
+"nnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : '^'
+"nnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s*\%#', 'bcn') ? '0' : '^'
+"nnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S', 'bcn') ? '0' : '^'
+nnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^'
+vnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^'
+"nnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\(\S\|\s$\)', 'bcn') ? '0' : '^'
+"vnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : '^'
+
+"""  " ^に、|の機能を付加
+"""  nnoremap <silent> ^ <Esc>:exe v:prevcount ? ('normal! ' . v:prevcount . '<Bar>') : 'normal! ^'<CR>
+nnoremap <silent> U <Esc>:exe 'normal!' v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^' <CR>
+vnoremap <silent> U <Esc>:exe 'normal!' v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^' <CR>
+"onoremap <silent> U <Esc>:exe 'normal!' v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^' <CR>
+onoremap <expr> <silent> U search('^\s\+\%#\S\?', 'bcn') ? '0' : '^'
+"nnoremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^' <CR>
+
+nnoremap zU g0
+
+"nnoremap U ^
+"nnoremap : $
+"vnoremap U ^
+"vnoremap : $
+
+nnoremap 0 g0
+nnoremap $ g$
+
+" 補償
+vnoremap gu u
+vnoremap gU U
+
+
+" 矯正
+" nnoremap ^ <Nop>
+" nnoremap $ <Nop>
+" vnoremap ^ <Nop>
+" vnoremap $ <Nop>
+
+
+
+"---------------------------------------------------------------------------------------------
+
+if 0
+  nnoremap <silent> t <Esc>:exe 'normal!' v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^' <CR>
+  vnoremap <silent> t <Esc>:exe 'normal!' v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\S\?', 'bcn') ? '0' : '^' <CR>
+
+  nmap U *
+  nnoremap T $
+endif
+
+
+
+"---------------------------------------------------------------------------------------------
+
+nnoremap <Leader>6 ^y$/\C\V<C-r>=substitute(escape(@", '/\|\\'), '\s', '\\s\\+', 'g')<CR><CR>
+
+
+
+"---------------------------------------------------------------------------------------------
+
+iab LOOP while ( 1 ) {<CR>}
+
+
+"---------------------------------------------------------------------------------------------
+
+nmap ? *
+
+
+"---------------------------------------------------------------------------------------------
+
+function! Find(arg)
+  "echo a:arg
+  "et f = a:arg
+
+  let f = substitute(a:arg, ' ', '*', 'g')
+
+  if a:arg !~ '^\^'
+    let f = substitute(f, '^', '*', '')
+  elseif a:arg !~ '^;'
+    let f = substitute(f, '^;', '^', '')
+  else
+    let f = substitute(f, '^\^', '', '')
+  endif
+
+  if a:arg !~ '\$$'
+    let f = substitute(f, '$', '*', '')
+  elseif a:arg !~ ';$'
+    let f = substitute(f, ';$', '$', '')
+  else
+    let f = substitute(f, '\$$', '', '')
+  endif
+
+  "exe 'find' f
+  call feedkeys(':find '. f . "\<Tab>\<Tab>", 'nt')
+endfunction
+
+com! -bar -nargs=* Find call Find(<q-args>)
+com! -bar -nargs=* F Find <args>
+
+
+"---------------------------------------------------------------------------------------------
+
+" 折り畳みトグル
+function! Toggle_folding()
+  normal! zi
+  if &l:foldenable
+    normal! zM
+  endif
+  return
+endfunction
+"nnoremap zi :<C-u>call Toggle_folding()<CR>
+
+
+
+"---------------------------------------------------------------------------------------------
+
+com! MacroStart normal! qq
+com! MacroEnd   normal! q
+
+nnoremap ! q
+
+
+
+"---------------------------------------------------------------------------------------------
+
+nnoremap <Leader><C-s> :<C-u>wind %s/<C-r>//<C-r><C-w>/g<CR>:wind up<CR><C-w>t
+
+
+
+"---------------------------------------------------------------------------------------------
+
+nnoremap ^ :<C-u>normal!<Space>
+
+
+
+"---------------------------------------------------------------------------------------------
+
+"set foldtext=MyFoldText()
+"function MyFoldText()
+"  let line = getline(v:foldstart)
+"  let sub = substitute(line, '^\t\?\zs\t', repeat(' ', &tabstop), 'g')
+"  let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
+"  return v:folddashes . sub
+"endfunction
+
+
+
+"---------------------------------------------------------------------------------------------
+
+" com! Tac !tac
+
+
+"---------------------------------------------------------------------------------------------
+" ファイル内全てのシンボルを置換
+nnoremap <silent> <Leader>S :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+nmap gS <Leader>S
+
+
+
+"---------------------------------------------------------------------------------------------
+cab <silent> J *<C-R>=Eatchar('\s')<CR>
+cab J *
+cab G *
+cab K *
+cnoremap <C-j> *
+cnoremap <C-g> %
+
+
+
+
+set termguicolors
+
+nnoremap <C-j> J
+
+
+nnoremap <C-g><C-g> :<C-u>vim "\<<C-r><C-w>\>" *.c *.h<CR>
+
+
+nnoremap <D-o> <C-l>

@@ -2,7 +2,6 @@ set runtimepath^=~/vim/runtime
 let $VIM = '~/vim/runtime'
 
 
-" Mac {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 
 "let OSTYPE = system('uname')
 "if OSTYPE == "Darwin\n" 
@@ -10,10 +9,6 @@ let $VIM = '~/vim/runtime'
 "  :syntax on 
 "endif 
 
-set termguicolors
-nnoremap <D-o> <C-l>
-
-" Mac }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
 
 " Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
@@ -42,25 +37,12 @@ nmap <silent> <Ins> <Plug>(MyVimrc-QfPrev)
 " Quickfix & Locationlist }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
 
-" GUI {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 
 set renderoptions=type:directx,scrlines:1
 
-" nnoremap <silent> <F9>  :exe 'winpos' getwinposx() - 1 ' ' getwinposy() - 0<CR>
-" nnoremap <silent> <F10> :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 1<CR>
-" nnoremap <silent> <F11> :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 1<CR>
-" nnoremap <silent> <F12> :exe 'winpos' getwinposx() + 1 ' ' getwinposy() + 0<CR>
-" 
-" nnoremap <silent> <S-F9>  :let &columns -= 1<CR>
-" nnoremap <silent> <S-F10> :let &lines   += 1<CR>
-" nnoremap <silent> <S-F11> :let &lines   -= 1<CR>
-" nnoremap <silent> <S-F12> :let &columns += 1<CR>
-
-" GUI }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
 
 " {{{
-
 hi HlWord	guifg=#4050cd	guibg=white
 hi HlWord	guibg=#4050cd	guifg=white
 hi HlWord	guibg=NONE	guifg=NONE
@@ -75,11 +57,8 @@ augroup MyHiLight
   au!
   au WinLeave * match
 augroup end
-
-
-"match CursorLineNr /\%#./
-
 " `}}}
+
 
 
 " Refactoring  {{{
@@ -119,7 +98,18 @@ nnorema <silent> <Leader>D :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:P
 " Refactoring  }}}
 
 
+
+nnoremap <silent> <C-]> g;:FuncNameStl<CR>
+nnoremap <silent> <C-\> g,:FuncNameStl<CR>
+
+
+
 let plugin_dicwin_disable = v:true
+
+
+
+ru! ftplugin/man.vim
+
 
 
 "nnoremap  ]]  ]]f(bzt
@@ -132,7 +122,9 @@ let plugin_dicwin_disable = v:true
 "nnoremap g[]  []
 
 
+
 cabb f find
+
 
 
 "com! -nargs=+ F
@@ -177,40 +169,39 @@ endif
 "     \ try | exe 'find ' . ('<args>'[0] == '.' ? '' : '*') . substitute('<args>', ' ', '*', 'g') . '*' | endtry |
 "     \ catch | call feedkeys(':find *' . substitute('<args>', ' ', '*', 'g') . '*<Tab>', 'nt') | endtry
 
-"---------------------------------------------------------------------------------------------
 
-function! Find(arg)
-  "echo a:arg
-  "et f = a:arg
 
-  let f = substitute(a:arg, ' ', '*', 'g')
+"match CursorLineNr /\%#./
 
-  if a:arg !~ '^\^'
-    let f = substitute(f, '^', '*', '')
-  elseif a:arg !~ '^;'
-    let f = substitute(f, '^;', '^', '')
-  else
-    let f = substitute(f, '^\^', '', '')
-  endif
 
-  if a:arg !~ '\$$'
-    let f = substitute(f, '$', '*', '')
-  elseif a:arg !~ ';$'
-    let f = substitute(f, ';$', '$', '')
-  else
-    let f = substitute(f, '\$$', '', '')
-  endif
+" TODO 不正なプリプロ命令をハイライト
 
-  "exe 'find' f
-  call feedkeys(':find '. f . "\<Tab>\<Tab>", 'nt')
-endfunction
 
-com! -bar -nargs=* Find call Find(<q-args>)
-com! -bar -nargs=* F Find <args>
+" nnoremap <silent> <F9>  :exe 'winpos' getwinposx() - 1 ' ' getwinposy() - 0<CR>
+" nnoremap <silent> <F10> :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 1<CR>
+" nnoremap <silent> <F11> :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 1<CR>
+" nnoremap <silent> <F12> :exe 'winpos' getwinposx() + 1 ' ' getwinposy() + 0<CR>
+" 
+" nnoremap <silent> <S-F9>  :let &columns -= 1<CR>
+" nnoremap <silent> <S-F10> :let &lines   += 1<CR>
+" nnoremap <silent> <S-F11> :let &lines   -= 1<CR>
+" nnoremap <silent> <S-F12> :let &columns += 1<CR>
+
 
 
 nnoremap <Leader>9 :<C-u>RainbowParenthesesToggle<CR>
 
+
+
+com! WinOptimalWidth PushPosAll | exe 'silent windo call Window#Resize#SetOptimalWidth()' | PopPosAll
+
+com! WinOptimalWidthRev PushPosAll | for i in reverse(range(1, winnr('$'))) | exe i 'wincmd w' | sile call Window#Resize#SetOptimalWidth() | endfor | PopPosAll
+
+
+
+" iab IF0 #if 0
+" #else
+" #endif<C-R>=Eatchar('\s')<CR>
 
 augroup MyVimrc_ChDir
   au!
@@ -219,7 +210,19 @@ augroup MyVimrc_ChDir
 augroup end
 
 
+
+command! -nargs=* BUF exe 'browse filter %\c' . substitute(<q-args>, '[ *]', '.*', 'g') . '% ls' | call feedkeys(':b ', 'n')
+
+"nnoremap K :<C-u>BUF<Space>
+
+
+
+"? nnoremap <silent> <Leader>O :<C-u>MyExplore<CR>
+
+
+
 " test.vim {{{
+
 
 
 function! s:GoToDeclaration()
@@ -276,7 +279,55 @@ endfunction
 "
 
 
+
+" ver 0.1
+" function! s:GoToDeclaration()
+" 	let cl0 = line(".")
+" 
+" 	try
+" 		normal! 
+" 	catch
+" 	endtry
+" 	let cl = line(".")
+" 	if cl0 != cl | return | endif
+" 
+" 	normal! gD
+" 	let cl = line(".")
+" 	if cl0 != cl | return | endif
+" 
+" 	normal! gd
+" 	let cl = line(".")
+" 	if cl0 != cl | return | endif
+" 
+" 	echoe 'Declaration not found.'
+" endfunction
+" "call <SID>GoToDeclaration()
+" nnoremap <silent> <CR> :<C-u>call <SID>GoToDeclaration()<CR>
+
+
+
 """ Form Vimrc
+
+
+" Cscope
+" nnoremap <C-j><C-a> :<C-u>cscope add cscope.out<CR>
+" nnoremap <C-j><C-j> :<C-u>cscope find 
+" nnoremap <C-j>c     :<C-u>cscope find c 
+" nnoremap <C-j>d     :<C-u>cscope find d 
+" nnoremap <C-j>e     :<C-u>cscope find e 
+" nnoremap <C-j>f     :<C-u>cscope find f 
+" nnoremap <C-j>g     :<C-u>cscope find g 
+" nnoremap <C-j>i     :<C-u>cscope find i 
+" nnoremap <C-j>s     :<C-u>cscope find s 
+" nnoremap <C-j>t     :<C-u>cscope find t 
+" nnoremap <C-j>C     :<C-u>cscope find c <C-r><C-w><CR>
+" nnoremap <C-j>D     :<C-u>cscope find d <C-r><C-w><CR>
+" nnoremap <C-j>E     :<C-u>cscope find e <C-r><C-w><CR>
+" nnoremap <C-j>F     :<C-u>cscope find f <C-r><C-w><CR>
+" nnoremap <C-j>G     :<C-u>cscope find g <C-r><C-w><CR>
+" nnoremap <C-j>I     :<C-u>cscope find i <C-r><C-w><CR>
+" nnoremap <C-j>S     :<C-u>cscope find s <C-r><C-w><CR>
+" nnoremap <C-j>T     :<C-u>cscope find t <C-r><C-w><CR>
 
 
 "nnoremap s f_l
@@ -286,6 +337,7 @@ endfunction
 
 
 " test.vim }}}
+
 
 
 " 起動速度
@@ -301,8 +353,6 @@ endfunction
 " $VIMRUNTIME\gvimrc_example.vim
 
 
-" TODO 不正なプリプロ命令をハイライト
-
 
 " Bug Issue
 "     ・E443のメッセージ
@@ -312,28 +362,54 @@ endfunction
 "     ・CursorLineがONで、改行を含む文字列を検索したとき、hlsearchでの改行のハイライトがカレント行のときだけになるのは、おかしい。
 "
 
+com! QfStl setlocal stl=%#SLFileName#[\ %{winnr()}\ ]%##\ (\ %n\ )\ %t%{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}\ %=%-15(%l,%c%V%)\ %P
 
-" Gdiffsplit
-" :ReVimrc
-" ":!git
-" :e
-
-
-" nmap alt 使用済み <A-
-" f b o n p
-" h j k l
 
 
 set cedit=<C-q>
+
+augroup MyVimrc_CmdWin
+  au!
+  au CmdwinEnter * call s:init_cmdwin()
+augroup end
+function! s:init_cmdwin()
+  "nnoremap <buffer> q :<C-u>quit<CR>
+  "nnoremap <buffer> <TAB> :<C-u>quit<CR>
+  "inoremap <buffer><expr><CR> pumvisible() ? "\<C-y>\<CR>" : "\<CR>"
+  "inoremap <buffer><expr><C-h> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
+  "inoremap <buffer><expr><BS> pumvisible() ? "\<C-y>\<C-h>" : "\<C-h>"
+
+  "" Completion.
+  "inoremap <buffer><expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
+  "startinsert!
+
+  nnoremap <buffer> <CR> <CR>
+endfunction
+
 
 hi PPP	guifg=#f6f3f0	guibg=#292927	gui=none	ctermfg=254	ctermbg=235
 set previewpopup=height:30,width:120,highlight:PPP
 
 
+
+"nunmap gU
+
+"? Substitute nmap S *
+"? Substitute 
+"? Substitute nnoremap <C-s>           :<C-u>g$.$s    %%<Left>
+"? Substitute vnoremap <C-s>                    :s    %%<Left>
+
+nnoremap gs              :<C-u>g$.$s    %<C-R>/%%g<Left><Left>
+vnoremap gs                       :s    %<C-R>/%%g<Left><Left>
+
+
 let g:EmAutoState = v:false
 
 
+
 nnoremap <Leader>D :<C-u>e .<CR>
+
 
 
 if 0
@@ -346,16 +422,79 @@ else
 endif
 
 
+
+" Gdiffsplit
+" :ReVimrc
+" ":!git
+" :e
+
+
+
+" nmap alt 使用済み <A-
+" f b o n p
+" h j k l
+
+
+
 if g:UseHHKB
   inoremap <Down>   <C-n>
   inoremap <Up>     <C-p>
-  cnoremap <Down>   <C-n>
-  cnoremap <Up>     <C-p>
+  "cnoremap <Down>   <C-n>
+  "cnoremap <Up>     <C-p>
 endif
+
 
 
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 " from Unified_Tab.vim
+
+
+function Unified_Tab(m)
+  if &diff
+    if a:m > 0
+      " Next Hunk
+      normal! ]c
+    else
+      " Previouse Hunk
+      normal! [c
+    endif
+    normal! ^
+
+  "elseif win_getid()->getwininfo()[0].loclist == 1
+  elseif IsLocationlistWindowOpen()
+    "例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+    try
+      if a:m > 0
+        lnext
+      else
+        lprev
+      endif
+    catch /:E553/
+      " TODO Popup Windowにする？
+      echohl Search
+      echo a:m > 0 ?  'Last location list.' : '1st location list.'
+      echohl None
+    endtry
+
+  else
+    "例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+    try
+      if a:m > 0
+        cnext
+      else
+        cprev
+      endif
+    catch /:E553/
+      " TODO Popup Windowにする？
+      echohl Search
+      echo a:m > 0 ?  'Last error list.' : '1st error list.'
+      echohl None
+    endtry
+  endif
+
+  FuncNameStl
+  return
+endfunction
 
 
 function! GetLocationlistWinid()
@@ -367,16 +506,35 @@ function! IsLocationlistWindowOpen()
 endfunction
 
 
-"---------------------------------------------------------------------------------------------
 
+"---------------------------------------------------------------------------------------------
+nnoremap <silent>         t :<C-u>call Unified_Tab( 1)<CR>
+nnoremap <silent>         T :<C-u>call Unified_Tab(-1)<CR>
+nnoremap <silent>        gt :<C-u>cfirst<CR>
+nnoremap <silent>        gT :<C-u>clast<CR>
+nnoremap <silent> <Leader>T :<C-u>cc<CR>
+
+
+nnoremap <silent>       m :<C-u>call Unified_Tab( 1)<CR>
+nnoremap <silent>       M :<C-u>call Unified_Tab(-1)<CR>
+
+nnoremap <silent>         <Tab> :<C-u>call Unified_Tab( 1)<CR>
+nnoremap <silent>       <S-Tab> :<C-u>call Unified_Tab(-1)<CR>
+nnoremap <silent>        g<Tab> :<C-u>cfirst<CR>
+nnoremap <silent>        g<Tab> :<C-u>clast<CR>
+nnoremap <silent> <Leader><Tab> :<C-u>cc<CR>
+
+"nnoremap <silent>       t ^
+"nnoremap <silent>       T $
+
+"nnoremap <silent>       m J
+
+
+
+"---------------------------------------------------------------------------------------------
 iab FORI for ( uint32_t i = 0U; i < N; i++ ) {<CR><CR>}
 iab <silent> FORI for ( uint32_t i = 0U; i < N; i++ ) {<CR><CR>}<C-R>=Eatchar('\s')<CR>
 
-iab LOOP while ( 1 ) {<CR>}
-
-" iab IF0 #if 0
-" #else
-" #endif<C-R>=Eatchar('\s')<CR>
 
 
 "---------------------------------------------------------------------------------------------
@@ -385,6 +543,7 @@ vnoremap <Leader><C-s>                :g%<C-r>/%s     %%%g<Left><Left><Left>
 
 nnoremap <Leader><C-s>           :<C-u>g!<C-r>/!<Space>
 vnoremap <Leader><C-s>                :g!<C-r>/!<Space>
+
 
 
 "---------------------------------------------------------------------------------------------
@@ -409,6 +568,11 @@ onoremap <expr> <silent> U search('^\s\+\%#\S\?', 'bcn') ? '0' : '^'
 
 nnoremap zU g0
 
+"nnoremap U ^
+"nnoremap : $
+"vnoremap U ^
+"vnoremap : $
+
 nnoremap 0 g0
 nnoremap $ g$
 
@@ -424,6 +588,7 @@ vnoremap gU U
 " vnoremap $ <Nop>
 
 
+
 "---------------------------------------------------------------------------------------------
 
 if 0
@@ -433,6 +598,55 @@ if 0
   nmap U *
   nnoremap T $
 endif
+
+
+
+"---------------------------------------------------------------------------------------------
+
+nnoremap <Leader>6 ^y$/\C\V<C-r>=substitute(escape(@", '/\|\\'), '\s', '\\s\\+', 'g')<CR><CR>
+
+
+
+"---------------------------------------------------------------------------------------------
+
+iab LOOP while ( 1 ) {<CR>}
+
+
+"---------------------------------------------------------------------------------------------
+
+nmap ? *
+
+
+"---------------------------------------------------------------------------------------------
+
+function! Find(arg)
+  "echo a:arg
+  "et f = a:arg
+
+  let f = substitute(a:arg, ' ', '*', 'g')
+
+  if a:arg !~ '^\^'
+    let f = substitute(f, '^', '*', '')
+  elseif a:arg !~ '^;'
+    let f = substitute(f, '^;', '^', '')
+  else
+    let f = substitute(f, '^\^', '', '')
+  endif
+
+  if a:arg !~ '\$$'
+    let f = substitute(f, '$', '*', '')
+  elseif a:arg !~ ';$'
+    let f = substitute(f, ';$', '$', '')
+  else
+    let f = substitute(f, '\$$', '', '')
+  endif
+
+  "exe 'find' f
+  call feedkeys(':find '. f . "\<Tab>\<Tab>", 'nt')
+endfunction
+
+com! -bar -nargs=* Find call Find(<q-args>)
+com! -bar -nargs=* F Find <args>
 
 
 "---------------------------------------------------------------------------------------------
@@ -447,13 +661,6 @@ function! Toggle_folding()
 endfunction
 "nnoremap zi :<C-u>call Toggle_folding()<CR>
 
-"set foldtext=MyFoldText()
-"function MyFoldText()
-"  let line = getline(v:foldstart)
-"  let sub = substitute(line, '^\t\?\zs\t', repeat(' ', &tabstop), 'g')
-"  let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
-"  return v:folddashes . sub
-"endfunction
 
 
 "---------------------------------------------------------------------------------------------
@@ -464,9 +671,29 @@ com! MacroEnd   normal! q
 nnoremap ! q
 
 
+
 "---------------------------------------------------------------------------------------------
 
 nnoremap <Leader><C-s> :<C-u>wind %s/<C-r>//<C-r><C-w>/g<CR>:wind up<CR><C-w>t
+
+
+
+"---------------------------------------------------------------------------------------------
+
+nnoremap ^ :<C-u>normal!<Space>
+
+
+
+"---------------------------------------------------------------------------------------------
+
+"set foldtext=MyFoldText()
+"function MyFoldText()
+"  let line = getline(v:foldstart)
+"  let sub = substitute(line, '^\t\?\zs\t', repeat(' ', &tabstop), 'g')
+"  let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
+"  return v:folddashes . sub
+"endfunction
+
 
 
 "---------------------------------------------------------------------------------------------
@@ -480,8 +707,24 @@ nnoremap <silent> <Leader>S :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:
 nmap gS <Leader>S
 
 
+
 "---------------------------------------------------------------------------------------------
 cab <silent> J *<C-R>=Eatchar('\s')<CR>
 cab J *
+cab G *
+cab K *
 cnoremap <C-j> *
 cnoremap <C-g> %
+
+
+
+
+set termguicolors
+
+nnoremap <C-j> J
+
+
+nnoremap <C-g><C-g> :<C-u>vim "\<<C-r><C-w>\>" *.c *.h<CR>
+
+
+nnoremap <D-o> <C-l>
