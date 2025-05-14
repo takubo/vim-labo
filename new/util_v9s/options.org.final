@@ -1,0 +1,543 @@
+# Help
+
+# VIM - Vi IMproved 9.1 (2024 Jan 02, compiled May 11 2025 22:15:16)
+# MS-Windows 64 ビット GUI/コンソール 版 with OLE サポート
+# 適用済パッチ: 1-1382
+# Compiled by appveyor@APPVEYOR-VM
+# Huge 版 with GUI.  機能の一覧 有効(+)/無効(-)
+# +acl                +balloon_eval_term  +clientserver       +conceal            +diff               +eval               +float              +insert_expand      +langmap            +lua/dyn            +multi_byte_ime/dyn +packages           +printer            +rightleft          +sound              +tag_binary         -termresponse       +toolbar            +virtualedit        +wildmenu           +xpm_w32            
+# +arabic             +browse             +clipboard          +cryptv             +digraphs           +ex_extra           +folding            +ipv6               +libcall            +menu               +multi_lang         +path_extra         +profile            +ruby/dyn           +spell              -tag_old_static     +textobjects        +user_commands      +visual             +windows            -xterm_save         
+# +autocmd            ++builtin_terms     +cmdline_compl      +cscope             +directx            +extra_search       -footer             +job                +linebreak          +mksession          +mzscheme/dyn       +perl/dyn           +python/dyn         +scrollbind         +startuptime        -tag_any_white      +textprop           +vartabs            +visualextra        +writebackup        
+# +autochdir          +byte_offset        +cmdline_hist       +cursorbind         -dnd                -farsi              +gettext/dyn        +jumplist           +lispindent         +modify_fname       +netbeans_intg      +persistent_undo    +python3/dyn-stable +signs              +statusline         -tcl                -tgetent            +vertsplit          +vreplace           -xattr              
+# +autoservername     +channel            +cmdline_info       +cursorshape        -ebcdic             +file_in_path       -hangul_input       +keymap             +listcmds           +mouse              +num64              +popupwin           +quickfix           +smartindent        -sun_workshop       +termguicolors      +timers             +vim9script         +vtp                -xfontset           
+# +balloon_eval       +cindent            +comments           +dialog_con_gui     +emacs_tags         +find_in_path       +iconv/dyn          +lambda             +localmap           +mouseshape         +ole                -postscript         +reltime            +sodium/dyn         +syntax             +terminal           +title              +viminfo            +wildignore         -xim                
+#       システム vimrc: "$VIM\vimrc"
+#       ユーザー vimrc: "$HOME\_vimrc"
+#    第2ユーザー vimrc: "$HOME\vimfiles\vimrc"
+#    第3ユーザー vimrc: "$VIM\_vimrc"
+#        ユーザー exrc: "$HOME\_exrc"
+#     第2ユーザー exrc: "$VIM\_exrc"
+#      システム gvimrc: "$VIM\gvimrc"
+#      ユーザー gvimrc: "$HOME\_gvimrc"
+#   第2ユーザー gvimrc: "$HOME\vimfiles\gvimrc"
+#   第3ユーザー gvimrc: "$VIM\_gvimrc"
+#   デフォルトファイル: "$VIMRUNTIME\defaults.vim"
+#     システムメニュー: "$VIMRUNTIME\menu.vim"
+# コンパイル: cl -c /W3 /GF /nologo -I. -Iproto -DHAVE_PATHDEF -DWIN32 -DHAVE_STDINT_H  -DFEAT_CSCOPE -DFEAT_TERMINAL -DFEAT_SOUND -DFEAT_NETBEANS_INTG   -DFEAT_XPM_W32 -DHAVE_SODIUM -DDYNAMIC_SODIUM -DDYNAMIC_SODIUM_DLL=\"libsodium.dll\" /I "C:\projects\vim-win32-installer\dependencies\libsodium\include" -DFEAT_JOB_CHANNEL -DFEAT_IPV6 -DHAVE_INET_NTOP -DWINVER=0x0601 -D_WIN32_WINNT=0x0601 /source-charset:utf-8 /MP /Ox /GL -DNDEBUG /Zl /MT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DVIMDLL -DFEAT_OLE -DFEAT_MBYTE_IME -DDYNAMIC_IME -DFEAT_GUI_MSWIN -DFEAT_DIRECTX -DDYNAMIC_DIRECTX -DFEAT_DIRECTX_COLOR_EMOJI -DDYNAMIC_ICONV -DDYNAMIC_GETTEXT -DFEAT_LUA -DDYNAMIC_LUA -DDYNAMIC_LUA_DLL=\"lua54.dll\" -DFEAT_PYTHON -DDYNAMIC_PYTHON -DDYNAMIC_PYTHON_DLL=\"python27.dll\" -DFEAT_PYTHON3 -DDYNAMIC_PYTHON3 -DDYNAMIC_PYTHON3_DLL=\"python3.dll\" -DDYNAMIC_PYTHON3_STABLE_ABI -DFEAT_MZSCHEME -I "C:\projects\vim-win32-installer\dependencies\racket3m_dcgt6o-x64\include" -DMZ_PRECISE_GC -DDYNAMIC_MZSCHEME -DDYNAMIC_MZSCH_DLL=\"libracket3m_dcgt6o.dll\" -DDYNAMIC_MZGC_DLL=\"libracket3m_dcgt6o.dll\" -DFEAT_PERL -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -DDYNAMIC_PERL -DDYNAMIC_PERL_DLL=\"perl532.dll\" -DFEAT_RUBY -DDYNAMIC_RUBY -DDYNAMIC_RUBY_DLL=\"x64-ucrt-ruby320.dll\" -DRUBY_VERSION=32 -DFEAT_HUGE /Fd.\ObjDXOULYHRZAMD64/ /Zi
+# リンク: link /nologo /opt:ref /LTCG /HIGHENTROPYVA:NO oldnames.lib kernel32.lib advapi32.lib shell32.lib gdi32.lib  comdlg32.lib ole32.lib netapi32.lib uuid.lib user32.lib  /machine:AMD64 version.lib  winspool.lib comctl32.lib libcmt.lib oleaut32.lib  /nodefaultlib:lua54.lib  /STACK:8388608  /nodefaultlib:python27.lib  /nodefaultlib:python3.lib   winmm.lib  Ws2_32.lib xpm\x64\lib-vc14\libXpm.lib  /PDB:vim64.pdb -debug
+
+
+#  1 重要
+#  2 移動、検索とパターン
+#  3 タグ
+#  4 テキストの表示
+#  5 構文ハイライトとスペルチェック
+#  6 複数ウィンドウ
+#  7 複数タブページ
+#  8 端末
+#  9 マウスの使用
+# 10 GUI
+# 11 印刷
+# 12 メッセージと情報
+# 13 テキスト選択
+# 14 テキスト編集
+# 15 タブとインデント
+# 16 折畳み
+# 17 差分モード
+# 18 マッピング
+# 19 ファイルの読み書き
+# 20 スワップファイル
+# 21 コマンドライン編集
+# 22 外部コマンドの実行
+# 23 make の実行とエラーへのジャンプ (quickfix)
+# 24 システム固有
+# 25 言語固有
+# 26 マルチバイト文字
+# 27 その他
+
+
+#  1 重要
+
+set compatible=
+set cpoptions=
+set insertmode=
+set paste=
+set pastetoggle=
+set runtimepath=
+set packpath=
+set helpfile=
+
+#  2 移動、検索とパターン
+
+set whichwrap=
+set startofline=
+set paragraphs=
+set sections=
+set path=
+set cdhome=
+set cdpath=
+set autochdir=
+set autoshelldir=
+set wrapscan=
+set incsearch=
+set magic=
+set regexpengine=
+set ignorecase=
+set smartcase=
+set casemap=
+set maxmempattern=
+set define=
+set include=
+set includeexpr=
+
+#  3 タグ
+
+set tagbsearch=
+set taglength=
+set tags=
+set tagcase=
+set tagrelative=
+set tagstack=
+set showfulltag=
+set tagfunc=
+set cscopeprg=
+set cscopetag=
+set cscopetagorder=
+set cscopeverbose=
+set cscopepathcomp=
+set cscopequickfix=
+set cscoperelative=
+
+#  4 テキストの表示
+
+set scroll=
+set smoothscroll=
+set scrolloff=
+set wrap=
+set linebreak=
+set breakindent=
+set breakindentopt=
+set breakat=
+set showbreak=
+set sidescroll=
+set sidescrolloff=
+set display=
+set fillchars=
+set cmdheight=
+set columns=
+set lines=
+set window=
+set lazyredraw=
+set redrawtime=
+set writedelay=
+set list=
+set listchars=
+set number=
+set relativenumber=
+set numberwidth=
+set chistory=
+set lhistory=
+set conceallevel=
+set concealcursor=
+
+#  5 構文ハイライトとスペルチェック
+
+set background=
+set filetype=
+set syntax=
+set synmaxcol=
+set highlight=
+set hlsearch=
+set wincolor=
+set termguicolors=
+set cursorcolumn=
+set cursorline=
+set cursorlineopt=
+set colorcolumn=
+set spell=
+set spelllang=
+set spellfile=
+set spellcapcheck=
+set spelloptions=
+set spellsuggest=
+set mkspellmem=
+
+#  6 複数ウィンドウ
+
+set laststatus=
+set statusline=
+set equalalways=
+set eadirection=
+set winheight=
+set winminheight=
+set winfixbuf=
+set winfixheight=
+set winfixwidth=
+set winwidth=
+set winminwidth=
+set helpheight=
+set previewpopup=
+set previewheight=
+set previewwindow=
+set hidden=
+set switchbuf=
+set splitbelow=
+set splitkeep=
+set splitright=
+set scrollbind=
+set scrollopt=
+set cursorbind=
+set termwinsize=
+set termwinkey=
+set termwinscroll=
+set termwintype=
+set winptydll=
+
+#  7 複数タブページ
+
+set showtabline=
+set tabclose=
+set tabpagemax=
+set tabline=
+set guitablabel=
+set guitabtooltip=
+
+#  8 端末
+
+set term=
+set ttytype=
+set ttybuiltin=
+set ttyfast=
+set xtermcodes=
+set weirdinvert=
+set keyprotocol=
+set esckeys=
+set scrolljump=
+set ttyscroll=
+set guicursor=
+set title=
+set titlelen=
+set titlestring=
+set titleold=
+set icon=
+set iconstring=
+set restorescreen=
+
+#  9 マウスの使用
+
+set mouse=
+set mousefocus=
+set scrollfocus=
+set mousehide=
+set mousemoveevent=
+set mousemodel=
+set mousetime=
+set ttymouse=
+set mouseshape=
+
+# 10 GUI
+
+set guifont=
+set guifontwide=
+set guioptions=
+set renderoptions=
+set guipty=
+set browsedir=
+set langmenu=
+set menuitems=
+set winaltkeys=
+set linespace=
+set balloondelay=
+set ballooneval=
+set balloonevalterm=
+set balloonexpr=
+
+# 11 印刷
+
+set printoptions=
+set printdevice=
+set printfont=
+set printheader=
+set printmbcharset=
+set printmbfont=
+
+# 12 メッセージと情報
+
+set terse=
+set shortmess=
+set messagesopt=
+set showcmd=
+set showcmdloc=
+set showmode=
+set ruler=
+set rulerformat=
+set report=
+set verbose=
+set verbosefile=
+set more=
+set confirm=
+set errorbells=
+set visualbell=
+set belloff=
+set helplang=
+
+# 13 テキスト選択
+
+set selection=
+set selectmode=
+set clipboard=
+set keymodel=
+
+# 14 テキスト編集
+
+set undolevels=
+set undofile=
+set undodir=
+set undoreload=
+set modified=
+set readonly=
+set modifiable=
+set textwidth=
+set wrapmargin=
+set backspace=
+set comments=
+set formatoptions=
+set formatlistpat=
+set formatexpr=
+set complete=
+set completefuzzycollect=
+set completeopt=
+set completeitemalign=
+set completepopup=
+set pumheight=
+set pumwidth=
+set pummaxwidth=
+set completefunc=
+set omnifunc=
+set dictionary=
+set thesaurus=
+set thesaurusfunc=
+set infercase=
+set digraph=
+set tildeop=
+set operatorfunc=
+set showmatch=
+set matchtime=
+set matchpairs=
+set joinspaces=
+set nrformats=
+
+# 15 タブとインデント
+
+set tabstop=
+set shiftwidth=
+set vartabstop=
+set varsofttabstop=
+set smarttab=
+set softtabstop=
+set shiftround=
+set expandtab=
+set autoindent=
+set smartindent=
+set cindent=
+set cinoptions=
+set cinkeys=
+set cinwords=
+set cinscopedecls=
+set indentexpr=
+set indentkeys=
+set copyindent=
+set preserveindent=
+set lisp=
+set lispwords=
+set lispoptions=
+
+# 16 折畳み
+
+set foldenable=
+set foldlevel=
+set foldlevelstart=
+set foldcolumn=
+set foldtext=
+set foldclose=
+set foldopen=
+set foldminlines=
+set commentstring=
+set foldmethod=
+set foldexpr=
+set foldignore=
+set foldmarker=
+set foldnestmax=
+
+# 17 差分モード
+
+set diff=
+set diffopt=
+set diffexpr=
+set patchexpr=
+
+# 18 マッピング
+
+set maxmapdepth=
+set remap=
+set timeout=
+set ttimeout=
+set timeoutlen=
+set ttimeoutlen=
+
+# 19 ファイルの読み書き
+
+set modeline=
+set modelineexpr=
+set modelines=
+set binary=
+set endofline=
+set endoffile=
+set fixendofline=
+set bomb=
+set fileformat=
+set fileformats=
+set textmode=
+set textauto=
+set write=
+set writebackup=
+set backup=
+set backupskip=
+set backupcopy=
+set backupdir=
+set backupext=
+set autowrite=
+set autowriteall=
+set writeany=
+set autoread=
+set patchmode=
+set fsync=
+set shortname=
+set cryptmethod=
+
+# 20 スワップファイル
+
+set directory=
+set swapfile=
+set swapsync=
+set updatecount=
+set updatetime=
+set maxmem=
+set maxmemtot=
+
+# 21 コマンドライン編集
+
+set history=
+set wildchar=
+set wildcharm=
+set wildmode=
+set suffixes=
+set suffixesadd=
+set wildignore=
+set fileignorecase=
+set wildignorecase=
+set wildmenu=
+set cedit=
+set cmdwinheight=
+
+# 22 外部コマンドの実行
+
+set shell=
+set shellquote=
+set shellxquote=
+set shellxescape=
+set shellcmdflag=
+set shellredir=
+set shelltemp=
+set equalprg=
+set formatprg=
+set keywordprg=
+set warn=
+
+# 23 make の実行とエラーへのジャンプ (quickfix)
+
+set errorfile=
+set errorformat=
+set makeprg=
+set shellpipe=
+set makeef=
+set grepprg=
+set grepformat=
+set makeencoding=
+set quickfixtextfunc=
+
+# 24 システム固有
+
+set shellslash=
+set completeslash=
+
+# 25 言語固有
+
+set isfname=
+set isident=
+set isexpand=
+set iskeyword=
+set isprint=
+set quoteescape=
+set rightleft=
+set rightleftcmd=
+set revins=
+set allowrevins=
+set aleph=
+set hkmap=
+set hkmapp=
+set arabic=
+set arabicshape=
+set termbidi=
+set keymap=
+set langmap=
+set langremap=
+set iminsert=
+set imstyle=
+set imsearch=
+
+# 26 マルチバイト文字
+
+set encoding=
+set fileencoding=
+set fileencodings=
+set termencoding=
+set charconvert=
+set delcombine=
+set maxcombine=
+set ambiwidth=
+set emoji=
+
+# 27 その他
+
+set virtualedit=
+set eventignore=
+set eventignorewin=
+set loadplugins=
+set exrc=
+set secure=
+set gdefault=
+set edcompatible=
+set opendevice=
+set maxfuncdepth=
+set sessionoptions=
+set viewoptions=
+set viewdir=
+set viminfo=
+set viminfofile=
+set bufhidden=
+set buftype=
+set buflisted=
+set debug=
+set signcolumn=
+set luadll=
+set perldll=
+set pyxversion=
+set pythondll=
+set pythonhome=
+set pythonthreedll=
+set pythonthreehome=
+set rubydll=
+set tcldll=
+set mzschemedll=
+set mzschemegcdll=

@@ -135,6 +135,8 @@ set listchars=tab:>_,trail:$,extends:>,precedes:<,conceal:?,nbsp:X
 set number
 set relativenumber
 set numberwidth=3
+set chistory=100
+set lhistory=100
 #set conceallevel
 #set concealcursor
 
@@ -150,6 +152,7 @@ if !&hlsearch
   set hlsearch
 endif
 #set wincolor
+set termguicolors
 #set cursorcolumn  # cursor_move_and_scroll
 #set cursorline  # cursor_move_and_scroll
 #set cursorlineopt=screenline,number  # cursor_move_and_scroll
@@ -161,7 +164,6 @@ endif
 #set spelloptions
 #set spellsuggest
 #set mkspellmem
-set termguicolors
 
 #  6 複数ウィンドウ
 
@@ -171,6 +173,7 @@ set laststatus=2  # 常にステータス行を表示
 #set eadirection
 set winheight=3  # TODO
 set winminheight=3  # TODO
+#set winfixbuf
 #set winfixheight
 #set winfixwidth
 set winwidth=15  # 動的 ウィンドウサイズtと、 numberwidth
@@ -198,6 +201,7 @@ set termwinscroll=1000000000  # 10億: とくに根拠はないが、3倍して�
 #  7 複数タブページ
 
 #set showtabline=2  #@ tabline
+#set tabclose=uselast  #@ tabline
 set tabpagemax=50
 #set tabline  #@ tabline
 #set guitablabel
@@ -246,7 +250,7 @@ if has('win32')
   set guifont=BIZ_UDゴシック:h11:cSHIFTJIS:qDRAFT
 endif
 # TODO set guifontwide
-set guioptions=d  #TODO
+set guioptions=!cd  #TODO
 if has('win32')
   # TODO set renderoptions
 endif
@@ -258,6 +262,7 @@ endif
 # TODO set linespace
 #set balloondelay
 #set ballooneval
+# TODO set balloonevalterm
 #set balloonexpr
 
 # 11 印刷
@@ -273,6 +278,7 @@ endif
 
 #set noterse
 SetFlagOption('shortmess', 'imxcCS', 'flnrwastTWAIq')  # set shortmess
+set messagesopt=hit-enter,history:10000
 #set showcmd  # 入力中のコマンドを表示
 # TODO set showcmdloc=tabline
 #set showmode
@@ -312,10 +318,13 @@ SetFlagOption('formatoptions', 'mMBj', 'roa')  # set formatoptions  # テキス�
 # TODO set formatlistpat
 #set formatexpr
 #set complete  #@ completion
+#set completefuzzycollect  #@ completion
 #set completeopt  #@ completion
+#set completeitemalign  #@ completion
 #set completepopup  #@ completion
 #set pumheight  #@ completion
 #set pumwidth  #@ completion
+#set pummaxwidth
 #set completefunc
 #set omnifunc
 #set dictionary
@@ -484,6 +493,7 @@ set shellslash
 
 set isfname-=:  # grepの出力を取り込んで、gfするため。
 #set isident
+#set isexpand  # TODO
 #set iskeyword
 #set isprint
 #set quoteescape
@@ -520,6 +530,7 @@ set ambiwidth=double  # TODO if has('kaoriya') | set ambiwidth=auto | endif
 
 #set virtualedit=
 #set eventignore=
+#set eventignorewin=
 #set loadplugins
 #set exrc
 #set secure
