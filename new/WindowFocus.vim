@@ -539,7 +539,7 @@ nnoremap <C-W>T     <C-W>T
 # Tab (Window Container)
 #----------------------------------------------------------------------------------------
 
-# set tabclose=uselast FIXME
+set tabclose=uselast
 
 nnoremap  <C-T> <Cmd>tabnew<CR>
 nnoremap g<C-T> :<C-U>tabnew<Space>

@@ -13,10 +13,13 @@ scriptencoding utf-8
 
 # set complete=.,w,i,t,b,u
 set complete=.,i,t,w,b,u
-set completeopt=menuone,noselect # TODO ,fuzzy
+set completefuzzycollect=keyword # TODO
+set completeopt=menuone,noselect,fuzzy
+# set completeitemalign? TODO
 # set completepopup? TODO
 set pumheight=30
 # set pumwidth? TODO
+# set pummaxwidth? TODO
 
 # c ins-completion-menu 関連のメッセージを表示しない。
 #     例えば、"-- XXX補完 (YYY)"、"1 番目の該当 (全該当 2 個中)"、
