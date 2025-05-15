@@ -252,7 +252,7 @@ endif
 # TODO set guifontwide
 set guioptions=!cd  #TODO
 if has('win32')
-  # TODO set renderoptions
+  set renderoptions=type:directx,scrlines:1  # TODO
 endif
 # TODO set guipty
 #set browsedir
