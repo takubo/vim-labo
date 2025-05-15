@@ -68,7 +68,9 @@
 #	# myp     tabubo/Axes
 
 
-cd `git rev-parse --show-toplevel` || exit 1
+git rev-parse --show-toplevel || exit
+
+cd `git rev-parse --show-toplevel`
 
 cd ./pack
 
