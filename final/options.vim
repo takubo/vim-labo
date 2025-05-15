@@ -185,9 +185,9 @@ set winminwidth=5  # 動的 ウィンドウサイズtと、 numberwidth
 set hidden
 set switchbuf=useopen,uselast  # TODO ,split
 set splitbelow  # TODO
-set splitkeep=cursor
-set splitkeep=topline
-set splitkeep=screen
+set splitkeep=topline # TODO
+set splitkeep=screen  # TODO
+set splitkeep=cursor  # TODO
 set nosplitright  # TODO
 #set scrollbind
 #set scrollopt=ver,jump
