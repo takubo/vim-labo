@@ -5,6 +5,8 @@ scriptencoding utf-8
 
 " GUI {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 
+set renderoptions=type:directx,scrlines:1
+
 " nnoremap <silent> <F9>  :exe 'winpos' getwinposx() - 1 ' ' getwinposy() - 0<CR>
 " nnoremap <silent> <F10> :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 1<CR>
 " nnoremap <silent> <F11> :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 1<CR>
@@ -302,6 +304,14 @@ iab LOOP while ( 1 ) {<CR>}
 
 
 "---------------------------------------------------------------------------------------------
+nnoremap <Leader><C-s>           :<C-u>g%<C-r>/%s    %%%g<Left><Left><Left>
+vnoremap <Leader><C-s>                :g%<C-r>/%s     %%%g<Left><Left><Left>
+
+nnoremap <Leader><C-s>           :<C-u>g!<C-r>/!<Space>
+vnoremap <Leader><C-s>                :g!<C-r>/!<Space>
+
+
+"---------------------------------------------------------------------------------------------
 
 " ^に、|の機能を付加
 "nnoremap <silent> U <Esc>:exe v:prevcount ? ('normal! ' . v:prevcount . '<Bar>') : 'normal! ^'<CR>
@@ -380,7 +390,18 @@ nnoremap ! q
 
 "---------------------------------------------------------------------------------------------
 
+nnoremap <Leader><C-s> :<C-u>wind %s/<C-r>//<C-r><C-w>/g<CR>:wind up<CR><C-w>t
+
+
+"---------------------------------------------------------------------------------------------
+
 " com! Tac !tac
+
+
+"---------------------------------------------------------------------------------------------
+" ファイル内全てのシンボルを置換
+nnoremap <silent> <Leader>S :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+nmap gS <Leader>S
 
 
 "---------------------------------------------------------------------------------------------

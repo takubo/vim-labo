@@ -1,9 +1,50 @@
-scriptencoding utf-8
-" vim:set ts=8 sts=2 sw=2 tw=0:
-" (この行に関しては:help modelineを参照)
+set runtimepath^=~/vim/runtime
+let $VIM = '~/vim/runtime'
+
+
+" Mac {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+"let OSTYPE = system('uname')
+"if OSTYPE == "Darwin\n" 
+"  :set term=xterm-256color 
+"  :syntax on 
+"endif 
+
+set termguicolors
+nnoremap <D-o> <C-l>
+
+" Mac }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+
+" Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+let c_jk_local = 0
+
+nnoremap <silent> <Plug>(MyVimrc-Toggle-Qf-Ll) :<C-u>let c_jk_local = !c_jk_local<CR>
+
+"例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+nnoremap <silent> <Plug>(MyVimrc-CNext) :<C-u>try <Bar> exe (c_jk_local ? ":lnext" : "cnext") <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+nnoremap <silent> <Plug>(MyVimrc-CPrev) :<C-u>try <Bar> exe (c_jk_local ? ":lprev" : "cprev") <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+
+"例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+nnoremap <silent> <Plug>(MyVimrc-QfNext) :<C-u>try <Bar> cnext <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+nnoremap <silent> <Plug>(MyVimrc-QfPrev) :<C-u>try <Bar> cprev <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+
+"例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+nnoremap <silent> <Plug>(MyVimrc-LlNext) :<C-u>try <Bar> lnext <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+nnoremap <silent> <Plug>(MyVimrc-LlPrev) :<C-u>try <Bar> lprev <Bar> catch <Bar> endtry<CR>:FuncNameStl<CR>
+
+nmap <silent> <Del> <Plug>(MyVimrc-QfNext)
+nmap <silent> <Ins> <Plug>(MyVimrc-QfPrev)
+"nmap <silent> <A-n> <Plug>(MyVimrc-LlNext)
+"nmap <silent> <A-m> <Plug>(MyVimrc-LlPrev)
+
+" Quickfix & Locationlist }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
 
 " GUI {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+set renderoptions=type:directx,scrlines:1
 
 " nnoremap <silent> <F9>  :exe 'winpos' getwinposx() - 1 ' ' getwinposy() - 0<CR>
 " nnoremap <silent> <F10> :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 1<CR>
@@ -39,6 +80,43 @@ augroup end
 "match CursorLineNr /\%#./
 
 " `}}}
+
+
+" Refactoring  {{{
+
+" 関数内のシンボルだけを置換
+function!  RefactorLocalSymbol()
+  let srch = @/
+  let word = expand('<cword>')
+
+  call PushPos()
+
+  " 2jは、関数の先頭に居た時用
+  " 2kは、関数定義行を含むため
+  " いずれも暫定
+  keepjumps normal! 2j[[2k
+  let fl = line('.')
+  keepjumps normal! ][
+  let ll = line('.')
+
+  let c_l = fl . ',' . ll
+  "echo c_l
+
+  let c_c = 's/' . srch . '/' . word . '/g'
+  "echo c_c
+
+  let c_u = c_l . c_c
+  "echo c_u
+  exe c_u
+
+  call PopPos()
+endfunction
+
+"nnorema <silent> <Leader>d :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+nnoremap <silent> <Leader>d :<C-u>call RefactorLocalSymbol()<CR>
+nnorema <silent> <Leader>D :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+
+" Refactoring  }}}
 
 
 let plugin_dicwin_disable = v:true
@@ -302,6 +380,14 @@ iab LOOP while ( 1 ) {<CR>}
 
 
 "---------------------------------------------------------------------------------------------
+nnoremap <Leader><C-s>           :<C-u>g%<C-r>/%s    %%%g<Left><Left><Left>
+vnoremap <Leader><C-s>                :g%<C-r>/%s     %%%g<Left><Left><Left>
+
+nnoremap <Leader><C-s>           :<C-u>g!<C-r>/!<Space>
+vnoremap <Leader><C-s>                :g!<C-r>/!<Space>
+
+
+"---------------------------------------------------------------------------------------------
 
 " ^に、|の機能を付加
 "nnoremap <silent> U <Esc>:exe v:prevcount ? ('normal! ' . v:prevcount . '<Bar>') : 'normal! ^'<CR>
@@ -380,7 +466,18 @@ nnoremap ! q
 
 "---------------------------------------------------------------------------------------------
 
+nnoremap <Leader><C-s> :<C-u>wind %s/<C-r>//<C-r><C-w>/g<CR>:wind up<CR><C-w>t
+
+
+"---------------------------------------------------------------------------------------------
+
 " com! Tac !tac
+
+
+"---------------------------------------------------------------------------------------------
+" ファイル内全てのシンボルを置換
+nnoremap <silent> <Leader>S :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+nmap gS <Leader>S
 
 
 "---------------------------------------------------------------------------------------------

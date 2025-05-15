@@ -5,6 +5,8 @@ scriptencoding utf-8
 
 " GUI {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 
+set renderoptions=type:directx,scrlines:1
+
 " nnoremap <silent> <F9>  :exe 'winpos' getwinposx() - 1 ' ' getwinposy() - 0<CR>
 " nnoremap <silent> <F10> :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 1<CR>
 " nnoremap <silent> <F11> :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 1<CR>
@@ -39,6 +41,43 @@ augroup end
 "match CursorLineNr /\%#./
 
 " `}}}
+
+
+" Refactoring  {{{
+
+" 関数内のシンボルだけを置換
+function!  RefactorLocalSymbol()
+  let srch = @/
+  let word = expand('<cword>')
+
+  call PushPos()
+
+  " 2jは、関数の先頭に居た時用
+  " 2kは、関数定義行を含むため
+  " いずれも暫定
+  keepjumps normal! 2j[[2k
+  let fl = line('.')
+  keepjumps normal! ][
+  let ll = line('.')
+
+  let c_l = fl . ',' . ll
+  "echo c_l
+
+  let c_c = 's/' . srch . '/' . word . '/g'
+  "echo c_c
+
+  let c_u = c_l . c_c
+  "echo c_u
+  exe c_u
+
+  call PopPos()
+endfunction
+
+"nnorema <silent> <Leader>d :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+nnoremap <silent> <Leader>d :<C-u>call RefactorLocalSymbol()<CR>
+nnorema <silent> <Leader>D :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+
+" Refactoring  }}}
 
 
 let plugin_dicwin_disable = v:true
@@ -302,6 +341,14 @@ iab LOOP while ( 1 ) {<CR>}
 
 
 "---------------------------------------------------------------------------------------------
+nnoremap <Leader><C-s>           :<C-u>g%<C-r>/%s    %%%g<Left><Left><Left>
+vnoremap <Leader><C-s>                :g%<C-r>/%s     %%%g<Left><Left><Left>
+
+nnoremap <Leader><C-s>           :<C-u>g!<C-r>/!<Space>
+vnoremap <Leader><C-s>                :g!<C-r>/!<Space>
+
+
+"---------------------------------------------------------------------------------------------
 
 " ^に、|の機能を付加
 "nnoremap <silent> U <Esc>:exe v:prevcount ? ('normal! ' . v:prevcount . '<Bar>') : 'normal! ^'<CR>
@@ -380,7 +427,18 @@ nnoremap ! q
 
 "---------------------------------------------------------------------------------------------
 
+nnoremap <Leader><C-s> :<C-u>wind %s/<C-r>//<C-r><C-w>/g<CR>:wind up<CR><C-w>t
+
+
+"---------------------------------------------------------------------------------------------
+
 " com! Tac !tac
+
+
+"---------------------------------------------------------------------------------------------
+" ファイル内全てのシンボルを置換
+nnoremap <silent> <Leader>S :<C-u>PushPos<CR>:g$.$s    /<C-r>//<C-r><C-w>/g<CR>:PopPos<CR>:let @/='<C-r><C-w>'<CR>
+nmap gS <Leader>S
 
 
 "---------------------------------------------------------------------------------------------
