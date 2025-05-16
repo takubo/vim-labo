@@ -278,13 +278,10 @@ def SwitchTabline(...args: list<string>)
     return
   endif
 
-  # TODO foreach
-  args->mapnew((_, val) => {
-    TablineContentsSwitch[val] = !TablineContentsSwitch[val]
-    return 0
-  })
+  args -> foreach((_, val) => TablineContentsSwitch[val] = !TablineContentsSwitch[val])
 
   redrawtabline
+
   SetTimer(true)
 enddef
 
