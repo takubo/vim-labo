@@ -3,7 +3,7 @@ vim9script
 scriptencoding utf-8
 
 
-import autoload 'GetPrjRoot.vim' as gpr
+import autoload 'get_project_root.vim' as gpr
 
 
 #---------------------------------------------------------------------------------------------

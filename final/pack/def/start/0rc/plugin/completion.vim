@@ -184,6 +184,6 @@ enddef
 #inoremap <C-F> <C-X><C-F>
 #inoremap <C-T> <C-X><C-F>
 # プロジェクトルートに移動してから補完
-import autoload 'GetPrjRoot.vim' as gpr
+import autoload 'get_project_root.vim' as gpr
 
 inoremap <expr> <C-K> '<Cmd>cd ' .. gpr.GetPrjRoot() .. '\<CR>' .. '<C-X><C-F>'
