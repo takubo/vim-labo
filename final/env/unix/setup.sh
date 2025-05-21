@@ -1,3 +1,4 @@
 #!/bin/sh
 
-ln -s ~/vimfiles/ ~/.vim
+git rev-parse --show-toplevel &&
+ln -s `git rev-parse --show-toplevel` ~/.vim
