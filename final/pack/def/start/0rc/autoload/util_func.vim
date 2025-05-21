@@ -110,3 +110,19 @@ export def GetCursorCharCode(): number
 enddef
 
 com! GetCursorCharCode echo printf('0x%x', GetCursorCharCode())
+
+
+finish
+
+
+# 全タブの全ウィンドウの、ウィンドウIDのリストを返す。
+def GetAllWinIdList(): list<number>
+
+  def Sub(key: number, val: list<number>): list<number>
+    return val -> map((_, v) => win_getid(v, key + 1))
+  enddef
+
+  const all_win_id = tabpagenr('$') -> range() -> map((_, v) => v + 1) -> map((_, v) => [v, tabpagewinnr(v, '$')]) -> map((_, v) => range(1, v[1])) -> map(Sub) -> flattennew()
+
+  return all_win_id
+enddef
