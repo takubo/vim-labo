@@ -99,7 +99,7 @@ vnoremap <expr> l (mode() == '<C-V>' && !!search('\%#$', 'bcn') ? '<Cmd>set virt
 #----------------------------------------------------------------------------------------
 # Show Entering Visual Mode
 
-import autoload 'PopUpInfo.vim' as pui
+import autoload "popup_info.vim" as pui
 
 def ShowEnteringVisualMode()
   if state() =~# 'm'

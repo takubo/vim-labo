@@ -186,7 +186,7 @@ enddef
 # Typewriter Scroll
 #----------------------------------------------------------------------------------------
 
-import autoload "PopUpInfo.vim" as pui
+import autoload "popup_info.vim" as pui
 
 var TypewriterScroll = false
 
