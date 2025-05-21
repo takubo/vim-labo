@@ -1,0 +1,12 @@
+def     vim-jp/vimdoc-ja
+def     thinca/vim-prettyprint
+def     takubo/vim-submode
+def     takubo/current-func-info.vim
+def     rhysd/clever-f.vim
+def     tpope/vim-fugitive
+def     bkad/CamelCaseMotion
+def     takubo/mru.vim
+ext     takubo/undotree
+ext     kien/rainbow_parentheses.vim
+try     takubo/comfortable-motion.vim
+sts     takubo/BlockDiff
