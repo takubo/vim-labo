@@ -4,7 +4,19 @@ scriptencoding utf-8
 
 
 #---------------------------------------------------------------------------------------------
-# Basic
+# Invalidate Key
+#---------------------------------------------------------------------------------------------
+
+nnoremap <silent> ZZ <Nop>
+nnoremap <silent> ZQ <Nop>
+
+# IME状態の切り替えをさせない。
+inoremap <C-^> <Nop>
+
+
+#---------------------------------------------------------------------------------------------
+# Basic Keymap
+#---------------------------------------------------------------------------------------------
 
 nnoremap Y y$
 
@@ -36,6 +48,7 @@ vnoremap ` m
 
 #---------------------------------------------------------------------------------------------
 # EscEsc
+#---------------------------------------------------------------------------------------------
 
 # 'noh'は自動コマンド内では(事実上)実行出来ないので、別途実行の要あり。
 # TODO  doautocmd nomodeline User
@@ -64,15 +77,17 @@ endif
 
 #---------------------------------------------------------------------------------------------
 # 保存
+#---------------------------------------------------------------------------------------------
 
 # 無名バッファなら、pwd。そうでなければ、保存。
 nnoremap <expr> <silent> <Leader>w bufname() == '' ? '<Cmd>pwd<CR>' : '<Cmd>update<CR>'
-#
+
 #nmap <silent> <Leader>e <Leader>w
 
 
 #---------------------------------------------------------------------------------------------
 # Line Number
+#---------------------------------------------------------------------------------------------
 
 set number relativenumber
 
@@ -95,6 +110,9 @@ com! -bar SwitchLineNumber SwitchLineNumber()  # TODO
 
 #---------------------------------------------------------------------------------------------
 # 空行の挿入
+#---------------------------------------------------------------------------------------------
+
+if 0
 
 nnoremap <C-O> O<Esc>
 
@@ -103,9 +121,12 @@ nnoremap go o<Esc>
 nnoremap gO O<Esc>
 #nnoremap <silent> <C-o> :<C-u>call append(expand('.'), '')<CR>j
 
+endif
+
 
 #---------------------------------------------------------------------------------------------
 # Undo Redo
+#---------------------------------------------------------------------------------------------
 
 call submode#enter_with('undo/redo', 'n', '', 'g-', 'g-')
 call submode#enter_with('undo/redo', 'n', '', 'g+', 'g+')
@@ -115,6 +136,7 @@ call submode#map(       'undo/redo', 'n', '',  '+', 'g+')
 
 #---------------------------------------------------------------------------------------------
 # MRU
+#---------------------------------------------------------------------------------------------
 
 nnoremap <Space>o :<C-U>Mru<Space>
 nnoremap       go  <Cmd>MRU<CR>
@@ -124,6 +146,7 @@ nnoremap    <C-O> :<C-U>Mru<Space>
 
 #---------------------------------------------------------------------------------------------
 # コメント行の前後の新規行の自動コメント化
+#---------------------------------------------------------------------------------------------
 
 # 自動コメント化のON/OFF
 com! -bang RO {
@@ -139,7 +162,8 @@ nnoremap <Leader># <Cmd>RO<CR>
 
 
 #---------------------------------------------------------------------------------------------
-# ge
+# ge (前の単語末尾への移動)
+#---------------------------------------------------------------------------------------------
 
 submode#enter_with('word_move_ge', 'nvo', '', 'ge', 'ge')
 submode#map(       'word_move_ge', 'nvo', '',  'e', 'ge')
@@ -150,6 +174,7 @@ submode#map(       'word_move_ge', 'nvo', '',  'b',  'b')
 
 #---------------------------------------------------------------------------------------------
 # Case Motion
+#---------------------------------------------------------------------------------------------
 
 map <silent> W  <Plug>CamelCaseMotion_w
 map <silent> B  <Plug>CamelCaseMotion_b
@@ -183,6 +208,7 @@ vnoremap <silent> aW <Plug>CamelCaseMotion_iw
 
 #---------------------------------------------------------------------------------------------
 # Short Cut
+#---------------------------------------------------------------------------------------------
 
 nnoremap <silent> <Leader>r <Cmd>setl readonly!<CR>
 nnoremap <silent> <Leader>R <Cmd>exe 'setl' &l:modifiable ? 'readonly nomodifiable' : 'modifiable'<CR>
@@ -197,7 +223,8 @@ nnoremap <Leader>$ <Cmd>setl scrollbind!<CR>
 
 
 #---------------------------------------------------------------------------------------------
-# Browsing
+# Browsing (Jump-list) (Tag-list)
+#---------------------------------------------------------------------------------------------
 
 set jumpoptions=stack
 
@@ -216,6 +243,7 @@ nnoremap <silent> <C-\> g,<Cmd>CursorJumped<CR>
 
 #---------------------------------------------------------------------------------------------
 # Folding
+#---------------------------------------------------------------------------------------------
 
 
 # 折り畳みトグル (現在行)
@@ -336,19 +364,6 @@ noremap! <C-@># \%()\@=<Left><Left><Left><Left>
 noremap! <C-@>$ \%()\@!<Left><Left><Left><Left>
 
 
-#---------------------------------------------------------------------------------------------
-# スペースへの色付け
-# TODO nbsp
-highlight ZenkakuSpace guibg=#337733 guifg=#eeeeee cterm=underline ctermfg=lightblue
-highlight ZenkakuSpace guibg=#433387 guifg=#eeeeee cterm=underline ctermfg=lightblue
-syntax match ZenkakuSpace /　/
-augroup MyVimrc_ZenkakuSpace
-  au!
-  au BufNewFile,BufRead * match ZenkakuSpace /　/
- #au BufNewFile,BufRead * matchadd(ZenkakuSpace, '　')
-  au BufNew,BufNewFile,BufRead * syntax match ZenkakuSpace /　/
-augroup end
-
 
 #---------------------------------------------------------------------------------------------
 # TBC
@@ -422,6 +437,67 @@ inoremap <C-E> <End>
 
 
 
+#---------------------------------------------------------------------------------------------
+# Swap_Exists
+#---------------------------------------------------------------------------------------------
+
+var swap_select = true
+
+augroup MyVimrc_SwapExists
+  au!
+  au SwapExists * if !swap_select | v:swapchoice = 'o' | endif
+augroup END
+
+com! SwapSelect {
+      swap_select = true
+      edit %
+      swap_select = false
+    }
+
+
+
+#---------------------------------------------------------------------------------------------
+# Eatchar
+#---------------------------------------------------------------------------------------------
+
+def g:Eatchar(pattern: string): string
+  const c = nr2char(getchar(0))
+  return (c =~ pattern) ? '' : c
+enddef
+# 使用例 iabbr <silent> if if ()<Left><C-R>=Eatchar('\s')<CR>
+
+def g:EatS(): string    # def EatSpace(): string
+  const c = nr2char(getchar(0))
+  return (c =~ '\s') ? '' : c
+enddef
+# 使用例 iabbr <silent> if if ()<Left><C-R>=EatS()<CR>
+
+
+
+#---------------------------------------------------------------------------------------------
+# CursorJumped
+#---------------------------------------------------------------------------------------------
+
+com! -bar -nargs=0 CursorJumped CFIPopupAuto
+
+
+
+#---------------------------------------------------------------------------------------------
+# スペースへの色付け
+#---------------------------------------------------------------------------------------------
+# TODO nbsp
+highlight ZenkakuSpace guibg=#337733 guifg=#eeeeee cterm=underline ctermfg=lightblue
+highlight ZenkakuSpace guibg=#433387 guifg=#eeeeee cterm=underline ctermfg=lightblue
+syntax match ZenkakuSpace /　/
+augroup MyVimrc_ZenkakuSpace
+  au!
+  au BufNewFile,BufRead * match ZenkakuSpace /　/
+ #au BufNewFile,BufRead * matchadd(ZenkakuSpace, '　')
+  au BufNew,BufNewFile,BufRead * syntax match ZenkakuSpace /　/
+augroup end
+
+
+
 
 finish
 
@@ -450,6 +526,17 @@ def ToggleFolding()
   #echo "folding close"
   return
 endfunction
+
+
+# 折り畳みに表示するテキスト
+
+#set foldtext=MyFoldText()
+#function MyFoldText()
+#  let line = getline(v:foldstart)
+#  let sub = substitute(line, '^\t\?\zs\t', repeat(' ', &tabstop), 'g')
+#  let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
+#  return v:folddashes . sub
+#endfunction
 
 
 nnoremap <C-@> g-
