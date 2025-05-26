@@ -1,0 +1,30 @@
+" vim: set ts=8 sts=2 sw=2 tw=0 et:
+scriptencoding utf-8
+
+
+if has('win32')
+  set guifont=BIZ_UDゴシック:h11:cSHIFTJIS:qDRAFT
+endif
+
+
+
+finish
+
+
+
+set display+=lastline
+
+" set visualbell t_vb=
+
+" set guioptions=!cd
+
+" colorscheme Rimpa
+
+set transparency=235
+
+set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+set guicursor=n-v-c:ver10-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+
+call ResizeFont(0)
+
+set visualbell t_vb=
