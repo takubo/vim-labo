@@ -28,22 +28,19 @@ var PrjRootFile = '.git'
 #   return ret
 # enddef
 
-# プロジェクトルートディレクトリの絶対パスを返す。
-# プロジェクトルートディレクトリが見つからないときは、カレントディレクトリ(絶対パス)を返す。
-def GetPrjRoot(): string
-  var prj_root: string
-
-  prj_root = finddir(PrjRootFile, '.;')
-  if prj_root != ''
-    return prj_root -> fnamemodify(':h:p')
+# # プロジェクトルートディレクトリの絶対パスを返す。
+# # プロジェクトルートディレクトリが見つからないときは、カレントディレクトリ(絶対パス)を返す。
+export def GetPrjRoot(): string
+  # PrjRootFileをディレクトリとして探索
+  const prj_root_dir_path = finddir(PrjRootFile, '.;')
+  if prj_root_dir_path != ''
+    return (prj_root_dir_path  .. '/..') -> fnamemodify(':p')
   endif
 
-  prj_root = findfile(PrjRootFile, '.;')
-  if prj_root != ''
-    return prj_root -> fnamemodify(':h:p')
-  endif
-
-  return './' -> fnamemodify(':p')
+  # PrjRootFileをファイルとして探索
+  const prj_root_file_path = findfile(PrjRootFile, '.;')
+  # prj_root_file_pathが空文字列のとき、カレントディレクトリのフルパスとなる。
+  return prj_root_file_path -> fnamemodify(':p:h')
 enddef
 
 

@@ -19,7 +19,7 @@ export def ToCapital(str: string): string
 enddef
 
 
-# ”’l”äŠr—p‚ÌŠÖ” lhs ‚Ì‚Ù‚¤‚ª‘å‚«‚¯‚ê‚Î³”C¬‚³‚¯‚ê‚Î•‰”Clhs ‚Æ rhs ‚ª“™‚µ‚¯‚ê‚Î 0 ‚ğ•Ô‚·
+# æ•°å€¤æ¯”è¼ƒç”¨ã®é–¢æ•° lhs ã®ã»ã†ãŒå¤§ãã‘ã‚Œã°æ­£æ•°ï¼Œå°ã•ã‘ã‚Œã°è² æ•°ï¼Œlhs ã¨ rhs ãŒç­‰ã—ã‘ã‚Œã° 0 ã‚’è¿”ã™
 export def CompNr(lhs: number, rhs: number): number
   return lhs - rhs
 enddef
@@ -41,7 +41,7 @@ function Eatchar(pat)
   let c = nr2char(getchar(0))
   return (c =~ a:pat) ? '' : c
 endfunc
-# —á iabbr <silent> if if ()<Left><C-R>=Eatchar('\s')<CR>
+# ä¾‹ iabbr <silent> if if ()<Left><C-R>=Eatchar('\s')<CR>
 
 
 export def ProcTopUnderScore(word: string): string
@@ -60,18 +60,18 @@ function Factorial(n)
 endfunction
 
 
-# •Ô‚è’l
-#   Cursor‚ªWord‚Ìã:       ³®”
-#   Cursor‚ªWord‚Ìã‚Å‚È‚¢: 0
+# è¿”ã‚Šå€¤
+#   CursorãŒWordã®ä¸Š:       æ­£æ•´æ•°
+#   CursorãŒWordã®ä¸Šã§ãªã„: 0
 export def IsCursorOnWord(): number
   return search('\%#\k', 'cnz')
 enddef
 
 
-# •Ô‚è’l
-#   Cursor‚ªWord‚Ìæ“ª:             -1
-#   Cursor‚ªWord‚Ìã(æ“ª‚Å‚È‚Í‚¢):  1
-#   Cursor‚ªWord‚Ìã‚Å‚È‚¢:          0
+# è¿”ã‚Šå€¤
+#   CursorãŒWordã®å…ˆé ­:             -1
+#   CursorãŒWordã®ä¸Š(å…ˆé ­ã§ãªã¯ã„):  1
+#   CursorãŒWordã®ä¸Šã§ãªã„:          0
 function CursorWord_old()
   if search('\<\%#\k', 'cnz')
     return -1
@@ -82,10 +82,10 @@ function CursorWord_old()
 endfunction
 
 
-# •Ô‚è’l
-#   Cursor‚ªWord‚Ìæ“ª:             -1
-#   Cursor‚ªWord‚Ìã(æ“ª‚Å‚È‚Í‚¢):  1
-#   Cursor‚ªWord‚Ìã‚Å‚È‚¢:          0
+# è¿”ã‚Šå€¤
+#   CursorãŒWordã®å…ˆé ­:             -1
+#   CursorãŒWordã®ä¸Š(å…ˆé ­ã§ãªã¯ã„):  1
+#   CursorãŒWordã®ä¸Šã§ãªã„:          0
 export def CursorWord(): number
   return search('\<\%#\k', 'cnz') ? -1 : search('\%#\k', 'cnz') ? 1 : 0
 enddef
@@ -97,14 +97,14 @@ const NumWin = function('winnr',     ['$'])
 const NumTab = function('tabpagenr', ['$'])
 
 
-# ƒJ[ƒ\ƒ‹‰º‚Ì•¶š‚ğ•Ô‚·
+# ã‚«ãƒ¼ã‚½ãƒ«ä¸‹ã®æ–‡å­—ã‚’è¿”ã™
 export def GetCursorChar(): string
   return getline('.') -> strcharpart(getcursorcharpos()[2] - 1, 1)
 enddef
 
 com! GetCursorChar echo GetCursorChar()
 
-# ƒJ[ƒ\ƒ‹‰º‚Ì•¶š‚Ì•¶šƒR[ƒh‚ğ•Ô‚·
+# ã‚«ãƒ¼ã‚½ãƒ«ä¸‹ã®æ–‡å­—ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’è¿”ã™
 export def GetCursorCharCode(): number
   return getline('.') -> strcharpart(getcursorcharpos()[2] - 1, 1) -> char2nr()
 enddef
@@ -115,7 +115,7 @@ com! GetCursorCharCode echo printf('0x%x', GetCursorCharCode())
 finish
 
 
-# ‘Sƒ^ƒu‚Ì‘SƒEƒBƒ“ƒhƒE‚ÌAƒEƒBƒ“ƒhƒEID‚ÌƒŠƒXƒg‚ğ•Ô‚·B
+# å…¨ã‚¿ãƒ–ã®å…¨ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦IDã®ãƒªã‚¹ãƒˆã‚’è¿”ã™ã€‚
 def GetAllWinIdList(): list<number>
 
   def Sub(key: number, val: list<number>): list<number>
