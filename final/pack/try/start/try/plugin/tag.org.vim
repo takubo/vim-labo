@@ -34,17 +34,17 @@ endif
 
 " ---------------
 " Unified CR
-"   ”š•t‚«‚È‚çAs‚ÖƒWƒƒƒ“ƒv
-"   qf‚È‚ç“–ŠYs‚ÖƒWƒƒƒ“ƒv
-"   help‚È‚ç“–ŠYs‚ÖƒWƒƒƒ“ƒv
-"   ‚»‚êˆÈŠO‚È‚çAƒ^ƒOƒWƒƒƒ“ƒv
+"   æ•°å­—ä»˜ããªã‚‰ã€è¡Œã¸ã‚¸ãƒ£ãƒ³ãƒ—
+"   qfãªã‚‰å½“è©²è¡Œã¸ã‚¸ãƒ£ãƒ³ãƒ—
+"   helpãªã‚‰å½“è©²è¡Œã¸ã‚¸ãƒ£ãƒ³ãƒ—
+"   ãã‚Œä»¥å¤–ãªã‚‰ã€ã‚¿ã‚°ã‚¸ãƒ£ãƒ³ãƒ—
 " ---------------
 function! Unified_CR(mode)
 
   if v:prevcount
-    "jump‚·‚é‘O‚É“o˜^‚µ‚È‚¢‚ÆAv:prevcount‚ªã‘‚³‚ê‚Ä‚µ‚Ü‚¤B
+    "jumpã™ã‚‹å‰ã«ç™»éŒ²ã—ãªã„ã¨ã€v:prevcountãŒä¸Šæ›¸ã•ã‚Œã¦ã—ã¾ã†ã€‚
     call histadd('cmd', v:prevcount)
-    "jumplist‚Éc‚·‚½‚ß‚ÉAG‚ğg—pB
+    "jumplistã«æ®‹ã™ãŸã‚ã«ã€Gã‚’ä½¿ç”¨ã€‚
     exe 'normal!' v:prevcount . 'G'
     return
   endif
@@ -95,7 +95,7 @@ function! Unified_CR(mode)
         echo 'Go File' . repeat(' ', &columns - 40)
         echohl None
       elseif 1
-        " Cursor ‰º
+        " Cursor ä¸‹
         call popup_create('    Go  File    ' , #{
               \ line: 'cursor+3',
               \ col: 'cursor',
@@ -156,7 +156,7 @@ function! TagHighlightDelete(dummy)
 
   if a:dummy == g:TimerTagMatch0
     au! ZZZZ0
-    "‚±‚±‚Åreturn‚µ‚È‚¢‚ÆA‚±‚Ì‰º‚Ìif•¶‚Åg:TimerTagMatch‚ª–¢’è‹`ƒGƒ‰[‚É‚È‚éB
+    "ã“ã“ã§returnã—ãªã„ã¨ã€ã“ã®ä¸‹ã®ifæ–‡ã§g:TimerTagMatchãŒæœªå®šç¾©ã‚¨ãƒ©ãƒ¼ã«ãªã‚‹ã€‚
     return
   endif
   if a:dummy == g:TimerTagMatch
@@ -169,10 +169,10 @@ let g:TagMatchI = {}
 let s:TagHighlightTime = 1500  " [ms]
 
 " TODO
-"   ƒ‰ƒxƒ‹‚È‚çf:b
-"   •Ï”‚È‚çAƒXƒNƒ[ƒ‹‚µ‚È‚¢
-"   ˆø”‚Ìƒ^ƒO
-"   asm‚Ìƒ^ƒO
+"   ãƒ©ãƒ™ãƒ«ãªã‚‰f:b
+"   å¤‰æ•°ãªã‚‰ã€ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã—ãªã„
+"   å¼•æ•°ã®ã‚¿ã‚°
+"   asmã®ã‚¿ã‚°
 function! JumpToDefine(mode)
   let w0 = expand("<cword>")
 
@@ -201,13 +201,13 @@ function! JumpToDefine(mode)
         endif
       else
         if ! TTTT(w, a:mode)
-          " TODO –³—‚â‚è—áŠO‚ğ”­¶‚³‚¹‚é
+          " TODO ç„¡ç†ã‚„ã‚Šä¾‹å¤–ã‚’ç™ºç”Ÿã•ã›ã‚‹
           throw ':E426:'
         endif
       endif
-      " •\¦”ÍˆÍ‚ğÅ“K‰»
+      " è¡¨ç¤ºç¯„å›²ã‚’æœ€é©åŒ–
       exe "normal! z\<CR>" . (winheight(0)/4) . "\<C-y>"
-      " ƒJ[ƒ\ƒ‹ˆÊ’u‚ğ’²® (Cê—p)
+      " ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’èª¿æ•´ (Cå°‚ç”¨)
       call PostTagJumpCursor_C()
       let g:TagMatch = matchadd('TagMatch', '\<'.w.'\>')
       let g:TimerTagMatch = timer_start(s:TagHighlightTime, 'TagHighlightDelete')
@@ -219,14 +219,14 @@ function! JumpToDefine(mode)
       return 0
     catch /:E426:/
       if w0 =~ '^_'
-	" Œ³‚ÌŒŸõŒê‚Í"_"n‚Ü‚è
+	" å…ƒã®æ¤œç´¢èªã¯"_"å§‹ã¾ã‚Š
 	let w = substitute(w0, '^_', '', '')
       else
-	" Œ³‚ÌŒŸõŒê‚Í"_"n‚Ü‚è‚Å‚È‚¢
+	" å…ƒã®æ¤œç´¢èªã¯"_"å§‹ã¾ã‚Šã§ãªã„
 	let w = '_' . w0
       endif
       if i == 0
-	" ƒGƒ‰[ƒƒbƒZ[ƒW•\¦—p‚ÉƒIƒŠƒWƒiƒ‹’PŒê‚Å‚ÌƒGƒ‰[•¶š—ñ‚ğ•Û‘¶
+	" ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤ºç”¨ã«ã‚ªãƒªã‚¸ãƒŠãƒ«å˜èªã§ã®ã‚¨ãƒ©ãƒ¼æ–‡å­—åˆ—ã‚’ä¿å­˜
       let exception = v:exception
       endif
     catch /:E433:/
@@ -238,44 +238,44 @@ function! JumpToDefine(mode)
   return 1
 endfunction
 
-" ƒJ[ƒ\ƒ‹ˆÊ’u‚ğ’²® (Cê—p)
+" ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’èª¿æ•´ (Cå°‚ç”¨)
 function! PostTagJumpCursor_C()
   if search('\%##define\s\+\k\+(', 'bcn')
-  "ŠÖ”Œ`®ƒ}ƒNƒ
+  "é–¢æ•°å½¢å¼ãƒã‚¯ãƒ­
     normal! ww
   elseif search('\%##define\s\+\k\+\s\+', 'bcn')
-  "’è”ƒ}ƒNƒ
+  "å®šæ•°ãƒã‚¯ãƒ­
     normal! ww
   elseif search('\%#.\+;', 'bcn')
-  "•Ï”
+  "å¤‰æ•°
     normal! f;b
   else
-    "ŠÖ”
+    "é–¢æ•°
     normal! $F(b
   endif
 endfunction
 
-" ‘ÎÛ
-"   ƒJ[ƒ\ƒ‹‰º  ->  Normal mode ƒfƒtƒHƒ‹ƒg
-"   Visual      ->  Visual mode ƒfƒtƒHƒ‹ƒg
-"   (“ü—Í)      ->  ‘Î‰‚È‚µ
+" å¯¾è±¡
+"   ã‚«ãƒ¼ã‚½ãƒ«ä¸‹  ->  Normal mode ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
+"   Visual      ->  Visual mode ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
+"   (å…¥åŠ›)      ->  å¯¾å¿œãªã—
 
-" ƒ^ƒO“®ì
-"   ’¼ÚƒWƒƒƒ“ƒv -> ‚È‚µ
-"   ‚æ‚«‚ÉŒv‚ç‚¤(ƒ^ƒO‚Ì”Ÿ‘æ‚Å) -> ƒfƒtƒHƒ‹ƒg‚Æ‚·‚é
-"   ‹­§‘I‘ğ
+" ã‚¿ã‚°å‹•ä½œ
+"   ç›´æ¥ã‚¸ãƒ£ãƒ³ãƒ— -> ãªã—
+"   ã‚ˆãã«è¨ˆã‚‰ã†(ã‚¿ã‚°ã®æ•°æ¬¡ç¬¬ã§) -> ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¨ã™ã‚‹
+"   å¼·åˆ¶é¸æŠ
 
-" ƒEƒBƒ“ƒhƒE
-"   ‚»‚Ì‚Ü‚Ü
-"   •ÊƒEƒBƒ“ƒhƒE
-"   ƒvƒŒƒrƒ…[
+" ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+"   ãã®ã¾ã¾
+"   åˆ¥ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+"   ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼
 
 " mode
 "   s:select
 "   p:preview
-"   w:•ÊƒEƒBƒ“ƒhƒE
+"   w:åˆ¥ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
 "
-" Å‰‚Ì<Esc>‚ª‚È‚¢‚ÆAprevcount‚ğ‚¤‚Ü‚­ˆ—‚Å‚«‚È‚¢B
+" æœ€åˆã®<Esc>ãŒãªã„ã¨ã€prevcountã‚’ã†ã¾ãå‡¦ç†ã§ããªã„ã€‚
 nnoremap <silent> <CR>         <Esc>:call Unified_CR('')<CR>
 nnoremap <silent> g<CR>        <Esc>:call Unified_CR('p')<CR>
 nnoremap <silent> <Leader><CR> <Esc>:call Unified_CR('w')<CR>
@@ -299,94 +299,94 @@ nmap <Leader><CR> <Plug>(MyVimrc-Window-AutoSplit-Rev)<CR>
 " Unified_CR
 
 " ------------------------------------------------------------
-"   count•t‚«Às‚³‚ê‚½‚çAcounts‚ÖƒWƒƒƒ“ƒvB
-"   qf‚È‚çƒGƒ‰[Œ³‚ÖƒWƒƒƒ“ƒvB
-"   help‚È‚çƒŠƒ“ƒN‚ÖƒWƒƒƒ“ƒvB
-"   ƒJ[ƒ\ƒ‹‚ª”’lã‚È‚çAŠî”•ÏŠ·B
-"   ‚»‚êˆÈŠO‚È‚çAƒ^ƒOƒWƒƒƒ“ƒvB
-"   ¸”s‚µ‚½‚çAƒ}ƒjƒ…ƒAƒ‹‚ğˆø‚­B
-"   ¸”s‚µ‚½‚çAGo FileB
-"   ¸”s‚µ‚½‚çAGo DefineB
+"   countä»˜ãå®Ÿè¡Œã•ã‚ŒãŸã‚‰ã€countè¡Œã¸ã‚¸ãƒ£ãƒ³ãƒ—ã€‚
+"   qfãªã‚‰ã‚¨ãƒ©ãƒ¼å…ƒã¸ã‚¸ãƒ£ãƒ³ãƒ—ã€‚
+"   helpãªã‚‰ãƒªãƒ³ã‚¯ã¸ã‚¸ãƒ£ãƒ³ãƒ—ã€‚
+"   ã‚«ãƒ¼ã‚½ãƒ«ãŒæ•°å€¤ä¸Šãªã‚‰ã€åŸºæ•°å¤‰æ›ã€‚
+"   ãã‚Œä»¥å¤–ãªã‚‰ã€ã‚¿ã‚°ã‚¸ãƒ£ãƒ³ãƒ—ã€‚
+"   å¤±æ•—ã—ãŸã‚‰ã€ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ã‚’å¼•ãã€‚
+"   å¤±æ•—ã—ãŸã‚‰ã€Go Fileã€‚
+"   å¤±æ•—ã—ãŸã‚‰ã€Go Defineã€‚
 " ------------------------------------------------------------
 
 " ------------------------------------------------------------
-" ‘ÎÛ
-"   ƒJ[ƒ\ƒ‹‰º  ->  Normal mode ƒfƒtƒHƒ‹ƒg
-"   Visual      ->  Visual mode ƒfƒtƒHƒ‹ƒg
-"   (“ü—Í)      ->  ‘Î‰‚È‚µ
+" å¯¾è±¡
+"   ã‚«ãƒ¼ã‚½ãƒ«ä¸‹  ->  Normal mode ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
+"   Visual      ->  Visual mode ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
+"   (å…¥åŠ›)      ->  å¯¾å¿œãªã—
 
-" ƒ^ƒO“®ì
-"   ’¼ÚƒWƒƒƒ“ƒv -> ‚È‚µ
-"   ‚æ‚«‚ÉŒv‚ç‚¤(ƒ^ƒO‚Ì”Ÿ‘æ‚Å) -> ƒfƒtƒHƒ‹ƒg‚Æ‚·‚é
-"   ‹­§‘I‘ğ
+" ã‚¿ã‚°å‹•ä½œ
+"   ç›´æ¥ã‚¸ãƒ£ãƒ³ãƒ— -> ãªã—
+"   ã‚ˆãã«è¨ˆã‚‰ã†(ã‚¿ã‚°ã®æ•°æ¬¡ç¬¬ã§) -> ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¨ã™ã‚‹
+"   å¼·åˆ¶é¸æŠ
 
-" ƒEƒBƒ“ƒhƒE
-"   ‚»‚Ì‚Ü‚Ü
-"   •ÊƒEƒBƒ“ƒhƒE
-"   ƒvƒŒƒrƒ…[
+" ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+"   ãã®ã¾ã¾
+"   åˆ¥ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+"   ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼
 " ------------------------------------------------------------
 
-" TODO select‚Ìˆµ‚¢B   ‚æ‚«‚ÉŒv‚ç‚¤(ƒ^ƒO‚Ì”Ÿ‘æ‚Å) -> ƒfƒtƒHƒ‹ƒg‚Æ‚·‚é
-" TODO ’[––—p‚ÉA‚à‚Á‚ÆAƒ‚ƒfƒBƒtƒ@ƒCƒA{“ÁêƒL[‚ğg‚í‚È‚­‚Ä—Ç‚¢‚æ‚¤‚É‚·‚éB
+" TODO selectã®æ‰±ã„ã€‚   ã‚ˆãã«è¨ˆã‚‰ã†(ã‚¿ã‚°ã®æ•°æ¬¡ç¬¬ã§) -> ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¨ã™ã‚‹
+" TODO ç«¯æœ«ç”¨ã«ã€ã‚‚ã£ã¨ã€ãƒ¢ãƒ‡ã‚£ãƒ•ã‚¡ã‚¤ã‚¢ï¼‹ç‰¹æ®Šã‚­ãƒ¼ã‚’ä½¿ã‚ãªãã¦è‰¯ã„ã‚ˆã†ã«ã™ã‚‹ã€‚
 
-" ƒm[ƒ}ƒ‹ (Å‰‚Ì<Esc>‚ª‚È‚¢‚ÆAprevcount‚ğ‚¤‚Ü‚­ˆ—‚Å‚«‚È‚¢B)
+" ãƒãƒ¼ãƒãƒ« (æœ€åˆã®<Esc>ãŒãªã„ã¨ã€prevcountã‚’ã†ã¾ãå‡¦ç†ã§ããªã„ã€‚)
 nnoremap <silent>         <CR>    <Esc>:call Unified_CR('')<CR>
-" ƒXƒvƒŠƒbƒg (’[––‚Å‚Í’Êí<S-CR>‚ªg‚¦‚È‚¢‚Ì‚ÅA•Ê‚Ìƒpƒ^[ƒ“‚ğ—pˆÓ‚µ‚Ä‚¨‚­B)
+" ã‚¹ãƒ—ãƒªãƒƒãƒˆ (ç«¯æœ«ã§ã¯é€šå¸¸<S-CR>ãŒä½¿ãˆãªã„ã®ã§ã€åˆ¥ã®ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’ç”¨æ„ã—ã¦ãŠãã€‚)
 nmap                    <S-CR>    <Plug>(MyVimrc-Window-AutoSplit)<CR>
 nmap                  <BS><CR>    <Plug>(MyVimrc-Window-AutoSplit)<CR>
 nmap               <Space><CR>    <Plug>(MyVimrc-Window-AutoSplit)<CR>
-" ƒvƒŒƒrƒ…[
+" ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼
 nnoremap <silent>       <C-CR>    :call Unified_CR('p')<CR>
-" ƒZƒŒƒNƒg
+" ã‚»ãƒ¬ã‚¯ãƒˆ
 nnoremap <silent>        g<CR>    :call Unified_CR('s')<CR>
-" ƒXƒvƒŠƒbƒgƒZƒŒƒNƒg
+" ã‚¹ãƒ—ãƒªãƒƒãƒˆã‚»ãƒ¬ã‚¯ãƒˆ
 nmap                   g<S-CR>    <Plug>(MyVimrc-Window-AutoSplit)g<CR>
-" ƒvƒŒƒrƒ…[ƒZƒŒƒNƒg
+" ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼ã‚»ãƒ¬ã‚¯ãƒˆ
 nnoremap <silent>      g<C-CR>    <Esc>:call Unified_CR('sp')<CR>
 
-" ˆø”‚Ìmode‚ÍAŸ‚Ì•¶š‚ğ‚©‚ç\¬‚³‚ê‚é•¶š—ñB
+" å¼•æ•°ã®modeã¯ã€æ¬¡ã®æ–‡å­—ã‚’ã‹ã‚‰æ§‹æˆã•ã‚Œã‚‹æ–‡å­—åˆ—ã€‚
 "   s:select
 "   p:preview
-"   w:•ÊƒEƒBƒ“ƒhƒE
+"   w:åˆ¥ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
 function! Unified_CR(mode)
 
-  " count•t‚«Às‚³‚ê‚½‚çAcounts‚ÖƒWƒƒƒ“ƒvB
+  " countä»˜ãå®Ÿè¡Œã•ã‚ŒãŸã‚‰ã€countè¡Œã¸ã‚¸ãƒ£ãƒ³ãƒ—ã€‚
   if v:prevcount
-    "jump‚·‚é‘O‚É“o˜^‚µ‚È‚¢‚ÆAv:prevcount‚ªã‘‚³‚ê‚Ä‚µ‚Ü‚¤B
+    "jumpã™ã‚‹å‰ã«ç™»éŒ²ã—ãªã„ã¨ã€v:prevcountãŒä¸Šæ›¸ã•ã‚Œã¦ã—ã¾ã†ã€‚
     call histadd('cmd', v:prevcount)
-    "jumplist‚Éc‚·‚½‚ß‚ÉAG‚ğg—pB
+    "jumplistã«æ®‹ã™ãŸã‚ã«ã€Gã‚’ä½¿ç”¨ã€‚
     exe 'normal!' v:prevcount . 'G'
     " TODO CFI
     return
   endif
 
-  " qf‚È‚çƒGƒ‰[Œ³‚ÖƒWƒƒƒ“ƒvB
+  " qfãªã‚‰ã‚¨ãƒ©ãƒ¼å…ƒã¸ã‚¸ãƒ£ãƒ³ãƒ—ã€‚
   if &buftype == 'quickfix'
     call feedkeys("\<CR>:FF2\<CR>", 'nt')
     return
-  " help‚È‚çƒŠƒ“ƒN‚ÖƒWƒƒƒ“ƒvB
+  " helpãªã‚‰ãƒªãƒ³ã‚¯ã¸ã‚¸ãƒ£ãƒ³ãƒ—ã€‚
   elseif &buftype == 'help'
     call feedkeys("\<C-]>", 'nt')
     return
   endif
 
   if 0
-    " ƒJ[ƒ\ƒ‹‚ª”’lã‚È‚çAŠî”•ÏŠ·B
+    " ã‚«ãƒ¼ã‚½ãƒ«ãŒæ•°å€¤ä¸Šãªã‚‰ã€åŸºæ•°å¤‰æ›ã€‚
     if EmIsNum()
       EmDispNoTimeOut
-      " TODO Split‚È‚çA•ÊƒEƒBƒ“ƒhƒE‚Å•\¦B
+      " TODO Splitãªã‚‰ã€åˆ¥ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã§è¡¨ç¤ºã€‚
       return
     endif
   endif
 
   let cword = expand('<cword>')
 
-  " ‚»‚êˆÈŠO‚È‚çAƒ^ƒOƒWƒƒƒ“ƒvB
+  " ãã‚Œä»¥å¤–ãªã‚‰ã€ã‚¿ã‚°ã‚¸ãƒ£ãƒ³ãƒ—ã€‚
   if TagJump(cword, a:mode)
     return
   endif
 
-  " TODO b’è‘Î‰
+  " TODO æš«å®šå¯¾å¿œ
   if &ft == 'vim' && isk !~ '#'
     set isk+=#
     let cword2 = expand('<cword>')
@@ -397,24 +397,24 @@ function! Unified_CR(mode)
     endif
   endif
 
-  " ¸”s‚µ‚½‚çAƒ}ƒjƒ…ƒAƒ‹‚ğˆø‚­B
+  " å¤±æ•—ã—ãŸã‚‰ã€ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ã‚’å¼•ãã€‚
   if s:lookup_in_man(cword)
     return
   endif
 
-  " ¸”s‚µ‚½‚çAGo FileB
+  " å¤±æ•—ã—ãŸã‚‰ã€Go Fileã€‚
   if s:go_file_curfile(a:mode)
     return
   endif
 
-  " ¸”s‚µ‚½‚çAGo DefineB
+  " å¤±æ•—ã—ãŸã‚‰ã€Go Defineã€‚
   keeppatterns normal! gd
 
 endfunction
 
 
 " -----------------------------------------------------------------------------
-" ƒ}ƒjƒ…ƒAƒ‹‚ğˆø‚­
+" ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ã‚’å¼•ã
 
 function! s:lookup_in_man(word)
   if &ft == 'vim'
@@ -432,14 +432,14 @@ endfunction
 " -----------------------------------------------------------------------------
 " Go File
 
-" ƒJ[ƒ\ƒ‹‰º‚Ìƒtƒ@ƒCƒ‹‚Égf
+" ã‚«ãƒ¼ã‚½ãƒ«ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ã«gf
 "
-" go file‚É
-"   ¬Œ÷‚µ‚½‚çAtrueA
-"   ¸”s‚µ‚½‚çAfalsA
-" ‚ğ•Ô‚·B
+" go fileã«
+"   æˆåŠŸã—ãŸã‚‰ã€trueã€
+"   å¤±æ•—ã—ãŸã‚‰ã€falsã€
+" ã‚’è¿”ã™ã€‚
 "
-" TODO Preview‘Î‰
+" TODO Previewå¯¾å¿œ
 "
 function! s:go_file_curfile(mode)
   if search('\%#\f', 'bcn')
@@ -482,21 +482,21 @@ nmap <BS><C-n>  <Plug>(MyVimrc-Window-AutoSplit)<Plug>(MyVimrc-WinCmd-p)<C-n>
 
 " Tag_Test {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 
-"¡d—l
+"â– ä»•æ§˜
 "
-" ƒ^ƒO‚ª1‚Â‚È‚ç‚»‚ê
-" “à•”ƒ^ƒO‚ª‚ ‚ê‚Î‚»‚êi“à•”ƒ^ƒO•¡”‚Í‚È‚¢‘z’èj
-" ŠOƒ^ƒO‚È‚ç
-"   IncludeFiles‚É‘Î‚µ‚Ä
-"     1‚Â‚È‚ç‚»‚ê
-"     “¯Dir‚É1‚Â‚È‚ç‚»‚ê
-"     ‰ºˆÊDir‚É1‚Â‚È‚ç‚»‚ê
-"     TODO: ƒtƒ@ƒCƒ‹–¼‚Ì“Á’¥‚©‚ç„‘ª
-"   ”ñIncludeFiles‚É‘Î‚µ‚Ä
-"     “¯Dir‚É1‚Â‚È‚ç‚»‚ê
-"     ‰ºˆÊDir‚É1‚Â‚È‚ç‚»‚ê
-"     TODO: ƒtƒ@ƒCƒ‹–¼‚Ì“Á’¥‚©‚ç„‘ª
-" ƒ†[ƒU‘I‘ğ
+" ã‚¿ã‚°ãŒ1ã¤ãªã‚‰ãã‚Œ
+" å†…éƒ¨ã‚¿ã‚°ãŒã‚ã‚Œã°ãã‚Œï¼ˆå†…éƒ¨ã‚¿ã‚°è¤‡æ•°ã¯ãªã„æƒ³å®šï¼‰
+" å¤–ã‚¿ã‚°ãªã‚‰
+"   IncludeFilesã«å¯¾ã—ã¦
+"     1ã¤ãªã‚‰ãã‚Œ
+"     åŒDirã«1ã¤ãªã‚‰ãã‚Œ
+"     ä¸‹ä½Dirã«1ã¤ãªã‚‰ãã‚Œ
+"     TODO: ãƒ•ã‚¡ã‚¤ãƒ«åã®ç‰¹å¾´ã‹ã‚‰æ¨æ¸¬
+"   éIncludeFilesã«å¯¾ã—ã¦
+"     åŒDirã«1ã¤ãªã‚‰ãã‚Œ
+"     ä¸‹ä½Dirã«1ã¤ãªã‚‰ãã‚Œ
+"     TODO: ãƒ•ã‚¡ã‚¤ãƒ«åã®ç‰¹å¾´ã‹ã‚‰æ¨æ¸¬
+" ãƒ¦ãƒ¼ã‚¶é¸æŠ
 "
 
 function! GetTags(word)
@@ -518,8 +518,8 @@ function! GetIncludeFiles(file)
   let incs = split(inclist, '\n')
   call remove(incs, 0)
   call filter(incs, { idx, val -> val !~ '-->$' })
-  call filter(incs, { idx, val -> val !~ ')$' })  " '(Šù‚É—ñ‹“)'s‚ğíœ
-  call filter(incs, { idx, val -> val !~ '"\f\+"' })  " 'Œ©‚Â‚©‚è‚Ü‚¹‚ñ's‚ğíœ
+  call filter(incs, { idx, val -> val !~ ')$' })  " '(æ—¢ã«åˆ—æŒ™)'è¡Œã‚’å‰Šé™¤
+  call filter(incs, { idx, val -> val !~ '"\f\+"' })  " 'è¦‹ã¤ã‹ã‚Šã¾ã›ã‚“'è¡Œã‚’å‰Šé™¤
   "PrettyPrint incs
 
   return incs
@@ -531,7 +531,7 @@ function! TTTT(word, mode)
   let taglist = taglist(a:word)
   "PrettyPrint taglist
 
-  " ƒ^ƒO‚ª1‚Â‚È‚ç‚»‚ê
+  " ã‚¿ã‚°ãŒ1ã¤ãªã‚‰ãã‚Œ
   if len(taglist) == 1
     "return v:false
     exe 'tag' a:word
@@ -543,7 +543,7 @@ function! TTTT(word, mode)
 
   let t_file = range(len(taglist))
 
-  " “à•”ƒ^ƒO‚ª‚ ‚ê‚Î‚»‚êi“à•”ƒ^ƒO•¡”‚Í‚È‚¢‘z’èj
+  " å†…éƒ¨ã‚¿ã‚°ãŒã‚ã‚Œã°ãã‚Œï¼ˆå†…éƒ¨ã‚¿ã‚°è¤‡æ•°ã¯ãªã„æƒ³å®šï¼‰
   let cur_file = expand('%:p')
   for i in range(len(taglist))
     let t_file = fnamemodify(taglist[i]['filename'], ':p')
@@ -557,7 +557,7 @@ function! TTTT(word, mode)
     "echo i
   endfor
 
-  "   IncludeFiles‚É‘Î‚µ‚Ä
+  "   IncludeFilesã«å¯¾ã—ã¦
   let incs = GetIncludeFiles(expand('%f'))
 
   for i in range(len(taglist))
@@ -629,16 +629,16 @@ function! TTTT(word, mode)
     let cmd_tag = cmd_tselect
   endif
 
-  " ƒ^ƒO‚ª1‚Â‚È‚ç‚»‚ê
+  " ã‚¿ã‚°ãŒ1ã¤ãªã‚‰ãã‚Œ
   if len(taglist) == 1
     "return v:false
     exe cmd_tag a:word
     return v:true
   endif
 
-  " “à•”ƒ^ƒO‚ª‚ ‚ê‚Î‚»‚êi“à•”ƒ^ƒO•¡”‚Í‚È‚¢‘z’èj
+  " å†…éƒ¨ã‚¿ã‚°ãŒã‚ã‚Œã°ãã‚Œï¼ˆå†…éƒ¨ã‚¿ã‚°è¤‡æ•°ã¯ãªã„æƒ³å®šï¼‰
   let cur_file = expand('%:p')
-  " ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‘Š‘Î‚É‚µ‚È‚¢‚ÆActags‚ÆDOS‚ÅƒpƒX‚ÌŒ`®‚ªˆÙ‚È‚éB
+  " ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªç›¸å¯¾ã«ã—ãªã„ã¨ã€ctagsã¨DOSã§ãƒ‘ã‚¹ã®å½¢å¼ãŒç•°ãªã‚‹ã€‚
   let cur_file = fnamemodify(cur_file, ':.')
 
   for i in range(len(taglist))
@@ -658,7 +658,7 @@ function! TTTT(word, mode)
     "echo i
   endfor
 
-  "   IncludeFiles‚É‘Î‚µ‚Ä
+  "   IncludeFilesã«å¯¾ã—ã¦
 
   "let dir = GetPrjRoot()
   "exe 'cd ' . dir

@@ -1,3 +1,10 @@
+ToDo
+    qf.vim
+    gvimrc
+    try/
+    cax.vim
+    impauto を分ける
+
 
 
 

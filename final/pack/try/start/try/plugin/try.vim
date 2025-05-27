@@ -707,6 +707,13 @@ augroup end
 
 #---------------------------------------------------------------------------------------------
 
+nnoremap <Leader><C-E> 0y$o<C-R>=<C-R>"<CR><Esc>
+com! Calc normal! 0y$o<C-R>=<C-R>"<CR><Esc>
+
+nnoremap <Leader><C-X> <Cmd>Calc<CR>
+nnoremap <Leader><C-E> <Cmd>Calc<CR>
+inoremap <C-X><CR>     <Esc><Cmd>Calc<CR>
+
 
 
 #---------------------------------------------------------------------------------------------
