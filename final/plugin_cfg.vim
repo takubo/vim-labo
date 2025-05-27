@@ -22,18 +22,18 @@ com! CleverfUseMigemoToggle {
       }
 
 
-# ”CˆÓ‚Ì‹L†‚Éƒ}ƒbƒ`‚·‚é•¶š‚ğİ’è‚·‚é
+# ä»»æ„ã®è¨˜å·ã«ãƒãƒƒãƒã™ã‚‹æ–‡å­—ã‚’è¨­å®šã™ã‚‹
 g:clever_f_chars_match_any_signs = "\<BS>"
 
-# ‰ß‹‚Ì“ü—Í‚ÌÄ—˜—p
+# éå»ã®å…¥åŠ›ã®å†åˆ©ç”¨
 g:clever_f_repeat_last_char_inputs = ["\<CR>"]  # ["\<CR>", "\<Tab>"]
 
 
-# f‚Í•K‚¸‰E•ûŒü‚ÉˆÚ“®CF‚Í•K‚¸¶•ûŒü‚ÉˆÚ“®‚·‚é
+# fã¯å¿…ãšå³æ–¹å‘ã«ç§»å‹•ï¼ŒFã¯å¿…ãšå·¦æ–¹å‘ã«ç§»å‹•ã™ã‚‹
 g:clever_f_fix_key_direction = 1
 
 
-# ƒ^ƒCƒ€ƒAƒEƒg
+# ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆ
 g:clever_f_timeout_ms = 3000
 
 
@@ -56,11 +56,11 @@ g:clever_f_mark_char_color   = 'My_cleverf_Char'
 g:clever_f_mark_cursor = 1
 g:clever_f_mark_char = 1
 
-# clever-f‚ªd‚¢ê‡A
+# clever-fãŒé‡ã„å ´åˆã€
 #   g:clever_f_mark_char = 0
-# ‚Æ‚·‚é‚©A
+# ã¨ã™ã‚‹ã‹ã€
 #   g:clever_f_use_migemo = 0
-# ‚Æ‚·‚é‚©‚·‚ê‚ÎAd‚¢‚Ì‚ª‰ğÁ‚³‚ê‚éB
+# ã¨ã™ã‚‹ã‹ã™ã‚Œã°ã€é‡ã„ã®ãŒè§£æ¶ˆã•ã‚Œã‚‹ã€‚
 
 
 
@@ -100,10 +100,10 @@ endif
 #---------------------------------------------------------------------------------------------
 
 if exists('*smartchr#one_of') && 0
-  # TODO s––
+  # TODO è¡Œæœ«
   inoremap <expr> , smartchr#one_of(', ', ',')
 
-  # ‰‰Zq‚ÌŠÔ‚É‹ó”’‚ğ“ü‚ê‚é
+  # æ¼”ç®—å­ã®é–“ã«ç©ºç™½ã‚’å…¥ã‚Œã‚‹
   inoremap <expr> + smartchr#one_of(' = ', ' == ', '=')
   inoremap <expr> + smartchr#one_of(' + ', '++', '+')
   inoremap <expr> - smartchr#one_of(' - ', '--', '-')
@@ -114,7 +114,7 @@ if exists('*smartchr#one_of') && 0
   inoremap <expr> <Bar> smartchr#one_of(' <Bar> ', ' <Bar><Bar> ', '<Bar>')
 
   if &filetype == "c"
-    # ‰º‹L‚Ì•¶š‚Í˜A‘±‚µ‚ÄŒ»‚ê‚é‚±‚Æ‚ª‚Ü‚ê‚È‚Ì‚ÅA“ñ‰ñ‘±‚¯‚Ä“ü—Í‚µ‚½‚ç‰üs‚·‚é
+    # ä¸‹è¨˜ã®æ–‡å­—ã¯é€£ç¶šã—ã¦ç¾ã‚Œã‚‹ã“ã¨ãŒã¾ã‚Œãªã®ã§ã€äºŒå›ç¶šã‘ã¦å…¥åŠ›ã—ãŸã‚‰æ”¹è¡Œã™ã‚‹
     inoremap <buffer><expr> } smartchr#one_of('}', '}<cr>')
     inoremap <buffer><expr> ; smartchr#one_of(';', ';<cr>')
   endif
