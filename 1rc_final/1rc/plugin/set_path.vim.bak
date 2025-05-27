@@ -19,8 +19,41 @@ var PrjRootFile = '.git'
 
 import autoload 'get_project_root.vim' as gpr
 
+# def GetPrjRoot(): string
+#   # PrjRootFileをディレクトリとして探索
+#   const prj_root_dir_path = finddir(PrjRootFile, '.;')
+#   if prj_root_dir_path != ''
+#     return (prj_root_dir_path  .. '/..') -> fnamemodify(':p')
+#   endif
+# 
+#   # PrjRootFileをファイルとして探索
+#   const prj_root_file_path = findfile(PrjRootFile, '.;')
+#   # prj_root_file_pathが空文字列のとき、カレントディレクトリのフルパスとなる。
+#   return prj_root_file_path -> fnamemodify(':p:h')
+# enddef
+
+
+ # TODO スペースをエスケープ
+ # TODO コンマをエスケープ
+def GetPrjRootPath_0(): string
+  const prj_root = gpr.GetPrjRoot() -> substitute('.\zs/$', '', '')  # (PrejectのRootではなく、)本物のroot dirでないとき、末尾の'/'を削除する。
+
+  return prj_root == '' ?  '' : (prj_root .. '/**' .. ',')
+enddef
+
+def GetPrjRootPath_1(): string
+  const prj_root = gpr.GetPrjRoot()
+
+  # 本当のルート・ディレクトリ(Projectのルートではない)でないとき、末尾の'/'を削除する。
+  if prj_root != '/'
+    prj_root = prj_root -> substitute('/$', '', '')
+  endif
+
+  return prj_root == '' ?  '' : (prj_root .. '/**' .. ',')
+enddef
+
 def GetPrjRootPath(): string
-  var prj_root = gpr.GetPrjRoot()
+  const prj_root = gpr.GetPrjRoot()
 
   if prj_root != ''
     return ''
@@ -34,6 +67,7 @@ def GetPrjRootPath(): string
   # これにより、'dir/to/path/**,' のような文字列が返る。
   return prj_root .. '**,'
 enddef
+
 
 def GetIncludePath(): string
   return ''
@@ -51,9 +85,9 @@ com! -bang -bar -nargs=0 SetPath {
       echo &l:path
     }
 
-com! -bang -bar -nargs=0 ResetPath SetPath<bang>
+com! -bang -bar -nargs=0 ResetPath SetpathSilent<bang> | echo &l:path
 
-com! -bang -bar -nargs=0 SetpathForce ResetPath!
+com! -bang -bar -nargs=0 SetpathForce ResetPath<bang>
 
 
 #---------------------------------------------------------------------------------------------
