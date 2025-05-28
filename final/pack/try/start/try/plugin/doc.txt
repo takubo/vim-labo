@@ -5,6 +5,7 @@ ToDo
     cax.vim
     impauto を分ける
 
+    window.vimのlambdaがロード時に評価される
 
 
 
