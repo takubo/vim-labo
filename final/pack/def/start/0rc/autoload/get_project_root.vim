@@ -6,7 +6,9 @@ scriptencoding utf-8
 #---------------------------------------------------------------------------------------------
 # Initialize
 
-var PrjRootFile = '.git'
+if !exists('g:PrjRootFile')
+  g:PrjRootFile = '.git'
+endif
 
 
 #---------------------------------------------------------------------------------------------
@@ -32,13 +34,13 @@ var PrjRootFile = '.git'
 # # プロジェクトルートディレクトリが見つからないときは、カレントディレクトリ(絶対パス)を返す。
 export def GetPrjRoot(): string
   # PrjRootFileをディレクトリとして探索
-  const prj_root_dir_path = finddir(PrjRootFile, '.;')
+  const prj_root_dir_path = finddir(g:PrjRootFile, '.;')
   if prj_root_dir_path != ''
     return (prj_root_dir_path  .. '/..') -> fnamemodify(':p')
   endif
 
   # PrjRootFileをファイルとして探索
-  const prj_root_file_path = findfile(PrjRootFile, '.;')
+  const prj_root_file_path = findfile(g:PrjRootFile, '.;')
   # prj_root_file_pathが空文字列のとき、カレントディレクトリのフルパスとなる。
   return prj_root_file_path -> fnamemodify(':p:h')
 enddef

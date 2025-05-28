@@ -97,12 +97,10 @@ inoreab <silent> pptab const org_win_id = win_getid()  # save window<CR>win_goto
 inoreab <silent> ppbuf const org_buf_nr = bufnr()  # save buffer<CR>exe 'buffer' org_buf_nr     # restore buffer<C-R>=Eatchar('\s')<CR>
 
 
-# inoreab <silent> ppdef defer winrestview(winsaveview())     # restore win view<CR>defer win_gotoid(win_getid())        # restore window<CR>defer execute('buffer ' .. bufnr())  # restore buffer<C-R>=EatS()<CR>
-exe 'inoreab' '<silent>' 'ppdef'
-                            'defer winrestview(winsaveview())     # restore win view<CR>' ..
-                            'defer win_gotoid(win_getid())        # restore window<CR>' ..
-                            "defer execute('buffer ' .. bufnr())  # restore buffer<C-R>" ..
-                            '=EatS()<CR>'
+exe 'inoreab <silent> ppdef' 'defer winrestview(winsaveview())     # restore win view<CR>' ..
+                             'defer win_gotoid(win_getid())        # restore window<CR>' ..
+                             "defer execute('buffer ' .. bufnr())  # restore buffer<C-R>" ..
+                             '=EatS()<CR>'
 
 inoreab <silent> pdpos defer winrestview(winsaveview())  # restore win view
 inoreab <silent> pdwin defer win_gotoid(win_getid())  # resore window

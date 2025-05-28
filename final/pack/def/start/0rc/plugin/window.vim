@@ -110,7 +110,10 @@ enddef
 const OptimalHeightBuf        = (): dict<number> => {
   return {height: line('$') + 2, top_line: 1}  # 2に根拠はない。
 }
-const OptimalHeightFunction = (): dict<number> => {
+
+# TODO この下の関数をλにすると、ロード時に評価されて、PushPosが未定義のエラーになる。
+# TODO const OptimalHeightFunction = (): dict<number> => {
+def OptimalHeightFunction(): dict<number>
   # TODO normalに!を付けると、飛び先がおかしくなる。
   #const cur_line = line('.')
   PushPos
@@ -120,7 +123,7 @@ const OptimalHeightFunction = (): dict<number> => {
   const f_bot = line('.')
   PopPos
   return {height: f_bot - f_top + 2 + &l:scrolloff, top_line: max([f_top, 1])}  # 2に根拠はない。
-}
+enddef
 # const OptimalHeightBlock    = (): dict<number> => 10
 # const OptimalHeightIfBlock  = (): dict<number> => 10
 
@@ -134,7 +137,8 @@ def WindowResizeOptimalHeight(arg: dict<number>)
 enddef
 
 export const WindowResizeOptimalHeightBuf        = () => OptimalHeightBuf()->WindowResizeOptimalHeight()
-export const WindowResizeOptimalHeightFunction = () => OptimalHeightFunction()->WindowResizeOptimalHeight()
+# TODO この下の行を実行すると、OptimalHeightFunction()が評価されていまって、「PushPosが未定義エラー」となる。
+# TODO export const WindowResizeOptimalHeightFunction = () => OptimalHeightFunction()->WindowResizeOptimalHeight()
 # export const WindowResizeOptimalHeightBlock    = () => OptimalHeightBlock()->WindowResizeOptimalHeight()
 # export const WindowResizeOptimalHeightIfBlock  = () => OptimalHeightIfBlock()->WindowResizeOptimalHeight()
 

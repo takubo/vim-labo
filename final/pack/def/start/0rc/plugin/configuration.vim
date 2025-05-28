@@ -19,7 +19,7 @@ import autoload 'window_ratio.vim' as wr
 #const vimrc_path = $HOME .. (true || has('win32') ? '/vimfiles/vimrc' : '/.vimrc')
 const vimrc_path = $HOME .. (has('win32') ? '/vimfiles' : '/.vim') .. '/vimrc'
 const colors_dir = $HOME .. (has('win32') ? '/vimfiles' : '/.vim') .. '/pack/def/start/0rc/colors/'  # TODO
-const color_path = colors_dir .. g:colors_name .. '.vim'
+# TODO const color_path = colors_dir .. g:colors_name .. '.vim'
 
 
 def FileOpen(path: string, other_tab: bool = false)
@@ -56,7 +56,8 @@ enddef
 com! -bang -bar EditVIMRC FileOpen(vimrc_path, <bang>false)
 com! -bang -bar VIMRC EditVIMRC
 
-com! -bang -bar EditColor FileOpen(color_path, <bang>false)
+# TODO com! -bang -bar EditColor FileOpen(color_path, <bang>false)
+com! -bang -bar EditColor FileOpen(colors_dir .. g:colors_name .. '.vim', <bang>false)
 
 
 nnoremap <silent> <Leader>v <Cmd>EditVIMRC<CR>
