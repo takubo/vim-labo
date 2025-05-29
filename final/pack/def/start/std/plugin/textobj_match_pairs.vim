@@ -115,8 +115,10 @@ def MoveToMatchPairStart(): string
   #const re = right -> join('\|')
 
   # TODO
-  const le = left  -> join('\|') -> substitute('[', '\\[', '')
-  const re = right -> join('\|') -> substitute(']', '\\]', '')
+  #const le = left  -> join('\|') -> substitute('[', '\\[', '')
+  #const re = right -> join('\|') -> substitute(']', '\\]', '')
+  const le = '[' .. ( left  -> join('') -> substitute('[', '\\[', '') ) .. ']'
+  const re = '[' .. ( right -> join('') -> substitute(']', '\\]', '') ) .. ']'
 
   # TODO   後に "\zs" をつけるとよいかもしれない。するとカーソルがendの
   searchpairpos(le, '', re, 'bcW')        # カーソル移動
@@ -208,8 +210,10 @@ def g:MatchPair()
   const mps = &mps -> split(',\|:')
   const left  = mps -> copy() -> filter((k, _) => k % 2 == 0) # -> filter((k, _) => k != 2)
   const right = mps -> copy() -> filter((k, _) => k % 2 != 0) # -> filter((k, _) => k != 2)
-  const le = left  -> join('\|') -> substitute('[', '\\[', '')
-  const re = right -> join('\|') -> substitute(']', '\\]', '')
+  #const le = left  -> join('\|') -> substitute('[', '\\[', '')
+  #const re = right -> join('\|') -> substitute(']', '\\]', '')
+  const le = '[' .. ( left  -> join('') -> substitute('[', '\\[', '') ) .. ']'
+  const re = '[' .. ( right -> join('') -> substitute(']', '\\]', '') ) .. ']'
 
   echo le
   echo re
