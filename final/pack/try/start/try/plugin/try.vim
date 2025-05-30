@@ -542,6 +542,8 @@ inoremap <C-X><CR>     <Esc><Cmd>Calc<CR>
 
 #---------------------------------------------------------------------------------------------
 
+com! -nargs=1 -complete=file_in_path Find echo <q-args>
+com! -nargs=1 -complete=runtime Configure echo <q-args>
 
 
 #---------------------------------------------------------------------------------------------
