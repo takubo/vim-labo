@@ -22,7 +22,7 @@ import autoload 'get_project_root.vim' as gpr
 def GetPrjRootPath(): string
   var prj_root = gpr.GetPrjRoot()
 
-  if prj_root != ''
+  if prj_root == ''
     return ''
   endif
 

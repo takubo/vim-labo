@@ -3,6 +3,9 @@ vim9script
 scriptencoding utf-8
 
 
+import autoload "popup_info.vim" as pui
+
+
 def VimSaveAndExe(force: bool = false)
   if bufname('') == ''
     pwd
@@ -18,13 +21,16 @@ def VimSaveAndExe(force: bool = false)
 
     if dir -> match('[/\\]colors$') >= 0
       exe 'colorscheme' expand('%:r')
-      PopUpInfo ColorScheme!!
+      # PopUpInfo ColorScheme!!
+      pui.PopUpInfo('ColorScheme!!', 2500)
     elseif dir -> match('[/\\]ftplugin$') == -1 || expand('%') == 'vim.vim'
     # ftpluginなら、実行しない。
       exe 'source' expand('%')
-      PopUpInfo Source!!
+      # PopUpInfo Source!!
+      pui.PopUpInfo('Source!!', 2500)
     else
-      PopUpInfo None!!
+      # PopUpInfo None!!
+      pui.PopUpInfo('Source!!', 2500)
     endif
 
     #PopUpInfo Execute!!
