@@ -8,11 +8,27 @@ scriptencoding utf-8
 #---------------------------------------------------------------------------------------------
 
 
-augroup MyVimrc_QickFix
+augroup Qf_AutoWinOpen
   au!
   # grepする際に'|cwindow'を付けなくても、Quickfixに結果を表示する
   au QuickfixCmdPost make,grep,grepadd,vimgrep,helpgrep,cbuffer,cfile exe 'botright cwindow ' .. (&lines / 4)
   au QuickfixCmdPost lmake,lgrep,lgrepadd,lvimgrep,lhelpgrep,lcbuffer,lcfile exe 'lwindow ' .. (winheight(0) / 4)
+augroup end
+
+
+augroup Qf_AutoChDir
+  au!
+
+  # QFコマンド実行時のcwdをcontextへ保存。
+  au QuickfixCmdPost * setqflist([], 'r', {'context': getcwd()})
+
+  # DelEntry, UndoEntryも、これで対応。
+  # copenなどで、再度開いたとき用。
+  au WinEnter * {
+                  if (&buftype == 'quickfix')
+                    chdir(getqflist({'context': 0}).context)
+                  endif
+                }
 augroup end
 
 
