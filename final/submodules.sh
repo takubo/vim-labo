@@ -89,13 +89,13 @@ cat <<- 'EOF' | sed '/^\s*#/d; /^$/d' | cat > submodules
 	reg/start    bkad/CamelCaseMotion
 	reg/start    takubo/mru.vim
 	reg/start    takubo/BlockDiff
+	reg/start    troydm/easybuffer.vim
 
 	ext/start    thinca/vim-prettyprint
 	ext/start    takubo/undotree
 	ext/start    kien/rainbow_parentheses.vim
 
 	# try/opt    takubo/comfortable-motion.vim
-  # try/opt  X troydm/easybuffer.vim
 	# try/opt    snippets
 	# try/opt    Surround
 	# try/opt    Tagbar
