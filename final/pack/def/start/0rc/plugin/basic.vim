@@ -109,17 +109,32 @@ com! -bar SwitchLineNumber SwitchLineNumber()  # TODO
 
 
 #---------------------------------------------------------------------------------------------
+# Cmdline Wndow
+#---------------------------------------------------------------------------------------------
+
+augroup My_CmdwinEnter
+  au!
+  au VimEnter,VimResized * &cmdwinheight = max([8, &lines / 2])
+augroup end
+
+nnoremap <C-Q>?     q?
+nnoremap <C-Q>/     q/
+nnoremap <C-Q>;     q:
+nnoremap <C-Q><C-Q> q:
+
+
+#---------------------------------------------------------------------------------------------
 # 空行の挿入
 #---------------------------------------------------------------------------------------------
 
 if 0
 
-nnoremap <C-O> O<Esc>
+  nnoremap <C-O> O<Esc>
 
-# TODO
-nnoremap go o<Esc>
-nnoremap gO O<Esc>
-#nnoremap <silent> <C-o> :<C-u>call append(expand('.'), '')<CR>j
+  # TODO
+  nnoremap go o<Esc>
+  nnoremap gO O<Esc>
+  #nnoremap <silent> <C-o> :<C-u>call append(expand('.'), '')<CR>j
 
 endif
 
@@ -207,7 +222,7 @@ vnoremap <silent> aW <Plug>CamelCaseMotion_iw
 
 
 #---------------------------------------------------------------------------------------------
-# Short Cut
+# Change Option
 #---------------------------------------------------------------------------------------------
 
 nnoremap <silent> <Leader>r <Cmd>setl readonly!<CR>

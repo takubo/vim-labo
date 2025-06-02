@@ -3,6 +3,13 @@ vim9script
 scriptencoding utf-8
 
 
+#---------------------------------------------------------------------------------------------
+# Mapping
+
+
+#--------------------------------------------
+# バッファ切替
+
 # バッファ切替 (選択)
 nnoremap  <C-K> :<C-U>ls <CR>:b<Space>
 nnoremap g<C-K> :<C-U>ls!<CR>:b<Space>
@@ -12,7 +19,20 @@ nnoremap g<A-n> <Cmd>bnext<CR>
 nnoremap g<A-p> <Cmd>bprev<CR>
 
 
+#--------------------------------------------
+# バッファ削除
+
+# バッファ削除 (指定)
+nnoremap <Leader>z :<C-U>CloseBuffer<Space>
+nnoremap <Leader>Z :<C-U>CloseBuffer!<Space>
+
+# バッファ削除 (選択)
+nnoremap <Leader><C-K> :<C-U>ls <CR>:CloseBuffer<Space>
+
+
+#--------------------------------------------
 # バッファ切替 (無名バッファ)
+
 # バッファ切替 (無名バッファ, 変更あり)
 nnoremap         <A-p> <ScriptCmd>NextNonameBuf(-1, MODIFIED_ONLY)<CR>
 nnoremap         <A-n> <ScriptCmd>NextNonameBuf(+1, MODIFIED_ONLY)<CR>
@@ -23,16 +43,8 @@ nnoremap        g<A-n> <ScriptCmd>NextNonameBuf(+1, NO_MODIFIED_ONLY)<CR>
 nnoremap <Leader><A-p> <ScriptCmd>NextNonameBuf(-1, REGARDLESS_OF_MODIFY)<CR>
 nnoremap <Leader><A-n> <ScriptCmd>NextNonameBuf(+1, REGARDLESS_OF_MODIFY)<CR>
 
-# com! -bar -bang -nargs=0 NonameBufPrev NextNonameBuf(-1, '<bar>' == '!' ? REGARDLESS_OF_MODIFY : NO_MODIFIED_ONLY)
-# com! -bar -bang -nargs=0 NonameBufNext NextNonameBuf(+1, '<bar>' == '!' ? REGARDLESS_OF_MODIFY : NO_MODIFIED_ONLY)
-
-
-# バッファ削除 (指定)
-nnoremap <Leader>z :<C-U>CloseBuffer<Space>
-nnoremap <Leader>Z :<C-U>CloseBuffer!<Space>
-
-# バッファ削除 (選択)
-nnoremap <Leader><C-K> :<C-U>ls <CR>:CloseBuffer<Space>
+com! -bar -bang -nargs=0 NonameBufPrev NextNonameBuf(-1, '<bar>' == '!' ? REGARDLESS_OF_MODIFY : MODIFIED_ONLY)
+com! -bar -bang -nargs=0 NonameBufNext NextNonameBuf(+1, '<bar>' == '!' ? REGARDLESS_OF_MODIFY : MODIFIED_ONLY)
 
 
 #---------------------------------------------------------------------------------------------
@@ -48,9 +60,23 @@ com! -bang -nargs=* Buf {
 # EasyBuffer
 
 if 0
-  packadd EasyBuffer
-  nnoremap <silent> <C-K> :<Cmd>EasyBufferBotRight<CR><Cmd>OptimalWindowHeight<CR>
+  augroup My_EasyBuffer
+    au!
+    au VimEnter,VimResized * legacy let g:easybuffer_botright_height = max([8, &lines / 2 ])
+  augroup end
 endif
+
+com! -bang EzBuffer {
+                      const num_buf = getbufinfo({'buflisted': 1}) -> len()
+                      g:easybuffer_botright_height = min([
+                                                       max([8,       &lines / 3]),
+                                                       max([num_buf, &lines / 2])
+                                                     ])
+                      EasyBufferBotRight<bang>
+                    }
+
+nnoremap <silent> <Leader><C-K>  <Cmd>EzBuffer<CR>
+nnoremap <silent> <Leader>g<C-K> <Cmd>EzBuffer!<CR>
 
 
 #---------------------------------------------------------------------------------------------

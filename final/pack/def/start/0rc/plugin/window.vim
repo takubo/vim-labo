@@ -291,7 +291,7 @@ nnoremap q  <C-W>c
 # nnoremap gq <C-W>c
 
 # 補償
-nnoremap <C-Q> q
+# nnoremap <C-Q> q
 # <C-Q>: => q
 # <C-Q>: => q:
 # <C-Q>/ => q/
