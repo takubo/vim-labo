@@ -8,11 +8,11 @@ cd ./pack
 
 
 cat <<- 'EOF' | sed '/^\s*#/d; /^$/d' | cat > submodules
-	# def/start    tabubo/Battery
-	# def/start    tabubo/CursorJumped
-	# def/start    tabubo/EdgeMove BlockMove
-	# def/start    tabubo/Numbers
-	# def/start    tabubo/Axes
+	# ext/start    tabubo/Battery
+	# ext/start    tabubo/CursorJumped
+	# ext/start    tabubo/EdgeMove BlockMove
+	# ext/start    tabubo/numbers
+	# ext/start    tabubo/Axes
 
 	reg/start    vim-jp/vimdoc-ja
 	reg/start    takubo/vim-submode
@@ -23,9 +23,9 @@ cat <<- 'EOF' | sed '/^\s*#/d; /^$/d' | cat > submodules
 	reg/start    takubo/mru.vim
 	reg/start    takubo/BlockDiff
 	reg/start    troydm/easybuffer.vim
+	reg/start    thinca/vim-prettyprint
+	reg/start    takubo/undotree
 
-	try/start    thinca/vim-prettyprint
-	try/start    takubo/undotree
 	try/start    kien/rainbow_parentheses.vim
 
 	# try/opt    takubo/comfortable-motion.vim
