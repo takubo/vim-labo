@@ -14,7 +14,7 @@ scriptencoding utf-8
 # set complete=.,w,i,t,b,u
 set complete=.,i,t,w,b,u
 set completefuzzycollect=keyword  # TODO
-set completeopt=menuone,noselect  # ,fuzzy
+set completeopt=menuone,noselect  # TODO ,fuzzy ,nearest
 # set completeitemalign? TODO
 # set completepopup? TODO
 set pumheight=30
