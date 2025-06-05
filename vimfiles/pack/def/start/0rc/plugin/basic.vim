@@ -230,8 +230,9 @@ nnoremap <silent> <Leader>R <Cmd>exe 'setl' &l:modifiable ? 'readonly nomodifiab
 com! AR setl autoread!
 
 # is key word
-nnoremap <silent> + <Cmd>echo '++ ' <Bar> exe 'setl isk+=' .. GetKeyEcho()<CR>
-nnoremap <silent> - <Cmd>echo '-- ' <Bar> exe 'setl isk-=' .. GetKeyEcho()<CR>
+import autoload 'util_func.vim' as uf
+nnoremap <silent> + <ScriptCmd>echo '++ ' <Bar> exe 'setl isk+=' .. uf.GetKeyEcho()<CR>
+nnoremap <silent> - <ScriptCmd>echo '-- ' <Bar> exe 'setl isk-=' .. uf.GetKeyEcho()<CR>
 
 # scrollbind
 nnoremap <Leader>$ <Cmd>setl scrollbind!<CR>
