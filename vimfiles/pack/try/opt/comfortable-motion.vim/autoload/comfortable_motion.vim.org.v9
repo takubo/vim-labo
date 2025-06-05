@@ -1,0 +1,87 @@
+vim9script
+# vim: set ts=8 sts=2 sw=2 tw=0 et:
+scriptencoding utf-8
+
+#=============================================================================
+# File: comfortable_motion.vim
+# Author: Yuta Taniguchi
+# Created: 2016-10-02
+#=============================================================================
+
+
+# Default parameter values
+if !exists('g:comfortable_motion_interval')
+  g:comfortable_motion_interval = 1000.0 / 60
+endif
+if !exists('g:comfortable_motion_friction')
+  g:comfortable_motion_friction = 80.0
+endif
+if !exists('g:comfortable_motion_air_drag')
+  g:comfortable_motion_air_drag = 2.0
+endif
+if !exists('g:comfortable_motion_scroll_down_key')
+  g:comfortable_motion_scroll_down_key = "\<C-e>"
+endif
+if !exists('g:comfortable_motion_scroll_up_key')
+  g:comfortable_motion_scroll_up_key = "\<C-y>"
+endif
+
+# The state
+var comfortable_motion_state = {
+  'impulse': 0.0,
+  'velocity': 0.0,
+  'delta': 0.0,
+}
+
+var timer_id = -1
+
+
+def Tick(_: number)
+
+  var st = comfortable_motion_state  # This is just an alias for the global variable
+  if abs(st.velocity) >= 1 || st.impulse != 0 # short-circuit if velocity is less than one
+    const dt = g:comfortable_motion_interval / 1000.0  # Unit conversion: ms -> s
+
+    # Compute resistance forces
+    const vel_sign = st.velocity == 0
+      \            ? 0
+      \            : float2nr(st.velocity / abs(st.velocity)) # TODO
+    const friction = -vel_sign * g:comfortable_motion_friction * 1  # The mass is 1
+    const air_drag = -st.velocity * g:comfortable_motion_air_drag
+    const additional_force = friction + air_drag
+
+    # Update the state
+    st.delta += st.velocity * dt
+    st.velocity += st.impulse + (abs(additional_force * dt) > abs(st.velocity) ? -st.velocity : additional_force * dt)
+    st.impulse = 0.0
+
+    # Scroll
+    const int_delta = float2nr(st.delta >= 0 ? floor(st.delta) : ceil(st.delta))
+    st.delta -= int_delta + 0.0 # TODO
+    if int_delta > 0
+      execute "normal! " .. string(abs(int_delta)) .. g:comfortable_motion_scroll_down_key
+    elseif int_delta < 0
+      execute "normal! " .. string(abs(int_delta)) .. g:comfortable_motion_scroll_up_key
+    else
+      # Do nothing
+    endif
+    redraw
+  else
+    # Stop scrolling and the thread
+    st.velocity = 0.0
+    st.delta = 0.0
+    timer_stop(timer_id)
+    # TODO unlet s:timer_id
+    timer_id = -1
+  endif
+enddef
+
+export def Flick(impulse: float)
+#export def Flick(impulse: number)
+  if timer_id == -1
+    # There is no thread, start one
+    const interval = float2nr(round(g:comfortable_motion_interval))
+    timer_id = timer_start(interval, function("Tick"), {'repeat': -1})
+  endif
+  comfortable_motion_state.impulse += impulse
+enddef
