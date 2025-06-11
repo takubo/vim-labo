@@ -155,6 +155,34 @@ enddef
 # TestHexAddLeadingZero
 
 
+# 2進数に、4桁ごとにアンダースコアを挿入する
+def BinUnderscore(numstr: string): string
+  return numstr -> substitute('[01]\zs\ze\%([01]\{4\}\)\+$', '&_', 'g')
+enddef
+
+
+# 10進数に、4桁ごとにカンマを挿入する
+def DecimalComma(numstr: string): string
+  return numstr -> substitute('\d\zs\ze\%(\d\{3\}\)\+$', '&,', 'g')
+enddef
+
+
+# 16進数に、4桁ごとにアンダースコアを挿入する
+def HexUnderscore(numstr: string): string
+  return numstr -> substitute('\x\zs\ze\%(\x\{4\}\)\+$', '&_', 'g')
+enddef
+
+
+# 桁区切りを挿入する。
+def InsertSeparator(
+    numstr:  string,       # 変換対象文字列
+    sep:     string = '',  # 桁区切り文字(カンマやアンダースコアなど)
+    sep_dig: number = 4    # 桁区切り文字を何文字ごとに挿入するか
+  ): string
+  return numstr -> substitute(('\x\zs\ze\%(\x\{' .. sep_dig .. '\}\)\+$'), ('&' .. sep), 'g')
+enddef
+
+
 
 #----------------------------------------------------------------------------------------
 # I/F Functions
@@ -386,8 +414,8 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
 
   if base == 16
     hex = ana.numstr
-    dec = Hex2Dec(ana.numstr) -> substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g')
-    # dec = dec .. ' ' .. (dec->substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g'))
+    dec = Hex2Dec(ana.numstr) -> DecimalComma()
+    # dec = dec .. ' ' .. (dec->DecimalComma())
     bin = Hex2Bin_Disp(ana.numstr)
     byt = len(ana.numstr) / 2
     bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
@@ -396,8 +424,8 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
 
   elseif base == 10
     hex = Dec2Hex(ana.numstr)
-    dec = ana.numstr -> substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g')
-    # dec = dec .. ' ' .. (dec->substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g'))
+    dec = ana.numstr -> DecimalComma()
+    # dec = dec .. ' ' .. (dec->DecimalComma())
     bin = Hex2Bin_Disp(hex)
     byt = float2nr(ceil(len(hex) / 2.0))
     bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
@@ -406,8 +434,8 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
 
   elseif base == 2
     hex = Bin2Hex(ana.numstr)
-    dec = Hex2Dec(hex) -> substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g')
-    # dec = dec .. ' ' .. (dec->substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g'))
+    dec = Hex2Dec(hex) -> DecimalComma()
+    # dec = dec .. ' ' .. (dec->DecimalComma())
     bin = ana.numstr
     byt = float2nr(ceil(len(ana.numstr) / 8.0))
     bit = len(substitute(ana.numstr, '^0\+', '', ''))
@@ -480,14 +508,15 @@ export enum PREFIX
   MUST,
 endenum
 
+# 基数変換した文字列をクリップボードへコピーする。
 export def BaseChange(
-    to:      number,
-    arg_str: string = expand("<cword>"),
-    from:    number = 0,
-    prefix:  PREFIX = PREFIX.AUTO,
-    sep:     string = '',
-    sep_dig: number = 4,
-    zero_pad: bool = false,
+    to:      number,                      # 変換後基数
+    arg_str: string = expand("<cword>"),  # 変換対象文字列
+    from:    number = 0,                  # 変換元基数
+    sep:     string = '',                 # 桁区切り文字(カンマやアンダースコアなど) (空文字なら、桁区切りの挿入なし。)
+    sep_dig: number = 4,                  # 桁区切り文字を何文字ごとに挿入するか
+    zero_pad: bool = false,               # 先頭のゼロパディングを実施するか否か
+    prefix:  PREFIX = PREFIX.AUTO,        # 接頭辞(0xや0b)を付加するか
   ): string
 
   const str = (arg_str == '' ? expand("<cword>") : arg_str)
@@ -540,6 +569,10 @@ export def BaseChange(
   if (prefix == PREFIX.MUST) || ((prefix == PREFIX.AUTO) && (match(str, '^0[box]') != -1))
   else
     pfx_str = ''
+  endif
+
+  if sep != ''
+    num_str = num_str -> InsertSeparator(sep, sep_dig)
   endif
 
   const result = pfx_str .. pad_str .. num_str
