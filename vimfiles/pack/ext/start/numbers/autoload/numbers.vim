@@ -385,7 +385,9 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
   const base = ana.base
 
   if base == 16
-    dec = Hex2Dec(ana.numstr)
+    hex = ana.numstr
+    dec = Hex2Dec(ana.numstr) -> substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g')
+    # dec = dec .. ' ' .. (dec->substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g'))
     bin = Hex2Bin_Disp(ana.numstr)
     byt = len(ana.numstr) / 2
     bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
@@ -394,6 +396,8 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
 
   elseif base == 10
     hex = Dec2Hex(ana.numstr)
+    dec = ana.numstr -> substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g')
+    # dec = dec .. ' ' .. (dec->substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g'))
     bin = Hex2Bin_Disp(hex)
     byt = float2nr(ceil(len(hex) / 2.0))
     bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
@@ -402,7 +406,9 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
 
   elseif base == 2
     hex = Bin2Hex(ana.numstr)
-    dec = Hex2Dec(hex)
+    dec = Hex2Dec(hex) -> substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g')
+    # dec = dec .. ' ' .. (dec->substitute('\d\zs\ze\(\d\{3\}\)\+$', '&,', 'g'))
+    bin = ana.numstr
     byt = float2nr(ceil(len(ana.numstr) / 8.0))
     bit = len(substitute(ana.numstr, '^0\+', '', ''))
 
@@ -422,12 +428,12 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
     var mask:     list<list<number>> = []
     var num_line: number             = 1
 
-    if base !=  2 | MakePopupContents(' [Bin] '   .. bin, lines, mask, num_line) | num_line += 1 | endif
-    if base != 16 | MakePopupContents(' [Hex] 0x' .. hex, lines, mask, num_line) | num_line += 1 | endif
-    if base != 10 | MakePopupContents(' [Dec] '   .. dec, lines, mask, num_line) | num_line += 1 | endif
-                    MakePopupContents(' [byt] '   .. byt, lines, mask, num_line) | num_line += 1
-                    MakePopupContents(' [Bit] '   .. bit, lines, mask, num_line) | num_line += 1
-                    MakePopupContents(' [Len] '   .. dig, lines, mask, num_line) | num_line += 1
+    if true || base !=  2 | MakePopupContents(' [Bin] '   .. bin, lines, mask, num_line) | num_line += 1 | endif
+    if true || base != 10 | MakePopupContents(' [Dec] '   .. dec, lines, mask, num_line) | num_line += 1 | endif
+    if true || base != 16 | MakePopupContents(' [Hex] 0x' .. hex, lines, mask, num_line) | num_line += 1 | endif
+                            MakePopupContents(' [Byt] '   .. byt, lines, mask, num_line) | num_line += 1
+                            MakePopupContents(' [Bit] '   .. bit, lines, mask, num_line) | num_line += 1
+                            MakePopupContents(' [Len] '   .. dig, lines, mask, num_line) | num_line += 1
 
     #-------------------------------------------
     # Show PopUp Window
