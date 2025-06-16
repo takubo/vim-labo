@@ -355,7 +355,7 @@ export def NumbersAutoToggle(auto_mode: AUTO_MODE)
     endif
 
     # if NumbersAuto != AUTO_MODE.POPUP
-    #   popup_close(S_win_id)
+    #   popup_close(PopWinId)
     # endif
   augroup end
 enddef
@@ -389,9 +389,9 @@ augroup end
 #--------------------------------------------
 # PopUp
 
-var S_win_id = 0
+var PopWinId = 0
 
-# Unified CRのために、結果を返す。
+# PopUpで、数字情報を表示する。
 export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 4000): bool
   #-------------------------------------------
   # Analize
@@ -446,7 +446,7 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
     now_disp = false
   endif
 
-  # popup_close(S_win_id)
+  # popup_close(PopWinId)
 
   if now_disp
     #-------------------------------------------
@@ -466,7 +466,7 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
     #-------------------------------------------
     # Show PopUp Window
 
-    S_win_id = popup_create(lines, {
+    PopWinId = popup_create(lines, {
              #line: 'cursor+2',
               line: 'cursor+3',
               col: 'cursor',
@@ -495,6 +495,18 @@ def MakePopupContents(line: string, lines: list<string>, mask: list<list<number>
     lines -> add(line)
     mask  -> add([strdisplaywidth(line) + 2, -1, num_line, num_line])
 enddef
+
+
+# 数字情報のPopUpをクローズする。
+export def NumberDisplayPopupClose()
+  popup_close(PopWinId)
+enddef
+
+
+augroup EscEscSearch
+  au!
+  au User EscEsc NumberDisplayPopupClose()
+augroup end
 
 
 
