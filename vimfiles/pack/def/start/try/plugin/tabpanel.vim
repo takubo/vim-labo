@@ -28,6 +28,7 @@ def g:TabPanel_cur_only(): string
     .. "\n" ..  printf('[ %d ]', g:actual_curtabpage)
     .. "\n" ..  line('.') # getcurpos()
 
+
     .. "\n" .. ''
     .. "\n" .. ''
     .. "\n" .. ''
@@ -40,6 +41,31 @@ def g:TabPanel_cur_only(): string
    #.. "\n" .. '@@                  @@@@'
    #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
    #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+
+
+ #const sinc = sins -> mapnew((_, v) => repeat('*', 12 + float2nr(v * 10))) -> join("\n") .. "\n"
+ #const sinc = sins -> mapnew((_, v) => repeat('*', abs(float2nr(v * 20)))) -> join("\n") .. "\n"
+ #cont ..= sinc
+
+
+  const grfs = range(30) -> mapnew((_, v) => repeat('*', float2nr(20 * rand() / pow(2, 32)))) -> join("\n") .. "\n"
+ #cont ..= grfs
+
+
+  cont ..=
+       "\n" .. ''
+    .. "\n" .. ''
+    .. "\n" .. ''
+    .. "\n" .. ''
+   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+   #.. "\n" .. '@@                  @@@@'
+   #.. "\n" .. '@@                    @@'
+   #.. "\n" .. '@@                    @@'
+   #.. "\n" .. '@@                  @@@@'
+   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+
 
   const conts = split(cont, "\n", 1) -> map((_, v) => '%#tabpanel#' .. v)
 
@@ -82,7 +108,7 @@ set tabpanel=%!g:TabPanel_cur_only()
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 const PI = atan2(0, -1) * 2
-const tic = 5
+const tic = 9  # 5
 const sins = range(360 / tic) -> map((_, v) => sin(v * tic * PI / 360))
 # echo sins
 #const sinb = range(15) -> map((_, v) => sin(v * 24 * 3.141592 * 2 / 360)) -> map((_, v) => repeat('*', float2nr(v * 200)))
