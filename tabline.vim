@@ -116,8 +116,15 @@ def! g:TabLine(): string
   enddef
 
   # --------------------------------------------------------
+  #  TabPanel Width
+  def TabPanelWidth(): number
+    const columns = matchstr(&tabpanelopt, 'columns:\zs\d\+')
+    return columns == '' ? 20 : str2nr(columns)
+  enddef
+
+  # --------------------------------------------------------
   # Calculate Tab Label Space
-  const win_width = &columns
+  const win_width = &columns - TabPanelWidth()
   const l_width = DispWidth(left)
   const r_width = DispWidth(right)
   const label_space = win_width - l_width - r_width
@@ -278,13 +285,10 @@ def SwitchTabline(...args: list<string>)
     return
   endif
 
-  # TODO foreach
-  args->mapnew((_, val) => {
-    TablineContentsSwitch[val] = !TablineContentsSwitch[val]
-    return 0
-  })
+  args -> foreach((_, val) => TablineContentsSwitch[val] = !TablineContentsSwitch[val])
 
   redrawtabline
+
   SetTimer(true)
 enddef
 
