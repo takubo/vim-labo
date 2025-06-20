@@ -74,10 +74,29 @@ def g:TabPanel_cur_only(): string
  #return '\b%#tabpanel#'
 enddef
 
+def g:TabPanel_cur_only_over_test(): string
+  # set line=102 cmdheight=2
+  const t = g:actual_curtabpage
+  const l = (&lines - 2)
+  const ADD = 0
+  # const sta = ((t - 1) * l) + ((t - 1) * 2) + 1 + 1
+  const sta = line('w0')
+  const end = sta + l - &cmdheight - 1 + ADD
+  var cont =    printf('[ %d ]', g:actual_curtabpage)
+  #.. ( range(2, 100) -> map((_, v) => "\n" .. v) -> join(''))
+  .. ( range(sta, end) -> map((_, v) => "\n" .. v) -> join(''))
+  #.. repeat("\n$", 98 + 98)
+
+  const conts = split(cont, "\n", 1) -> map((_, v) => '%#tabpanel#' .. v)
+
+  return join(conts, "\n") .. "\n" .. '%#StlGoldLeaf#            [Footer]'
+enddef
+
 set tabpanel=%{g:actual_curtabpage}
 set tabpanel=%!g:TabPanel()
 set tabpanel=%!g:TabPanel_last_only()
 set tabpanel=%!g:TabPanel_cur_only()
+set tabpanel=%!g:TabPanel_cur_only_over_test()
 
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
