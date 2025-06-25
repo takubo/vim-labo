@@ -448,7 +448,7 @@ set history=10000  # 最大値
 # TODO set wildchar=<Tab>
 # TODO set wildcharm
 set wildmode=full
-set wildoptions=fuzzy,pum,tagfile  # TODO options コマンドで出て来なかった。 TODO fuzzyの有効か？tagfileの効果もよくわからない。
+set wildoptions=pum,tagfile  # TODO options コマンドで出て来なかった。 TODO fuzzyの有効か？tagfileの効果もよくわからない。 fuzzy,
 # TODO set suffixes
 # TODO set suffixesadd
 set wildignore+=**/.git/**,**/.svn/**,*.o,*.obj,*.exe
