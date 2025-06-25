@@ -16,19 +16,20 @@ augroup Qf_AutoWinOpen
 augroup end
 
 
-augroup Qf_AutoChDir
+#augroup Qf_AutoChDir
+augroup Qf_AutoChDir_1
   au!
 
   # QFコマンド実行時のcwdをcontextへ保存。
   au QuickfixCmdPost * setqflist([], 'r', {'context': getcwd()})
 
-  # DelEntry, UndoEntryも、これで対応。
-  # copenなどで、再度開いたとき用。
-  au WinEnter * {
-                  if (&buftype == 'quickfix')
-                    chdir(getqflist({'context': 0}).context)
-                  endif
-                }
+  # # DelEntry, UndoEntryも、これで対応。
+  # # copenなどで、再度開いたとき用。
+  # au WinEnter * {
+  #                 if (&buftype == 'quickfix')
+  #                   chdir(getqflist({'context': 0}).context)
+  #                 endif
+  #               }
 augroup end
 
 

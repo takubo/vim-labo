@@ -4,51 +4,64 @@ scriptencoding utf-8
 
 
 if exists("b:did_ftplugin")
-  finish
+  #finish
 endif
 
 # Don't load another plugin for this buffer
 b:did_ftplugin = 1
-
-b:undo_ftplugin = "set stl<"
 
 
 
 #---------------------------------------------------------------------------------------------
 # Statusline
 
+b:undo_ftplugin = "set stl<"
+
 # Display the command that produced the list in the quickfix window:
 #setlocal stl=%t%{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}\ %#StlFill#%=%##\ %-15(%3l,\ %3c%3V%)\ %P\ 
 #let &l:stl = " %t %#StlGoldChar# [%{exists('w:quickfix_title')? w:quickfix_title : ''}] %#StlFill#%=%## %-15(%3l, %3c%3V%) %p%% %P [%4L] "
 
 def g:QfStl(): string
+  # Obtain Quick Fix Properties
   const prop = getqflist({'all': 0})
 
   var stl = ''
 
+  # Title
  #stl ..= " %t %#StlGoldChar# [%{exists('w:quickfix_title')? w:quickfix_title : ''}] "
   stl ..= " %t %#StlGoldChar# [ " .. prop.title .. " ] "
 
-  stl ..= ' %7(cur:' .. prop.idx .. '%) '
+  # Current Selected Element
+  stl ..= ' %7(cur:' .. prop.idx .. '%)'
+  # Current Select Element Percent
+  stl ..= ' %-8((' .. printf('%.1f', prop.idx * 100.0 / prop.size) .. '%%)%) '
+  # Total Number of Element
   stl ..= ' %10(total:' .. prop.size .. '%) '
 
-  stl ..= '%8((' .. printf('%.1f', prop.idx * 100.0 / prop.size) .. '%%)%) '
 
+  # Separator
   stl ..= '%<'
 
+  # QfList Number of Change
   stl ..= ' changedtick:' .. prop.changedtick .. ' '
 
+  # Selected QfList
  #stl ..= ' 《stack:' .. prop.nr .. '》 '
  #stl ..= ' ' .. getqflist({'nr': '$'}).nr .. ' '
   const stack_max = getqflist({'nr': '$'}).nr
  #stl ..= ' 《stack:' .. prop.nr .. '/' .. stack_max .. '》 '
   stl ..= ' 《stack:' .. (stack_max - prop.nr + 1) .. '/' .. stack_max .. '》 '
 
+  # Saved Directory
   stl ..= '%#StlNoNameDir# ' .. prop.context .. ' '
 
+  # Current Directory
   stl ..= '%#StlNoNameDir# ' .. getcwd() .. ' '
 
+  # Separator
   stl ..= "%#StlGoldChar#%="
+
+  # Line Column(bytes) Column(screen) Line-percnt Screen-percnt Total-lines
  #stl ..= "%## %-15(%3l, %3c%3V%) %3p%% %4P [%4L] "
   stl ..= "%#StlGoldChar# %-15(%3l, %3c%3V%) %## %3p%% %4P [%4L] "
 
@@ -152,3 +165,15 @@ enddef
 
 
 # TODO Locationlist
+
+
+#---------------------------------------------------------------------------------------------
+# Auto Change Directory
+
+augroup Qf_AutoChDir_2
+  au!
+
+  # DelEntry, UndoEntryも、これで対応。
+  # copenなどで、再度開いたとき用。
+  au WinEnter <buffer> chdir(getqflist({'context': 0}).context)
+augroup end

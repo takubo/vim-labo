@@ -55,7 +55,10 @@ def GGrep(word: string, path: string = '', add: bool = false, location_list: boo
   # echo cmd
 
   # noautocmdを付加しないと、Quickfixの結果パスが、意図したディレクトリ(PrrRoot)にならない。
-  exe 'noautocmd' cmd
+  #exe 'noautocmd' cmd
+  #setqflist([], 'r', {'context': getcwd()})  # au QuickfixCmdPost を抑制しているため。
+
+  exe cmd
 
   # noautocmdしているので、自分で開く必要がある。
   if location_list
