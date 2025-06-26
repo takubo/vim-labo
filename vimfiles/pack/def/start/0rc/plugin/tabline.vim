@@ -118,6 +118,10 @@ def! g:TabLine(): string
   # --------------------------------------------------------
   #  TabPanel Width
   def TabPanelWidth(): number
+    if &showtabpanel == 0 # || (&showtabpanel == 1 && tabpagenr('$') <= 1)
+      return 0
+    endif
+
     const columns = matchstr(&tabpanelopt, 'columns:\zs\d\+')
     return columns == '' ? 20 : str2nr(columns)
   enddef
