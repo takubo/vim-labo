@@ -9,7 +9,7 @@ import autoload 'get_project_root.vim' as gpr
 #---------------------------------------------------------------------------------------------
 # Set Grep-Program
 
-set grepprg=git\ grep\ --no-color\ -I\ --line-number\ --no-index
+set grepprg=git\ grep\ --line-number\ --no-color\ -I\ --no-index
 # set grepprg=git\ grep\ --no-color\ -I\ --line-number
 
 # -aオプションは、バイナリファイルもテキストとして扱えるようにする。

@@ -220,7 +220,7 @@ nnoremap g<Space> <ScriptCmd>ToggleTypewriterScroll(false)<CR>
 #----------------------------------------------------------------------------------------
 # Virtual Edit
 #----------------------------------------------------------------------------------------
-nnoremap <expr> <Leader>L '<Cmd>set virtualedit' .. (&virtualedit =~# 'onemore' ? '-=' : '+=') .. 'onemore<CR><Cmd>set virtualedit<CR>'
+nnoremap <expr> <Leader>$ '<Cmd>set virtualedit' .. (&virtualedit =~# 'onemore' ? '-=' : '+=') .. 'onemore<CR><Cmd>set virtualedit<CR>'
 
 
 #----------------------------------------------------------------------------------------

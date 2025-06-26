@@ -13,13 +13,14 @@ b:did_ftplugin = 1
 
 
 #---------------------------------------------------------------------------------------------
+# Options
+
+setl norelativenumber
+
+
+
+#---------------------------------------------------------------------------------------------
 # Statusline
-
-b:undo_ftplugin = "set stl<"
-
-# Display the command that produced the list in the quickfix window:
-#setlocal stl=%t%{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}\ %#StlFill#%=%##\ %-15(%3l,\ %3c%3V%)\ %P\ 
-#let &l:stl = " %t %#StlGoldChar# [%{exists('w:quickfix_title')? w:quickfix_title : ''}] %#StlFill#%=%## %-15(%3l, %3c%3V%) %p%% %P [%4L] "
 
 def g:QfStl(): string
   # Obtain Quick Fix Properties
@@ -28,42 +29,61 @@ def g:QfStl(): string
   var stl = ''
 
   # Title
- #stl ..= " %t %#StlGoldChar# [%{exists('w:quickfix_title')? w:quickfix_title : ''}] "
-  stl ..= " %t %#StlGoldChar# [ " .. prop.title .. " ] "
-
-  # Current Selected Element
-  stl ..= ' %7(cur:' .. prop.idx .. '%)'
-  # Current Select Element Percent
-  stl ..= ' %-8((' .. printf('%.1f', prop.idx * 100.0 / prop.size) .. '%%)%) '
-  # Total Number of Element
-  stl ..= ' %10(total:' .. prop.size .. '%) '
-
-
-  # Separator
-  stl ..= '%<'
-
-  # QfList Number of Change
-  stl ..= ' changedtick:' .. prop.changedtick .. ' '
-
-  # Selected QfList
- #stl ..= ' 《stack:' .. prop.nr .. '》 '
- #stl ..= ' ' .. getqflist({'nr': '$'}).nr .. ' '
-  const stack_max = getqflist({'nr': '$'}).nr
- #stl ..= ' 《stack:' .. prop.nr .. '/' .. stack_max .. '》 '
-  stl ..= ' 《stack:' .. (stack_max - prop.nr + 1) .. '/' .. stack_max .. '》 '
-
-  # Saved Directory
-  stl ..= '%#StlNoNameDir# ' .. prop.context .. ' '
-
-  # Current Directory
-  stl ..= '%#StlNoNameDir# ' .. getcwd() .. ' '
+  # Display the command that produced the list in the quickfix window:
+  const title = prop.title
+    -> substitute('^:git grep --line-number --no-color ', ':git grep ', '')
+    -> substitute(' -- :!..svn/ :!tags$', '', '')
+  stl ..= " %t "
+  stl ..= "%#StlGoldChar#"
+  stl ..= " [ " .. title .. " ] "
+  #       " %{exists('w:quickfix_title')? w:quickfix_title : ''} "
 
   # Separator
   stl ..= "%#StlGoldChar#%="
 
-  # Line Column(bytes) Column(screen) Line-percnt Screen-percnt Total-lines
- #stl ..= "%## %-15(%3l, %3c%3V%) %3p%% %4P [%4L] "
-  stl ..= "%#StlGoldChar# %-15(%3l, %3c%3V%) %## %3p%% %4P [%4L] "
+  #? # Current Selected Element
+  #? stl ..= ' %7(cur:' .. prop.idx .. '%)'
+  #? # Current Select Element Percent
+  #? stl ..= ' %-8((' .. printf('%.1f', prop.idx * 100.0 / prop.size) .. '%%)%) '
+  #? # Total Number of Element
+  #? stl ..= ' %10(total:' .. prop.size .. '%) '
+
+  #stl ..= '%#StlGoldChar#'
+  #stl ..= "%#StlGoldLeaf#"
+  stl ..= '%##'
+
+  # Selected QfList
+  const stack_max = getqflist({'nr': '$'}).nr
+  stl ..= '《list:%2(' .. (stack_max - prop.nr + 1) .. '%)/' .. stack_max .. '》'
+  # QfList Number of Change
+  stl ..= ' changed:' .. prop.changedtick .. ' '
+
+  # Element
+  # Current Select Element Percent
+  # Total Number of Element
+  const cur_elem = prop.idx
+  const max_elem = prop.size
+  const percent_elem = prop.idx * 100.0 / prop.size
+  stl ..= "%#StlGoldChar#"
+  stl ..= ' Elem:%3(' .. cur_elem .. '%) / %(' .. max_elem .. '%)'
+  stl ..= ' %8((' .. printf('%.1f', percent_elem) .. '%%)%) '
+
+  # Separator
+  stl ..= '%<'
+
+  # Saved Directory
+  stl ..= '%#StlNoNameDir# '
+  stl ..= prop.context .. '  '
+
+  # Current Directory
+  #stl ..= '%#StlNoNameDir# ' .. getcwd() .. ' '
+
+  # Separator
+  stl ..= "%#StlGoldChar#%="
+
+  # Line-percnt Screen-percnt Total-lines
+  stl ..= "%##"
+  stl ..= " %3p%% %4P [%4L] "
 
   return stl
 enddef
@@ -74,6 +94,7 @@ setlocal stl=%!QfStl()
 
 #---------------------------------------------------------------------------------------------
 # View
+
 nnoremap <buffer>      <CR> <CR><Cmd>CursorJumped<CR>
 nnoremap <buffer> <C-W><CR> <CR><Cmd>CursorJumped<CR>
 
@@ -111,7 +132,8 @@ endif
 
 #---------------------------------------------------------------------------------------------
 # History Stack
-# TODO LL未対応
+# TODO Locationlist未対応
+
 nnoremap <buffer> >> <Cmd>exe 'cnewer' v:count1<CR>
 nnoremap <buffer> << <Cmd>exe 'colder' v:count1<CR>
 nnoremap <buffer> == <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
@@ -164,7 +186,12 @@ def UndoEntry()
 enddef
 
 
-# TODO Locationlist
+
+#---------------------------------------------------------------------------------------------
+# TODO
+#
+#   Locationlist
+
 
 
 #---------------------------------------------------------------------------------------------
