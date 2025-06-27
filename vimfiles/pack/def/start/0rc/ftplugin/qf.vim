@@ -12,6 +12,23 @@ b:did_ftplugin = 1
 
 
 
+if exists("b:did_my_ftplugin")
+  #finish
+endif
+
+# Don't load another plugin for this buffer
+b:did_my_ftplugin = 1
+
+
+
+#---------------------------------------------------------------------------------------------
+# QuickFix or LocationList
+
+# QuickFixならtrue, LocationListならfalse
+b:QuickFix = (getloclist(winnr(), {'winid': 0}).winid == 0)
+
+
+
 #---------------------------------------------------------------------------------------------
 # Options
 
@@ -23,19 +40,20 @@ setl norelativenumber
 # Statusline
 
 def g:QfStl(): string
+  const GetList = getloclist(g:statusline_winid, {'winid': 0}).winid == 0 ?
+                  function('getqflist') :
+                  function('getloclist', [g:statusline_winid])
 
   # Obtain Quick Fix Properties
-  const prop = getloclist(g:statusline_winid, {'winid': 0}).winid == 0 ?
-               getqflist(          {'all': 0}) :
-               getloclist(g:statusline_winid, {'all': 0})
+  const prop = GetList({'all': 0})
 
   var stl = ''
 
   # Title
   # Display the command that produced the list in the quickfix window:
   const title = prop.title
-    -> substitute('^:git grep --line-number --no-color ', ':git grep ', '')
-    -> substitute(' -- :!..svn/ :!tags$', '', '')
+                -> substitute('^:git grep --line-number --no-color ', ':git grep ', '')
+                -> substitute(' -- :!..svn/ :!tags$', '', '')
   stl ..= " %t "
   stl ..= "%#StlGoldChar#"
   stl ..= " [ " .. title .. " ] "
@@ -44,32 +62,26 @@ def g:QfStl(): string
   # Separator
   stl ..= "%#StlGoldChar#%="
 
-  #? # Current Selected Element
-  #? stl ..= ' %7(cur:' .. prop.idx .. '%)'
-  #? # Current Select Element Percent
-  #? stl ..= ' %-8((' .. printf('%.1f', prop.idx * 100.0 / prop.size) .. '%%)%) '
-  #? # Total Number of Element
-  #? stl ..= ' %10(total:' .. prop.size .. '%) '
-
   #stl ..= '%#StlGoldChar#'
   #stl ..= "%#StlGoldLeaf#"
   stl ..= '%##'
 
   # Selected QfList
-  const stack_max = getqflist({'nr': '$'}).nr
+  const stack_max = GetList(         {'nr': '$'}).nr
   stl ..= '《list:%2(' .. (stack_max - prop.nr + 1) .. '%)/' .. stack_max .. '》'
   # QfList Number of Change
   stl ..= ' changed:' .. prop.changedtick .. ' '
 
   # Element
-  # Current Select Element Percent
+  # Current Select Element Number
   # Total Number of Element
-  const cur_elem = prop.idx
-  const max_elem = prop.size
-  const percent_elem = prop.idx * 100.0 / prop.size
+  # Current Select Element Percent
+  const elem_cur = prop.idx
+  const elem_max = prop.size
+  const elem_percent = prop.idx * 100.0 / prop.size
   stl ..= "%#StlGoldChar#"
-  stl ..= ' Elem:%3(' .. cur_elem .. '%) / %(' .. max_elem .. '%)'
-  stl ..= ' %8((' .. printf('%.1f', percent_elem) .. '%%)%) '
+  stl ..= ' Elem:%3(' .. elem_cur .. '%) / %(' .. elem_max .. '%)'
+  stl ..= ' %8((' .. printf('%.1f', elem_percent) .. '%%)%) '
 
   # Separator
   stl ..= '%<'
@@ -91,6 +103,7 @@ def g:QfStl(): string
   return stl
 enddef
 
+
 setlocal stl=%!QfStl()
 
 
@@ -98,8 +111,19 @@ setlocal stl=%!QfStl()
 #---------------------------------------------------------------------------------------------
 # View
 
-nnoremap <buffer>      <CR> <CR><Cmd>CursorJumped<CR>
-nnoremap <buffer> <C-W><CR> <CR><Cmd>CursorJumped<CR>
+nnoremap <buffer>      <CR> <Esc>:call <SID>CR()<CR>
+nnoremap <buffer> <C-W><CR> <Esc>:call <SID>CR()<CR>
+
+def CR()
+  if v:prevcount != 0
+    # jumplistに残すために、Gを使用。
+    histadd('cmd', v:prevcount .. '')
+    exe 'normal!' v:prevcount .. 'G'
+  else
+    exe "normal! \<CR>"
+  endif
+  CursorJumped
+enddef
 
 
 
@@ -118,8 +142,13 @@ nnoremap <buffer> r   <CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>
 
 #nnoremap <buffer> p   <Cmd>call QfJump(+1)<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
 #nnoremap <buffer> P   <Cmd>call QfJump(-1)<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
-nnoremap <buffer> p   <Cmd>cnext<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
-nnoremap <buffer> P   <Cmd>cprev<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+if b:QuickFix
+  nnoremap <buffer> p   <Cmd>cnext<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+  nnoremap <buffer> P   <Cmd>cprev<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+else
+  nnoremap <buffer> p   <Cmd>lnext<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+  nnoremap <buffer> P   <Cmd>lprev<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+endif
 
 nnoremap <buffer> o   <CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>j
 nnoremap <buffer> O   <CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>k
@@ -135,19 +164,29 @@ endif
 
 #---------------------------------------------------------------------------------------------
 # History Stack
-# TODO Locationlist未対応
 
-nnoremap <buffer> >> <Cmd>exe 'cnewer' v:count1<CR>
-nnoremap <buffer> << <Cmd>exe 'colder' v:count1<CR>
-nnoremap <buffer> == <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
-nnoremap <buffer> s  <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
-nnoremap <buffer> m  <Cmd>chistory<CR>:<C-U>chistory<Space>
-nnoremap <buffer> R  <Cmd>chistory<CR>:<C-U>chistory<Space>
+if b:QuickFix
+  nnoremap <buffer> >> <Cmd>exe 'cnewer' v:count1<CR>
+  nnoremap <buffer> << <Cmd>exe 'colder' v:count1<CR>
+  nnoremap <buffer> == <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
+  nnoremap <buffer> s  <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
+  nnoremap <buffer> m  <Cmd>chistory<CR>:<C-U>chistory<Space>
+  nnoremap <buffer> R  <Cmd>chistory<CR>:<C-U>chistory<Space>
+else
+  nnoremap <buffer> >> <Cmd>exe 'lnewer' v:count1<CR>
+  nnoremap <buffer> << <Cmd>exe 'lolder' v:count1<CR>
+  nnoremap <buffer> == <Cmd>exe 'lnewer' getloclist(winnr(), {'nr': '$'}).nr - getloclist(winnr(), {'nr': 0}).nr<CR>
+  nnoremap <buffer> s  <Cmd>exe 'lnewer' getloclist(winnr(), {'nr': '$'}).nr - getloclist(winnr(), {'nr': 0}).nr<CR>
+  nnoremap <buffer> m  <Cmd>lhistory<CR>:<C-U>lhistory<Space>
+  nnoremap <buffer> R  <Cmd>lhistory<CR>:<C-U>lhistory<Space>
+endif
 
 
 
 #---------------------------------------------------------------------------------------------
 # Edit
+# TODO 複数リストを、2次元リストで対応
+# TODO Locationlist未対応
 
 nnoremap <silent> <buffer> dd <ScriptCmd>DelEntry()<CR>
 nnoremap <silent> <buffer>  x <ScriptCmd>DelEntry()<CR>
@@ -191,16 +230,9 @@ enddef
 
 
 #---------------------------------------------------------------------------------------------
-# TODO
-#
-#   Locationlist
-#   <CR>のカウント対応
-
-
-
-#---------------------------------------------------------------------------------------------
 # Auto Change Directory
 
+# TODO 部分適用
 augroup Qf_AutoChDir_2
   au!
 
@@ -211,33 +243,25 @@ augroup Qf_AutoChDir_2
     au WinEnter <buffer> chdir(getqflist({'context': 0}).context)
 
     # QuickfixCmdを実行したディレクトリとは別のディレクトリで、copenを実行した時用。
-    au BufWinEnter <buffer> chdir(getqflist({'context': 0}).context)
-    au BufWinEnter <buffer> au SafeState <buffer> ++once copen
+    au BufWinEnter <buffer> if getqflist({'context': 0}).context != ''
+    au BufWinEnter <buffer>   chdir(getqflist({'context': 0}).context)
+    au BufWinEnter <buffer>   au SafeState <buffer> ++once copen
+    au BufWinEnter <buffer> endif
   else
   # LocationList
     # lopenなどで、再度開いたとき用。
     # DelEntry, UndoEntryも、これで対応。
     au WinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
 
-    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、copenを実行した時用。
-    au BufWinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
-    au BufWinEnter <buffer> au SafeState <buffer> ++once lopen
+    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、lopenを実行した時用。
+    #au BufWinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
+    #au BufWinEnter <buffer> au SafeState <buffer> ++once lopen
+
+    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、lopenを実行した時用。
+    # if 文により、LocationListウィンドウが開いている状態で、lコマンド実行したときに、この中が発動しないようにしている。
+    au BufWinEnter <buffer> if getloclist(winnr(), {'context': 0}).context != ''
+    au BufWinEnter <buffer>   chdir(getloclist(winnr(), {'context': 0}).context)
+    au BufWinEnter <buffer>   au SafeState <buffer> ++once lopen
+    au BufWinEnter <buffer> endif
   endif
-
-  #au BufWinEnter <buffer> noautocmd copen
-
-  #au BufWinEnter <buffer> au SafeState ++once echo copen
-
-  #au BufWinEnter <buffer> doau User KKK
-  #au User KKK noautocmd copen
-
-  #au BufWinEnter <buffer> chdir(getqflist({'context': 0}).context) | noautocmd copen
-
-  #au BufWinEnter <buffer> noau normal! :copen<CR>
-
-  #au SafeState <buffer> ++once chdir(getqflist({'context': 0}).context) | copen
-  #au BufWinEnter <buffer> au SafeState <buffer> ++once chdir(getqflist({'context': 0}).context) | copen
-
-  #au BufWinEnter <buffer> doau User KKK
-  #au User KKK <buffer> ++once noautocmd copen
 augroup end
