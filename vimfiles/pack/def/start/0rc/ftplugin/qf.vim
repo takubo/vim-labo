@@ -186,7 +186,6 @@ endif
 #---------------------------------------------------------------------------------------------
 # Edit
 # TODO 複数リストを、2次元リストで対応
-# TODO Locationlist未対応
 
 nnoremap <silent> <buffer> dd <ScriptCmd>DelEntry()<CR>
 nnoremap <silent> <buffer>  x <ScriptCmd>DelEntry()<CR>
@@ -198,32 +197,48 @@ nnoremap <silent> <buffer>  u <ScriptCmd>UndoEntry()<CR>
 
 
 function DelEntry() range
-  call <SID>DelEntry_body(a:firstline, a:lastline)
+  const winnr = winnr()
+  const GetList = b:QuickFix ? function('getqflist') : function('getloclist', [winnr])
+  const SetList = b:QuickFix ? function('setqflist') : function('setloclist', [winnr])
+
+  call <SID>DelEntry_body(a:firstline, a:lastline, GetList, SetList)
 endfunction
 
-def DelEntry_body(firstline: number, lastline: number)
-  var qf = getqflist()
+def DelEntry_body(firstline: number, lastline: number, GetList: func, SetList: func)
+  var qf = GetList()
   var history = get(w:, 'qf_history', [])
   history -> add(copy(qf))
   w:qf_history = history
   qf -> remove(firstline - 1, lastline - 1)
-  const title = getqflist({'title': 0}).title
+  const title = GetList({'title': 0}).title
   # TODO noau がないと、FTloadが走る。
   #      function <SNR>82_del_entry[6]..FileType Autocommands for "*"..function <SNR>12_LoadFTPlugin[18]..script C:\Users\UserName\vimfiles\ftplugin\qf.vim の処理中にエラーが検出されました:
   #      行  121:
   # E127: 関数 <SNR>82_del_entry を再定義できません: 使用中です
-  noautocmd setqflist(qf, 'r')
-  setqflist([], 'r', {'title': title})
+  noautocmd SetList(qf, 'r')
+  SetList([], 'r', {'title': title})
   execute ':' .. firstline
 enddef
 
 def UndoEntry()
+  const winnr = winnr()
+  const GetList = b:QuickFix ? function('getqflist') : function('getloclist', [winnr])
+  const SetList = b:QuickFix ? function('setqflist') : function('setloclist', [winnr])
+
+  UndoEntry_body(GetList, SetList)
+enddef
+
+def UndoEntry_body(GetList: func, SetList: func)
   var history = get(w:, 'qf_history', [])
   if !empty(history)
-    const title = getqflist({'title': 0}).title
+    const title = GetList({'title': 0}).title
+
+    const curpos = getpos('.')
     # TODO noau がないと、FTloadが走る。
-    noautocmd remove(history, -1) -> setqflist('r')
-    setqflist([], 'r', {'title': title})
+    noautocmd remove(history, -1) -> SetList('r')
+    setpos('.', curpos)
+
+    SetList([], 'r', {'title': title})
   endif
 enddef
 
@@ -233,8 +248,10 @@ enddef
 # Auto Change Directory
 
 # TODO 部分適用
+# TODO 複数リスト未対応かも
 augroup Qf_AutoChDir_2
   au!
+
 
   if getloclist(winnr(), {'winid': 0}).winid == 0
   # QuickFix
@@ -258,7 +275,9 @@ augroup Qf_AutoChDir_2
     #au BufWinEnter <buffer> au SafeState <buffer> ++once lopen
 
     # QuickfixCmdを実行したディレクトリとは別のディレクトリで、lopenを実行した時用。
+    #
     # if 文により、LocationListウィンドウが開いている状態で、lコマンド実行したときに、この中が発動しないようにしている。
+    # QuickfixCmdPostより、BufWinEnterの方が先に発動するため。
     au BufWinEnter <buffer> if getloclist(winnr(), {'context': 0}).context != ''
     au BufWinEnter <buffer>   chdir(getloclist(winnr(), {'context': 0}).context)
     au BufWinEnter <buffer>   au SafeState <buffer> ++once lopen
