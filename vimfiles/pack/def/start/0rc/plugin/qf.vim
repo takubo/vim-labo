@@ -3,105 +3,247 @@ vim9script
 scriptencoding utf-8
 
 
+if exists("b:did_ftplugin")
+  #finish
+endif
+
+# Don't load another plugin for this buffer
+b:did_ftplugin = 1
+
+
+
 #---------------------------------------------------------------------------------------------
-# QuickFix
+# QuickFix or LocationList
+
+# QuickFixならtrue, LocationListならfalse
+b:QuickFix = (getloclist(winnr(), {'winid': 0}).winid == 0)
+
+
+
 #---------------------------------------------------------------------------------------------
+# Options
+
+setl norelativenumber
 
 
-augroup Qf_AutoWinOpen
+
+#---------------------------------------------------------------------------------------------
+# Statusline
+
+# TODO 部分適用
+def g:QfStl(): string
+  const win_id = g:statusline_winid
+  const qf = getloclist(win_id, {'winid': 0}).winid == 0
+
+  # Obtain Quick Fix Properties
+  const prop = qf ?
+               getqflist(         {'all': 0}) :
+               getloclist(win_id, {'all': 0})
+
+  var stl = ''
+
+  # Title
+  # Display the command that produced the list in the quickfix window:
+  const title = prop.title
+                -> substitute('^:git grep --line-number --no-color ', ':git grep ', '')
+                -> substitute(' -- :!..svn/ :!tags$', '', '')
+  stl ..= " %t "
+  stl ..= "%#StlGoldChar#"
+  stl ..= " [ " .. title .. " ] "
+  #       " %{exists('w:quickfix_title')? w:quickfix_title : ''} "
+
+  # Separator
+  stl ..= "%#StlGoldChar#%="
+
+  #stl ..= '%#StlGoldChar#'
+  #stl ..= "%#StlGoldLeaf#"
+  stl ..= '%##'
+
+  # Selected QfList
+  const stack_max = qf ?
+                    getqflist(         {'nr': '$'}).nr :
+                    getloclist(win_id, {'nr': '$'}).nr
+  stl ..= '《list:%2(' .. (stack_max - prop.nr + 1) .. '%)/' .. stack_max .. '》'
+  # QfList Number of Change
+  stl ..= ' changed:' .. prop.changedtick .. ' '
+
+  # Element
+  # Current Select Element Number
+  # Total Number of Element
+  # Current Select Element Percent
+  const elem_cur = prop.idx
+  const elem_max = prop.size
+  const elem_percent = prop.idx * 100.0 / prop.size
+  stl ..= "%#StlGoldChar#"
+  stl ..= ' Elem:%3(' .. elem_cur .. '%) / %(' .. elem_max .. '%)'
+  stl ..= ' %8((' .. printf('%.1f', elem_percent) .. '%%)%) '
+
+  # Separator
+  stl ..= '%<'
+
+  # Saved Directory
+  stl ..= '%#StlNoNameDir# '
+  stl ..= prop.context .. '  '
+
+  # Current Directory
+  #stl ..= '%#StlNoNameDir# ' .. getcwd() .. ' '
+
+  # Separator
+  stl ..= "%#StlGoldChar#%="
+
+  # Line-percnt Screen-percnt Total-lines
+  stl ..= "%##"
+  stl ..= " %3p%% %4P [%4L] "
+
+  return stl
+enddef
+
+
+setlocal stl=%!QfStl()
+
+
+
+#---------------------------------------------------------------------------------------------
+# View
+
+nnoremap <buffer>      <CR> <Esc>:call <SID>CR()<CR>
+nnoremap <buffer> <C-W><CR> <Esc>:call <SID>CR()<CR>
+
+def CR()
+  if v:prevcount != 0
+    # jumplistに残すために、Gを使用。
+    histadd('cmd', v:prevcount .. '')
+    exe 'normal!' v:prevcount .. 'G'
+  else
+    exe "normal! \<CR>"
+  endif
+  CursorJumped
+enddef
+
+
+
+#---------------------------------------------------------------------------------------------
+# Continueouse Move
+# TODO Locationlist未対応
+
+#nnoremap <buffer> p <CR>zz<C-W>p
+#nnoremap <buffer> p <CR>zz<cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+#nnoremap <buffer> P <CR>zz<C-W>pj
+#nnoremap <buffer> o <CR>zz<C-W>pj
+#nnoremap <buffer> O <CR>zz<C-W>pk
+#nnoremap <buffer> o <CR>zz<cmd>noautocmd wincmd p<CR>j
+
+
+nnoremap <buffer> r   <CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+
+#nnoremap <buffer> p   <Cmd>call QfJump(+1)<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+#nnoremap <buffer> P   <Cmd>call QfJump(-1)<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+nnoremap <buffer> p   <Cmd>cnext<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+nnoremap <buffer> P   <Cmd>cprev<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+
+nnoremap <buffer> o   <CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>j
+nnoremap <buffer> O   <CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>k
+
+nnoremap <buffer> i gg<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+nnoremap <buffer> a  G<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
+
+if !exists(':CFIPopupNMV')
+  com! -bar CFIPopupNMV echon
+endif
+
+
+
+#---------------------------------------------------------------------------------------------
+# History Stack
+
+if b:QuickFix
+  nnoremap <buffer> >> <Cmd>exe 'cnewer' v:count1<CR>
+  nnoremap <buffer> << <Cmd>exe 'colder' v:count1<CR>
+  nnoremap <buffer> == <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
+  nnoremap <buffer> s  <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
+  nnoremap <buffer> m  <Cmd>chistory<CR>:<C-U>chistory<Space>
+  nnoremap <buffer> R  <Cmd>chistory<CR>:<C-U>chistory<Space>
+else
+  nnoremap <buffer> >> <Cmd>exe 'lnewer' v:count1<CR>
+  nnoremap <buffer> << <Cmd>exe 'lolder' v:count1<CR>
+  nnoremap <buffer> == <Cmd>exe 'lnewer' getloclist(winnr(), {'nr': '$'}).nr - getloclist(winnr(), {'nr': 0}).nr<CR>
+  nnoremap <buffer> s  <Cmd>exe 'lnewer' getloclist(winnr(), {'nr': '$'}).nr - getloclist(winnr(), {'nr': 0}).nr<CR>
+  nnoremap <buffer> m  <Cmd>lhistory<CR>:<C-U>lhistory<Space>
+  nnoremap <buffer> R  <Cmd>lhistory<CR>:<C-U>lhistory<Space>
+endif
+
+
+
+#---------------------------------------------------------------------------------------------
+# Edit
+# TODO 複数リストを、2次元リストで対応
+# TODO Locationlist未対応
+
+nnoremap <silent> <buffer> dd <ScriptCmd>DelEntry()<CR>
+nnoremap <silent> <buffer>  x <ScriptCmd>DelEntry()<CR>
+
+vnoremap <silent> <buffer>  d :call <SID>DelEntry()<CR>
+vnoremap <silent> <buffer>  x :call <SID>DelEntry()<CR>
+
+nnoremap <silent> <buffer>  u <ScriptCmd>UndoEntry()<CR>
+
+
+function DelEntry() range
+  call <SID>DelEntry_body(a:firstline, a:lastline)
+endfunction
+
+def DelEntry_body(firstline: number, lastline: number)
+  var qf = getqflist()
+  var history = get(w:, 'qf_history', [])
+  history -> add(copy(qf))
+  w:qf_history = history
+  qf -> remove(firstline - 1, lastline - 1)
+  const title = getqflist({'title': 0}).title
+  # TODO noau がないと、FTloadが走る。
+  #      function <SNR>82_del_entry[6]..FileType Autocommands for "*"..function <SNR>12_LoadFTPlugin[18]..script C:\Users\UserName\vimfiles\ftplugin\qf.vim の処理中にエラーが検出されました:
+  #      行  121:
+  # E127: 関数 <SNR>82_del_entry を再定義できません: 使用中です
+  noautocmd setqflist(qf, 'r')
+  setqflist([], 'r', {'title': title})
+  execute ':' .. firstline
+enddef
+
+def UndoEntry()
+  var history = get(w:, 'qf_history', [])
+  if !empty(history)
+    const title = getqflist({'title': 0}).title
+    # TODO noau がないと、FTloadが走る。
+    noautocmd remove(history, -1) -> setqflist('r')
+    setqflist([], 'r', {'title': title})
+  endif
+enddef
+
+
+
+#---------------------------------------------------------------------------------------------
+# Auto Change Directory
+
+# TODO 部分適用
+augroup Qf_AutoChDir_2
   au!
-  # grepする際に'|cwindow'を付けなくても、Quickfixに結果を表示する
-  au QuickfixCmdPost make,grep,grepadd,vimgrep,helpgrep,cbuffer,cfile exe 'botright cwindow ' .. (&lines / 4)
-  au QuickfixCmdPost lmake,lgrep,lgrepadd,lvimgrep,lhelpgrep,lcbuffer,lcfile exe 'lwindow ' .. (winheight(0) / 4)
+
+  if getloclist(winnr(), {'winid': 0}).winid == 0
+  # QuickFix
+    # copenなどで、再度開いたとき用。
+    # DelEntry, UndoEntryも、これで対応。
+    au WinEnter <buffer> chdir(getqflist({'context': 0}).context)
+
+    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、copenを実行した時用。
+    au BufWinEnter <buffer> chdir(getqflist({'context': 0}).context)
+    au BufWinEnter <buffer> au SafeState <buffer> ++once copen
+  else
+  # LocationList
+    # lopenなどで、再度開いたとき用。
+    # DelEntry, UndoEntryも、これで対応。
+    au WinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
+
+    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、lopenを実行した時用。
+    au BufWinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
+    au BufWinEnter <buffer> au SafeState <buffer> ++once lopen
+  endif
 augroup end
-
-
-#augroup Qf_AutoChDir
-augroup Qf_AutoChDir_1
-  au!
-
-  # QFコマンド実行時のcwdをcontextへ保存。
-  #au QuickfixCmdPost * setqflist([], 'r', {'context': getcwd()})
-  au QuickfixCmdPost [^l]* setqflist([], 'r', {'context': getcwd()})
-  au QuickfixCmdPost l*    setloclist(winnr(), [], 'r', {'context': getcwd()})
-
-  # # DelEntry, UndoEntryも、これで対応。
-  # # copenなどで、再度開いたとき用。
-  # au WinEnter * {
-  #                 if (&buftype == 'quickfix')
-  #                   chdir(getqflist({'context': 0}).context)
-  #                 endif
-  #               }
-augroup end
-
-
-# => unified_tab.vim
-
-
-
-finish
-
-
-
-# Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-
-let c_jk_local = 0
-
-nnoremap <silent> <Plug>(MyVimrc-Toggle-Qf-Ll) :<C-u>let c_jk_local = !c_jk_local<CR>
-
-#例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-nnoremap <silent> <Plug>(MyVimrc-CNext) :<C-u>try <Bar> exe (c_jk_local ? ':lnext' : 'cnext') <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-nnoremap <silent> <Plug>(MyVimrc-CPrev) :<C-u>try <Bar> exe (c_jk_local ? ':lprev' : 'cprev') <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-
-#例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-nnoremap <silent> <Plug>(MyVimrc-QfNext) :<C-u>try <Bar> cnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-nnoremap <silent> <Plug>(MyVimrc-QfPrev) :<C-u>try <Bar> cprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-
-#例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-nnoremap <silent> <Plug>(MyVimrc-LlNext) :<C-u>try <Bar> lnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-nnoremap <silent> <Plug>(MyVimrc-LlPrev) :<C-u>try <Bar> lprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-
-nmap <silent> <Del> <Plug>(MyVimrc-QfNext)
-nmap <silent> <Ins> <Plug>(MyVimrc-QfPrev)
-#nmap <silent> <A-n> <Plug>(MyVimrc-LlNext)
-#nmap <silent> <A-m> <Plug>(MyVimrc-LlPrev)
-
-# Quickfix & Locationlist }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-
-
-# #----------------------------------------------------------------------------------
-# # Quickfix cd Project-Root
-#
-# import autoload '../impauto/GetPrjRoot.vim' as gpr
-# import autoload 'get_project_root.vim' as gpr
-#
-# # Quickfixウィンドウを、指定のディレクトリをカレントディレクトリとして開き直す。
-# def QfChdir(dir: string)
-#   cclose
-#
-#   const save_autochdir = &autochdir
-#   set noautochdir
-#
-#   const org_dir = getcwd()
-#   exe 'noautocmd cd ' dir
-#
-#   copen
-#   exe 'noautocmd cd' org_dir
-#
-#   &autochdir = save_autochdir
-# enddef
-#
-# # Quickfixウィンドウを、プロジェクトルートをカレントディレクトリとして開き直す。
-# com! QfChdirPrjRoot call QfChdir(gpr.GetPrjRoot())
-#
-# #----------------------------------------------------------------------------------
-
-
-
-# #----------------------------------------------------------------------------------
-# augroup MyVimrc_Grep
-#   au!
-#   exe 'au WinEnter * if (&buftype == 'quickfix') | cd ' .. getcwd() .. ' | endif'
-# augroup end
-# #----------------------------------------------------------------------------------
