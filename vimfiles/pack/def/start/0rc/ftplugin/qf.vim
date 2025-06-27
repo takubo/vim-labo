@@ -23,8 +23,11 @@ setl norelativenumber
 # Statusline
 
 def g:QfStl(): string
+
   # Obtain Quick Fix Properties
-  const prop = getqflist({'all': 0})
+  const prop = getloclist(g:statusline_winid, {'winid': 0}).winid == 0 ?
+               getqflist(          {'all': 0}) :
+               getloclist(g:statusline_winid, {'all': 0})
 
   var stl = ''
 
@@ -191,6 +194,7 @@ enddef
 # TODO
 #
 #   Locationlist
+#   <CR>のカウント対応
 
 
 
@@ -200,7 +204,40 @@ enddef
 augroup Qf_AutoChDir_2
   au!
 
-  # DelEntry, UndoEntryも、これで対応。
-  # copenなどで、再度開いたとき用。
-  au WinEnter <buffer> chdir(getqflist({'context': 0}).context)
+  if getloclist(winnr(), {'winid': 0}).winid == 0
+  # QuickFix
+    # copenなどで、再度開いたとき用。
+    # DelEntry, UndoEntryも、これで対応。
+    au WinEnter <buffer> chdir(getqflist({'context': 0}).context)
+
+    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、copenを実行した時用。
+    au BufWinEnter <buffer> chdir(getqflist({'context': 0}).context)
+    au BufWinEnter <buffer> au SafeState <buffer> ++once copen
+  else
+  # LocationList
+    # lopenなどで、再度開いたとき用。
+    # DelEntry, UndoEntryも、これで対応。
+    au WinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
+
+    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、copenを実行した時用。
+    au BufWinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
+    au BufWinEnter <buffer> au SafeState <buffer> ++once lopen
+  endif
+
+  #au BufWinEnter <buffer> noautocmd copen
+
+  #au BufWinEnter <buffer> au SafeState ++once echo copen
+
+  #au BufWinEnter <buffer> doau User KKK
+  #au User KKK noautocmd copen
+
+  #au BufWinEnter <buffer> chdir(getqflist({'context': 0}).context) | noautocmd copen
+
+  #au BufWinEnter <buffer> noau normal! :copen<CR>
+
+  #au SafeState <buffer> ++once chdir(getqflist({'context': 0}).context) | copen
+  #au BufWinEnter <buffer> au SafeState <buffer> ++once chdir(getqflist({'context': 0}).context) | copen
+
+  #au BufWinEnter <buffer> doau User KKK
+  #au User KKK <buffer> ++once noautocmd copen
 augroup end
