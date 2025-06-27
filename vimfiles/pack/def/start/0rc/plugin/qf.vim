@@ -21,7 +21,9 @@ augroup Qf_AutoChDir_1
   au!
 
   # QFコマンド実行時のcwdをcontextへ保存。
-  au QuickfixCmdPost * setqflist([], 'r', {'context': getcwd()})
+  #au QuickfixCmdPost * setqflist([], 'r', {'context': getcwd()})
+  au QuickfixCmdPost [^l]* setqflist([], 'r', {'context': getcwd()})
+  au QuickfixCmdPost l*    setloclist(winnr(), [], 'r', {'context': getcwd()})
 
   # # DelEntry, UndoEntryも、これで対応。
   # # copenなどで、再度開いたとき用。
