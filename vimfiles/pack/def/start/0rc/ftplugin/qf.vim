@@ -62,26 +62,29 @@ def g:QfStl(): string
   # Separator
   stl ..= "%#StlGoldChar#%="
 
+  # Selected QfList
+  const stack_max = GetList(         {'nr': '$'}).nr
   #stl ..= '%#StlGoldChar#'
   #stl ..= "%#StlGoldLeaf#"
   stl ..= '%##'
-
-  # Selected QfList
-  const stack_max = GetList(         {'nr': '$'}).nr
   stl ..= '《list:%2(' .. (stack_max - prop.nr + 1) .. '%)/' .. stack_max .. '》'
-  # QfList Number of Change
-  stl ..= ' changed:' .. prop.changedtick .. ' '
 
-  # Element
-  # Current Select Element Number
-  # Total Number of Element
-  # Current Select Element Percent
-  const elem_cur = prop.idx
-  const elem_max = prop.size
-  const elem_percent = prop.idx * 100.0 / prop.size
+  # QfList Number of Change
+  #stl ..= ' changed:' .. prop.changedtick .. ' '
+
+  # QfList Change
+  stl ..= ' changed:' .. (prop.changedtick != 2 ? '+' : '*') .. ' '
+
+  # Entry
+  #   Current Select Entry Number
+  #   Total Number of Entry
+  #   Current Select Entry Percent
+  const entry_cur = prop.idx
+  const entry_max = prop.size
+  const entry_percent = prop.idx * 100.0 / prop.size
   stl ..= "%#StlGoldChar#"
-  stl ..= ' Elem:%3(' .. elem_cur .. '%) / %(' .. elem_max .. '%)'
-  stl ..= ' %8((' .. printf('%.1f', elem_percent) .. '%%)%) '
+  stl ..= ' Ent:%3(' .. entry_cur .. '%) / %(' .. entry_max .. '%)'
+  stl ..= ' %8((' .. printf('%.1f', entry_percent) .. '%%)%) '
 
   # Separator
   stl ..= '%<'
@@ -247,8 +250,6 @@ enddef
 #---------------------------------------------------------------------------------------------
 # Auto Change Directory
 
-# TODO 部分適用
-# TODO 複数リスト未対応かも
 #augroup Qf_AutoChDir
 #exe 'augroup Qf_AutoChDir_' .. bufnr()
 const augroup_name = 'Qf_AutoChDir_' .. bufnr()
