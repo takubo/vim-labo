@@ -52,7 +52,7 @@ def g:QfStl(): string
   # Title
   # Display the command that produced the list in the quickfix window:
   const title = prop.title
-                -> substitute('^:git grep --line-number --no-color ', ':git grep ', '')
+                -> substitute('^:git grep --line-number --no-color -I', ':git grep ', '')
                 -> substitute(' -- :!..svn/ :!tags$', '', '')
   stl ..= " %t "
   stl ..= "%#StlGoldChar#"
