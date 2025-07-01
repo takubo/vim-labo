@@ -54,6 +54,8 @@ def GGrep(word: string, path: string = '', add: bool = false, location_list: boo
 
   # echo cmd
 
+  const org_winnr = winnr()
+
   # noautocmdを付加しないと、Quickfixの結果パスが、意図したディレクトリ(PrrRoot)にならない。
   #exe 'noautocmd' cmd
   #setqflist([], 'r', {'context': getcwd()})  # au QuickfixCmdPost を抑制しているため。
@@ -62,13 +64,18 @@ def GGrep(word: string, path: string = '', add: bool = false, location_list: boo
 
   # noautocmdしているので、自分で開く必要がある。
   if location_list
-    lopen
+    #lopen
   else
-    copen
+    #copen
   endif
 
   # TODO 元いたウィンドウに留まるのがよいか？Quickfixウィンドウに移動するほうがよいか？
   #wincmd p
+  # このようにしないと、カーソルラインが適切に反映されない。
+  if winnr() != org_winnr
+    wincmd p
+    wincmd p
+  endif
 enddef
 
 # プロジェクトルートで、new, Quickfix
