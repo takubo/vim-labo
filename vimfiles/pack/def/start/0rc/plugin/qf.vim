@@ -8,7 +8,8 @@ scriptencoding utf-8
 #---------------------------------------------------------------------------------------------
 
 
-augroup Qf_AutoWinOpen
+
+augroup QuickFix_AutoWinOpen
   au!
   # grepする際に'|cwindow'を付けなくても、Quickfixに結果を表示する
   au QuickfixCmdPost make,grep,grepadd,vimgrep,helpgrep,cbuffer,cfile exe 'botright cwindow ' .. (&lines / 4)
@@ -16,57 +17,45 @@ augroup Qf_AutoWinOpen
 augroup end
 
 
-#augroup Qf_AutoChDir
-augroup Qf_AutoChDir_1
+
+#augroup QuickFix_AutoChDir
+augroup QuickFix_AutoChDir_SaveCwd
   au!
 
   # QFコマンド実行時のcwdをcontextへ保存。
-  #au QuickfixCmdPost * setqflist([], 'r', {'context': getcwd()})
   au QuickfixCmdPost [^l]* setqflist([], 'r', {'context': getcwd()})
-  au QuickfixCmdPost l*    setloclist(winnr(), [], 'r', {'context': getcwd()})
-
-  # # DelEntry, UndoEntryも、これで対応。
-  # # copenなどで、再度開いたとき用。
-  # au WinEnter * {
-  #                 if (&buftype == 'quickfix')
-  #                   chdir(getqflist({'context': 0}).context)
-  #                 endif
-  #               }
+  au QuickfixCmdPost    l* setloclist(winnr(), [], 'r', {'context': getcwd()})
 augroup end
+
 
 
 # => unified_tab.vim
 
 
 
-finish
-
-
-
-# Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-
-let c_jk_local = 0
-
-nnoremap <silent> <Plug>(MyVimrc-Toggle-Qf-Ll) :<C-u>let c_jk_local = !c_jk_local<CR>
-
-#例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-nnoremap <silent> <Plug>(MyVimrc-CNext) :<C-u>try <Bar> exe (c_jk_local ? ':lnext' : 'cnext') <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-nnoremap <silent> <Plug>(MyVimrc-CPrev) :<C-u>try <Bar> exe (c_jk_local ? ':lprev' : 'cprev') <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-
-#例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-nnoremap <silent> <Plug>(MyVimrc-QfNext) :<C-u>try <Bar> cnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-nnoremap <silent> <Plug>(MyVimrc-QfPrev) :<C-u>try <Bar> cprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-
-#例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-nnoremap <silent> <Plug>(MyVimrc-LlNext) :<C-u>try <Bar> lnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-nnoremap <silent> <Plug>(MyVimrc-LlPrev) :<C-u>try <Bar> lprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-
-nmap <silent> <Del> <Plug>(MyVimrc-QfNext)
-nmap <silent> <Ins> <Plug>(MyVimrc-QfPrev)
-#nmap <silent> <A-n> <Plug>(MyVimrc-LlNext)
-#nmap <silent> <A-m> <Plug>(MyVimrc-LlPrev)
-
-# Quickfix & Locationlist }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+# #----------------------------------------------------------------------------------
+# # Quickfix & Locationlist
+#
+# var c_jk_local = 0
+#
+# nnoremap <silent> <Plug>(QuickFix-Toggle-Qf-Ll) <Cmd>c_jk_local = !c_jk_local<CR>
+#
+# #例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+# nnoremap <silent> <Plug>(QuickFix-CNext) <Cmd>try <Bar> exe (c_jk_local ? ':lnext' : 'cnext') <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
+# nnoremap <silent> <Plug>(QuickFix-CPrev) <Cmd>try <Bar> exe (c_jk_local ? ':lprev' : 'cprev') <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
+#
+# #例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+# nnoremap <silent> <Plug>(QuickFix-QfNext) <Cmd>try <Bar> cnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
+# nnoremap <silent> <Plug>(QuickFix-QfPrev) <Cmd>try <Bar> cprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
+#
+# #例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+# nnoremap <silent> <Plug>(QuickFix-LlNext) <Cmd>try <Bar> lnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
+# nnoremap <silent> <Plug>(QuickFix-LlPrev) <Cmd>try <Bar> lprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
+#
+# #nmap <silent> <Del> <Plug>(QuickFix-QfNext)
+# #nmap <silent> <Ins> <Plug>(QuickFix-QfPrev)
+# #nmap <silent> <A-n> <Plug>(QuickFix-LlNext)
+# #nmap <silent> <A-m> <Plug>(QuickFix-LlPrev)
 
 
 
@@ -94,14 +83,3 @@ nmap <silent> <Ins> <Plug>(MyVimrc-QfPrev)
 #
 # # Quickfixウィンドウを、プロジェクトルートをカレントディレクトリとして開き直す。
 # com! QfChdirPrjRoot call QfChdir(gpr.GetPrjRoot())
-#
-# #----------------------------------------------------------------------------------
-
-
-
-# #----------------------------------------------------------------------------------
-# augroup MyVimrc_Grep
-#   au!
-#   exe 'au WinEnter * if (&buftype == 'quickfix') | cd ' .. getcwd() .. ' | endif'
-# augroup end
-# #----------------------------------------------------------------------------------

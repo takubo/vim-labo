@@ -13,7 +13,7 @@ b:did_ftplugin = 1
 
 
 if exists("b:did_my_ftplugin")
-  finish
+  #finish
 endif
 
 # Don't load another plugin for this buffer
@@ -249,7 +249,7 @@ enddef
 
 # TODO 部分適用
 # TODO 複数リスト未対応かも
-#augroup Qf_AutoChDir_2
+#augroup Qf_AutoChDir
 #exe 'augroup Qf_AutoChDir_' .. bufnr()
 const augroup_name = 'Qf_AutoChDir_' .. bufnr()
 
@@ -271,71 +271,21 @@ exe 'augroup' augroup_name
   au WinEnter <buffer> endif
 
   au BufWinEnter <buffer> if getloclist(winnr(), {'winid': 0}).winid == 0
+  # QuickFix
     # QuickfixCmdを実行したディレクトリとは別のディレクトリで、copenを実行した時用。
     au BufWinEnter <buffer> if getqflist({'context': 0}).context != ''
     au BufWinEnter <buffer>   chdir(getqflist({'context': 0}).context)
     au BufWinEnter <buffer>   au SafeState <buffer> ++once copen
     au BufWinEnter <buffer> endif
   au BufWinEnter <buffer> else
-    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、lopenを実行した時用。
-    #au BufWinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
-    #au BufWinEnter <buffer> au SafeState <buffer> ++once lopen
-
+  # LocationList
     # QuickfixCmdを実行したディレクトリとは別のディレクトリで、lopenを実行した時用。
     #
-    # if 文により、LocationListウィンドウが開いている状態で、lコマンド実行したときに、この中が発動しないようにしている。
-    # QuickfixCmdPostより、BufWinEnterの方が先に発動するため。
+    # LocationListウィンドウが開いている状態で、LocationListコマンドを実行したときに、
+    # この中が発動しないように、if文で囲んでいる。QuickfixCmdPostより、BufWinEnterの方が先に発動するため、その必要がある。
     au BufWinEnter <buffer> if getloclist(winnr(), {'context': 0}).context != ''
     au BufWinEnter <buffer>   chdir(getloclist(winnr(), {'context': 0}).context)
     au BufWinEnter <buffer>   au SafeState <buffer> ++once lopen
     au BufWinEnter <buffer> endif
   au BufWinEnter <buffer> endif
-augroup end
-
-finish
-
-#---------------------------------------------------------------------------------------------
-# Auto Change Directory
-
-# TODO 部分適用
-# TODO 複数リスト未対応かも
-#augroup Qf_AutoChDir_2
-#exe 'augroup Qf_AutoChDir_' .. bufnr()
-const augroup_name = 'Qf_AutoChDir_' .. bufnr()
-
-exe 'augroup' augroup_name
-  au!
-
-  exe 'au!' augroup_name
-
-  if getloclist(winnr(), {'winid': 0}).winid == 0
-  # QuickFix
-    # copenなどで、再度開いたとき用。
-    # DelEntry, UndoEntryも、これで対応。
-    au WinEnter <buffer> chdir(getqflist({'context': 0}).context)
-
-    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、copenを実行した時用。
-    au BufWinEnter <buffer> if getqflist({'context': 0}).context != ''
-    au BufWinEnter <buffer>   chdir(getqflist({'context': 0}).context)
-    au BufWinEnter <buffer>   au SafeState <buffer> ++once copen
-    au BufWinEnter <buffer> endif
-  else
-  # LocationList
-    # lopenなどで、再度開いたとき用。
-    # DelEntry, UndoEntryも、これで対応。
-    au WinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
-
-    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、lopenを実行した時用。
-    #au BufWinEnter <buffer> chdir(getloclist(winnr(), {'context': 0}).context)
-    #au BufWinEnter <buffer> au SafeState <buffer> ++once lopen
-
-    # QuickfixCmdを実行したディレクトリとは別のディレクトリで、lopenを実行した時用。
-    #
-    # if 文により、LocationListウィンドウが開いている状態で、lコマンド実行したときに、この中が発動しないようにしている。
-    # QuickfixCmdPostより、BufWinEnterの方が先に発動するため。
-    au BufWinEnter <buffer> if getloclist(winnr(), {'context': 0}).context != ''
-    au BufWinEnter <buffer>   chdir(getloclist(winnr(), {'context': 0}).context)
-    au BufWinEnter <buffer>   au SafeState <buffer> ++once lopen
-    au BufWinEnter <buffer> endif
-  endif
 augroup end
