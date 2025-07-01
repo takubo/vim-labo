@@ -352,7 +352,7 @@ set shiftwidth=2  # TODO 8
 #set varsofttabstop
 set smarttab
 set softtabstop=-1  # 'マイナスなら 'shiftwidth' の値が使われる。
-set shiftround
+set noshiftround
 set expandtab  # TODO
 set autoindent
 #set smartindent
