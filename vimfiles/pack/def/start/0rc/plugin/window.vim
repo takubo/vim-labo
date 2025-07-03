@@ -513,7 +513,24 @@ nnoremap <C-W>T     <C-W>T
 
 set tabclose=uselast
 
-nnoremap  <C-T> <Cmd>tabnew<CR>
+def TabNew()
+  const bufs = getbufinfo()
+                -> filter((_, b) => !b.changed && b.listed && b.name == '' && b.loaded && b.linecount == 1 && getbufoneline(b.bufnr, 1) == '')
+                -> filter((_, b) => undotree(b.bufnr).seq_last == 0)
+  #echo bufs
+
+  const bufnrs = bufs -> mapnew((_, b) => b.bufnr)
+  #echo bufnrs
+
+  if len(bufnrs) >= 1
+    exe 'tab' 'split'
+    exe 'b' bufnrs[0]
+  else
+    tabnew
+  endif
+enddef
+
+nnoremap  <C-T> <ScriptCmd>TabNew()<CR>
 nnoremap g<C-T> :<C-U>tabnew<Space>
 #nnoremap <silent>  <C-T> <Cmd>tabnew<Bar>SetpathSilent<CR>
 # nnoremap <silent> z<C-T> <Cmd>tab split<CR>
@@ -547,7 +564,7 @@ enddef
 
 com! -nargs=0 -bar SelectTab SelectTab()
 
-nnoremap <Leader>t <Cmd>SelectTab<CR>
+# nnoremap <Leader>t <Cmd>SelectTab<CR>
 
 
 #----------------------------------------------------------------------------------------
