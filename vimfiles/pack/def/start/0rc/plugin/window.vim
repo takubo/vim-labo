@@ -548,11 +548,16 @@ nnoremap <C-B> gT
 # nnoremap t gt
 # nnoremap T gT
 
-nnoremap g<C-F> <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>
-nnoremap g<C-B> <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
-
-nnoremap <A-F>  <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>
-nnoremap <A-B>  <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
+# nnoremap g<C-F> <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>
+# nnoremap g<C-B> <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
+# nnoremap <A-F>  <Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>
+# nnoremap <A-B>  <Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>
+submode#enter_with('TabMove', 'n', '', 'g<C-F>', "<Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +' .. v:count1<CR>")
+submode#enter_with('TabMove', 'n', '', 'g<C-B>', "<Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -' .. v:count1<CR>")
+submode#map(       'TabMove', 'n', '',  '<C-F>', "<Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>")
+submode#map(       'TabMove', 'n', '',  '<C-B>', "<Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>")
+submode#map(       'TabMove', 'n', '',      'j', "<Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>")
+submode#map(       'TabMove', 'n', '',      'k', "<Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>")
 
 nnoremap gt <Cmd>tabs<CR>:tabnext<Space>
 
