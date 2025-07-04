@@ -525,17 +525,17 @@ def GetCleanBuf(): number
   return len(bufs) >= 1 ? bufs[0] : -1
 enddef
 
-def TabNew()
+def New(split_cmd: string)
   const bufnr = GetCleanBuf()
+  exe split_cmd
   if bufnr >= 1
-    exe 'tab split'
     exe 'b' bufnr
   else
-    tabnew
+    enew
   endif
 enddef
 
-nnoremap  <C-T> <ScriptCmd>TabNew()<CR>
+nnoremap  <C-T> <ScriptCmd>New('tab split')<CR>
 nnoremap g<C-T> :<C-U>tabnew<Space>
 # nnoremap <silent>  <C-T> <Cmd>tabnew<Bar>SetpathSilent<CR>
 # nnoremap <silent> z<C-T> <Cmd>tab split<CR>
