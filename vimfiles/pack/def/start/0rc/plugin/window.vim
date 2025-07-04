@@ -255,10 +255,10 @@ nmap <C-J> <C-W>
 #----------------------------------------------------------------------------------------
 
 nnoremap  _     <C-W>s<Cmd>diffoff <Bar> setl noscrollbind<CR>
-nnoremap g_     <ScriptCmd>New('')<CR>
+nnoremap g_     <ScriptCmd>New('horizontal')<CR>
 
 nnoremap  <Bar> <C-W>v<Cmd>diffoff <Bar> setl noscrollbind<CR>
-nnoremap g<Bar> <ScriptCmd>New('v')<CR>
+nnoremap g<Bar> <ScriptCmd>New('vertical')<CR>
 
 # Auto Optimal Ratio Split
 #nnoremap <expr> <Plug>(MyVimrc-Window-AutoSplit)     ( wr.WindowRatio() >= 0 ? '<C-W>v' : '<C-W>s' ) .. '<Cmd>diffoff<CR>'
@@ -277,7 +277,7 @@ nmap <BS><BS>         <Plug>(MyVimrc-Window-AutoSplit-Dumb)
 #nmap <Leader><Leader> <Plug>(MyVimrc-Window-AutoSplit-Rev-Dumb)
 
 # Auto Optimal Ratio New
-nnoremap <expr> <Plug>(MyVimrc-Window-AutoNew) (winwidth(0) > (&columns * 7 / 10) && wr.WindowRatio() >=  0) ? '<ScriptCmd>New("v")<CR>' : '<ScriptCmd>New("")<CR>'
+nnoremap <expr> <Plug>(MyVimrc-Window-AutoNew) (winwidth(0) > (&columns * 7 / 10) && wr.WindowRatio() >=  0) ? "<ScriptCmd>New('vertical')<CR>" : "<ScriptCmd>New('horizontal')<CR>"
 nmap M <Plug>(MyVimrc-Window-AutoNew)
 #nmap U <Plug>(MyVimrc-Window-AutoNew)
 
@@ -516,26 +516,29 @@ set tabclose=uselast
 # クリーンなバッファのバッファ番号を返す。
 # クリーンなバッファがないなら、0以下の数を返す。
 def GetCleanBuf(): number
+  const curtab_bufnrs = tabpagebuflist()
+
   const bufs = getbufinfo()
                 -> filter((_, b) => b.name == '' && b.listed && b.loaded && !b.changed && b.linecount == 1)  # 無名で、リストされており、ロードされており、変更がなく、1行しかないバッファ。
                 -> map((_, b) => b.bufnr)                                                                    # ここでmapで、バッファ番号に変える。
                 -> filter((_, bufnr) => getbufoneline(bufnr, 1) == '')                                       # (唯一存在する行である)1行目は空文字である。
                 -> filter((_, bufnr) => undotree(bufnr).seq_last == 0)                                       # 変更履歴が一切ない(バッファ生成後、1度も編集されていない。)
-  #echo bufs
+                -> filter((_, bufnr) => index(curtab_bufnrs, bufnr) == -1)                                   # 既に、このタブにあるバッファを除外。
+  echo bufs
   return len(bufs) >= 1 ? bufs[0] : -1
 enddef
 
 def New(split_cmd: string)
   const bufnr = GetCleanBuf()
   if bufnr >= 1
-    exe split_cmd .. 'split'
-    exe 'buffer' bufnr
+    exe split_cmd 'split'
+    exe 'silent' 'buffer' bufnr
   else
-    exe split_cmd .. 'new'
+    exe split_cmd 'new'
   endif
 enddef
 
-nnoremap  <C-T> <ScriptCmd>New('tab ')<CR>
+nnoremap  <C-T> <ScriptCmd>New('tab')<CR>
 nnoremap g<C-T> :<C-U>tabnew<Space>
 # nnoremap <silent>  <C-T> <Cmd>tabnew<Bar>SetpathSilent<CR>
 # nnoremap <silent> z<C-T> <Cmd>tab split<CR>
