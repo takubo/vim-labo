@@ -513,18 +513,23 @@ nnoremap <C-W>T     <C-W>T
 
 set tabclose=uselast
 
-def TabNew()
+# クリーンなバッファのバッファ番号を返す。
+# クリーンなバッファがないなら、0以下の数を返す。
+def GetCleanBuf(): number
   const bufs = getbufinfo()
-                -> filter((_, b) => !b.changed && b.listed && b.name == '' && b.loaded && b.linecount == 1 && getbufoneline(b.bufnr, 1) == '')
-                -> filter((_, b) => undotree(b.bufnr).seq_last == 0)
+                -> filter((_, b) => b.name == '' && b.listed && b.loaded && !b.changed && b.linecount == 1)  # 無名で、リストされており、ロードされており、変更がなく、1行しかないバッファ。
+                -> map((_, b) => b.bufnr)                                                                    # ここでmapで、バッファ番号に変える。
+                -> filter(getbufoneline(bufnr, 1) == '')                                                     # (唯一存在する行である)1行目は空文字である。
+                -> filter((_, bufnr) => undotree(bufnr).seq_last == 0)                                       # 変更履歴が一切ない(バッファ生成後、1度も編集されていない。)
   #echo bufs
+  return len(bufs) >= 1 ? bufs[0] : -1
+enddef
 
-  const bufnrs = bufs -> mapnew((_, b) => b.bufnr)
-  #echo bufnrs
-
-  if len(bufnrs) >= 1
-    exe 'tab' 'split'
-    exe 'b' bufnrs[0]
+def TabNew()
+  const bufnr = GetCleanBuf()
+  if bufnr >= 1
+    exe 'tab split'
+    exe 'b' bufnr
   else
     tabnew
   endif
@@ -532,7 +537,7 @@ enddef
 
 nnoremap  <C-T> <ScriptCmd>TabNew()<CR>
 nnoremap g<C-T> :<C-U>tabnew<Space>
-#nnoremap <silent>  <C-T> <Cmd>tabnew<Bar>SetpathSilent<CR>
+# nnoremap <silent>  <C-T> <Cmd>tabnew<Bar>SetpathSilent<CR>
 # nnoremap <silent> z<C-T> <Cmd>tab split<CR>
 
 nnoremap <C-F> gt
