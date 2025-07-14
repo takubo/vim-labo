@@ -577,3 +577,25 @@ augroup AAA
 augroup end
 
 
+
+#---------------------------------------------------------------------------------------------
+# Break Point Sign
+
+def InitBreakPoint()
+  hi hlBreakPointText		guifg=#f62300	guibg=NONE	gui=NONE	cterm=NONE
+  hi hlBreakPointLine		guifg=NONE	guibg=#ccaa22	gui=NONE	cterm=NONE
+  sign define BreakPoint text=* texthl=hlBreakPointText linehl=hlBreakPointLine
+enddef
+
+def PlaceBreakPoint()
+  sign_place(0, 'BP', 'BreakPoint', bufnr(), {'lnum': line('.')})
+enddef
+
+def UnPlaceBreakPoint()
+  sign unplace group=BP
+enddef
+
+InitBreakPoint()
+com!   SetBP call <SID>PlaceBreakPoint()
+com! UnSetBP call <SID>UnPlaceBreakPoint()
+
