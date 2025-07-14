@@ -513,10 +513,57 @@ com! -nargs=1 -complete=runtime Configure echo <q-args>
 
 #---------------------------------------------------------------------------------------------
 
+augroup ExpandTab
+  au!
+  au InsertEnter * setl noexpandtab
+  au InsertLeave * setl   expandtab
+augroup end
+
+inoremap <Plug>(C-t) <C-t>
+inoremap <Plug>(C-d) <C-d>
+
+inoremap <C-t> <Cmd>setl expandtab<CR><Plug>(C-t)<Cmd>setl noexpandtab<CR>
+inoremap <C-d> <Cmd>setl expandtab<CR><Plug>(C-d)<Cmd>setl noexpandtab<CR>
+
+set softtabstop=0
+
+
+
+#---------------------------------------------------------------------------------------------
+# is key word
+
+import autoload "popup_info.vim" as pui
+import autoload 'util_func.vim' as uf
+
+def Isk(plus_minus: string)
+  pui.PopUpInfo_NMV(plus_minus .. plus_minus, -1, 1, 1)
+  redraw
+  const c = uf.GetKey()
+
+  #echo plus_minus .. plus_minus .. ' '
+  #const c = uf.GetKeyEcho()
+
+  exe 'setl isk' .. plus_minus .. '=' .. c
+  pui.PopUpInfoM([plus_minus .. plus_minus .. '  ' .. c, '', &isk], -1, 1, 1)
+enddef
+
+nnoremap <silent> + <ScriptCmd>Isk('+')<CR>
+nnoremap <silent> - <ScriptCmd>Isk('-')<CR>
+
 
 
 #---------------------------------------------------------------------------------------------
 
 
+#---------------------------------------------------------------------------------------------
+
+
+#---------------------------------------------------------------------------------------------
+
+
+#---------------------------------------------------------------------------------------------
+
+
+#---------------------------------------------------------------------------------------------
 
 
