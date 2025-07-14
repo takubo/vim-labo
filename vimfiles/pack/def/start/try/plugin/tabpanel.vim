@@ -3,9 +3,167 @@ vim9script
 scriptencoding utf-8
 
 
-def g:TabPanel(): string
-  return printf("[ %d ]\n  %%f", g:actual_curtabpage)
+def TabPanelHeader(): string
+  return "\n"
 enddef
+
+def g:TabPanel(): string
+  var str = ''
+
+  # Header
+  const header = TabPanelHeader()
+
+  const tabnr = g:actual_curtabpage
+
+  if 0
+    if tabnr == tabpagenr()
+      str ..= '%#TabLineSel#'
+    else
+      str ..= '%#PopupNotification#'
+    endif
+    str ..= printf("[%d]\n", tabnr)
+  elseif 0
+    str ..= '%#StlFill#'
+    str ..= '%#TabLineSel#'
+    str ..= printf("[%d]", tabnr)
+    str ..= '%##'
+    str ..= "\n"
+  else
+    if tabnr == tabpagenr()
+      str ..= '%#TabLineSel#'
+    else
+      str ..= '%#StlFill#'
+      str ..= '%#PopupNotification#'
+    endif
+    str ..= printf("[%d]", tabnr)
+    str ..= '%##'
+    str ..= "\n"
+  endif
+
+  # str ..= "  %t%<\n"
+
+  if 0
+    # タブ内のバッファのリスト
+    const bufnrs = tabpagebuflist(tabnr)
+
+    # バッファ数
+    # const bufnum_str = '(' .. len(bufnrs) .. ')'
+
+    # カレントバッファ番号
+    const curbufnr = bufnrs[tabpagewinnr(tabnr) - 1]  # tabpagewinnr()は、 1始まり。
+
+    # カレントバッファ名
+    const bufname_tmp = expand('#' .. curbufnr .. ':t')
+
+    const bufname = bufname_tmp == '' ? 'No Name' : bufname_tmp  # 無名バッファは、バッファ名が出ない。
+
+    str ..= '  ' .. bufname
+  endif
+
+  if 0
+    # タブ内のバッファのリスト
+    const bufnrs = tabpagebuflist(tabnr)
+
+    # バッファ名のリスト
+    const bufnames = bufnrs -> mapnew((i, bufnr) => BufNameStr(i + 1, bufnr))
+
+    # 無名バッファは、バッファ名が出ない。
+
+    # const bufnames = bufname_tmp == '' ? 'No Name' : bufname_tmp
+
+    str ..= '   ' .. join(bufnames, "\n   ") .. "\n"
+  endif
+
+  if 0
+    # タブ内のウィンドウのリスト
+    const winnrs = range(1, tabpagewinnr(tabnr, '$'))
+
+    # ウィンドウ名のリスト
+    const winnames = winnrs -> mapnew((i, winnr) => WinStr(winnr, 0))
+
+    str ..= '   ' .. join(winnames, "\n   ") .. "\n"
+  endif
+
+  if 1
+    # ウィンドウ名のリスト
+    const winnames = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinStr(i + 1, winid, tabnr))
+
+    str ..= '  ' .. join(winnames, "\n  ") .. "\n"
+   #str ..= '   ' .. join(winnames, "\n   ") .. "\n"
+  endif
+
+  #str ..= "\n"
+  return str
+enddef
+
+def WinStr(winnr: number, winid: number, tabnr: number): string
+  var winstr = ''
+
+  winstr ..= tabnr == tabpagenr() && winnr == tabpagewinnr(tabnr) ? '%#TabLineSel#>%## ' : '  '
+
+  const wininfo = getwininfo(winid)[0]
+  const wintype = win_gettype(winid)
+  const buftype = getbufvar(wininfo.bufnr, '&buftype')
+  const bufname = BufName(wininfo.bufnr)
+  const diff    = win_execute(winid, "setl diff?")  # getwinvar(winid, '&diff')
+  #const diff2   =  getwinvar(winid, '&diff')
+
+  var type = ''
+
+  #type ..= (diff == 'diff' ? '[Diff]' : '')
+  #type ..= (type(diff2) == v:t_bool && diff2 || type(diff2) == v:t_string && diff == 'diff' ? '[Diff2] ' : '')
+  type ..= (diff !~# 'nodiff' ? '[Diff] ' : '')
+  #if diff !~# 'nodiff'
+  #  type ..= (type != '' ? ' ' : '') .. '[Diff]'
+  #endif
+
+  type ..=
+  wininfo.loclist  == 1 ? '[Locationリスト]' :  # [Location List]
+  wininfo.quickfix == 1 ? '[Quickfixリスト]' :  # [Quickfix List]
+  wininfo.terminal == 1 ? '[Terminal]' :
+  wintype == 'preview'  ? '[Preview]' :
+  buftype == 'help'     ? '[Help]' :
+  buftype == 'prompt'   ? '[Prompt]' :
+  buftype == 'nowrite'  ? '[No Write]' :
+  buftype == 'nofile'   ? '[No File]' :
+  bufname == ''         ? '[無名]' :  # '[No Name]' :
+  ''
+
+  type ..= (type != '' && type[-1] != ' ' ? ' ' : '')
+
+  winstr ..= ''
+    .. '%#TabPanelBufName#'
+    .. '%##'
+    .. winnr .. '. '
+    .. '%#TabPanelBufName#'
+    .. '%##'
+    .. type
+    #.. type(diff2) .. ' ' .. type(diff)
+    .. '%##'
+    .. '%#TabPanelBufName#'
+    .. bufname .. '%<'
+
+  return winstr
+enddef
+
+def BufNameStr(winnr: number, bufnr: number): string
+ #const bufnamestr = winnr .. '. ' .. BufName(bufnr) .. '%<'
+  var bufnamestr = ''
+  bufnamestr ..= '%#TabPanelBufName#'
+  bufnamestr ..= '%##'
+  bufnamestr ..= winnr .. '. ' .. BufName(bufnr) .. '%<'
+  return bufnamestr
+enddef
+
+def BufName(bufnr: number): string
+  var bufname_tmp = expand('#' .. bufnr .. ':t')
+  #if bufname_tmp == ''
+  #  bufname_tmp = '[No Name]'
+  #endif
+  const bufinfo = getbufinfo(bufnr)
+  return bufname_tmp
+enddef
+
 
 def g:TabPanel_last_only(): string
  #if g:actual_curtabpage == tabpagenr('$')
@@ -92,49 +250,25 @@ def g:TabPanel_cur_only_over_test(): string
   return join(conts, "\n") .. "\n" .. '%#StlGoldLeaf#            [Footer]'
 enddef
 
-set tabpanel=%{g:actual_curtabpage}
-set tabpanel=%!g:TabPanel()
+
+#----------------------------------------------------------------------------------------
+# Options
+
 set tabpanel=%!g:TabPanel_last_only()
-set tabpanel=%!g:TabPanel_cur_only()
 set tabpanel=%!g:TabPanel_cur_only_over_test()
+set tabpanel=%!g:TabPanel()
+
+set tabpanelopt=align:right,columns:26
 
 
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@                         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@                           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@                           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@                         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#----------------------------------------------------------------------------------------
+# Toggle Sho Tab Panel
 
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@                    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@                      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@                      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@                    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@                  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@                    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@                    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@                  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-const PI = atan2(0, -1) * 2
-const tic = 9  # 5
-const sins = range(360 / tic) -> map((_, v) => sin(v * tic * PI / 360))
-# echo sins
-#const sinb = range(15) -> map((_, v) => sin(v * 24 * 3.141592 * 2 / 360)) -> map((_, v) => repeat('*', float2nr(v * 200)))
-#const sinb = sins -> mapnew((_, v) => repeat('*', float2nr(v * 100)))
-const sinb = sins -> mapnew((_, v) => repeat('*', 22 + float2nr(v * 20)))
-#echo sinb
-#foreach(sinb, (_, v) => { echo v } )
-for i in sinb
-  # echo i
-endfor
+com! ShowTabPanel {
+  if &showtabpanel == 0
+    &showtabpanel = 2
+  else
+    &showtabpanel = 0
+  endif
+}
+nnoremap <Leader>t <Cmd>ShowTabPanel<CR>
