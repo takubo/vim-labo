@@ -20,7 +20,7 @@ def Hl()
   hi BatteryLvlBrd	guifg=#000000	guibg=#000000	gui=NONE	cterm=NONE
 enddef
 
-augroup sp_hl
+augroup BatteryGraph
   au!
   au Colorscheme * Hl()
 augroup end
@@ -29,19 +29,19 @@ Hl()
 
 
 #----------------------------------------------------------------------------------------
+# Dummy (for Demo)
 
-def BatteryDemo(): float
-  return rand() / pow(2, 32) * 100 / 100 * 4
-enddef
-
+# 他から自由に干渉できるよう、グローバルスコープとしておく。
 g:BatDemoRem = 100
+
 def BatteryRemaining(): number
   var rem = g:BatDemoRem
 
   if rem <= 0
     rem = 100
   else
-    rem -= float2nr(BatteryDemo())
+    # 0..4の範囲の乱数を生成して引く
+    rem -= (rand() / pow(2, 32) * 4) -> float2nr()
     if rem < 0
       rem = 0
     endif
@@ -49,13 +49,16 @@ def BatteryRemaining(): number
 
   g:BatDemoRem = rem
   return rem
- #return 89
 enddef
+
+
+#----------------------------------------------------------------------------------------
+# Battery Graph
 
 const GraphCellNum = 20
 const GraphCellPerCent = 100 / GraphCellNum
 
-export def Demo(): list<string>
+export def g:BatteryGraph(): list<string>
   const remain_percent = BatteryRemaining()
   const remaining = remain_percent / GraphCellPerCent
   const consumed  = GraphCellNum - remaining

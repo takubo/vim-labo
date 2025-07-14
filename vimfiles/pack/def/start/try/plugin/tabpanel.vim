@@ -15,9 +15,17 @@ enddef
 
 def TabPanelFooter(): string
   return '%#TblDate# '
+ #return '%#StlGoldLeaf# '
  #return g:Demo() -> join("\n") .. "\n" .. '%#TblDate# '
  #return "\n"
  #return join(conts, "\n") .. repeat("\n%#tabpanel#", &lines - (&cmdheight) - len(conts)) .. '%#StlGoldLeaf#            [Footer]'
+enddef
+
+
+def TabPanelAdding(): string
+ #return '%#TblDate# '
+  return "\n\n\n" .. g:FuncsString()
+ #return "\n"
 enddef
 
 
@@ -45,16 +53,20 @@ def g:TabPanel(): string
   LinesAccum += body -> CountChar("\n") + 1
 
   if tabnr == tabpagenr('$')
+    # Adding
+    const adding = TabPanelAdding()
+    LinesAccum += adding -> CountChar("\n")
+
     # Footer
     const footer = TabPanelFooter()
+    LinesAccum += footer -> CountChar("\n")
 
     # Padding
-    const footer_lines = footer -> CountChar("\n")
     const tabpanel_height = &lines - &cmdheight
-    const padding = '%#tabpanel#' .. repeat("\n", tabpanel_height - (LinesAccum + footer_lines))
+    const padding = '%#tabpanel#' .. repeat("\n", tabpanel_height - LinesAccum)
 
     # 返り値
-    return header .. body .. padding .. footer
+    return header .. body .. adding .. padding .. footer
   else
     # 返り値
     return header .. body
@@ -159,6 +171,7 @@ set tabpanel=%!g:TabPanel_cur_only_over_test()
 set tabpanel=%!g:TabPanel()
 
 set tabpanelopt=align:right,columns:26
+set tabpanelopt=align:right,columns:36
 
 
 

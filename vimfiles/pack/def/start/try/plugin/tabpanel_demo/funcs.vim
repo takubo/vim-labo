@@ -66,17 +66,22 @@ def Funcs_Body_0(): list<string>
   return funcs
 enddef
 
+
 def Funcs_Body(): list<string>
-  if &filetype != 'vim'
+  if &filetype != 'vim' && &filetype != 'python'
     return []
   endif
-  return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>')
+
+  return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>') -> map((_, v) => v .. '%<')
+ #return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>')
 enddef
 
-export def FuncsOneline(): string
+
+export def g:FuncsString(): string
   return Funcs_Body() -> join("\n")
 enddef
 
-export def Funcs(): list<string>
+
+export def FuncsList(): list<string>
   return Funcs_Body()
 enddef
