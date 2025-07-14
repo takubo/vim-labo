@@ -1,5 +1,5 @@
 scriptencoding utf-8
-" vim:set ts=8 sts=8 sw=2 tw=0: (この行に関しては:help modelineを参照)
+" vim:set ts=8 sts=8 sw=2 tw=0 noet: (この行に関しては:help modelineを参照)
 
 set background=dark
 hi clear
@@ -93,8 +93,9 @@ else
   hi LineNrBelow	guifg=#d0c5a9	guibg=NONE	gui=NONE	cterm=NONE
 endif
 
+
 "----------------------------------------------------------------------------------------
-" Statusline, Tabline, VertSplit
+" Statusline, VertSplit, Tabline, TabPanel
 "
 "   StatusLine
 "   StatusLineNC
@@ -107,6 +108,10 @@ endif
 "   TabLineSel
 "   TabLineSep
 "   TabLineFill
+"
+"   TabPanel
+"   TabPanelSel
+"   TabPanelFill
 "
 hi StatusLine		guifg=#efd3b8	guibg=#7f1f1a	gui=NONE	cterm=NONE	" Rimpaデフォルト 高コントラスト白字
 "hi StatusLineNC	guifg=#5c5a4f	guibg=#300a03	gui=NONE	cterm=NONE
@@ -144,8 +149,13 @@ else
   hi! link TabLineFill	StlFill
 endif
 
+hi TabPanel		guifg=#d0c5a9	guibg=black	gui=NONE	cterm=NONE
+hi! link TabPanelSel	TabPanel
+hi TabPanelFill		guifg=black	guibg=black	gui=NONE	cterm=NONE
+
+
 "----------------------------------------------------------------------------------------
-" For Statusline and Tabline
+" For Statusline, Tabline, and TabPanel
 
 hi! link TblDate	StatusLine
 hi! link TblDiffOn	StlFill
@@ -170,6 +180,14 @@ hi StlFill		guifg=#cf302d	guibg=#000000	gui=NONE	cterm=NONE
 "hi! link StlFileName	StlFill
 hi StlNoNameDir		guifg=#5c5a4f	guibg=#000000	gui=NONE	cterm=NONE
 hi! link StlFuncName	stl_blue_char
+
+hi! link TabPanelBufType	TabPanel
+hi TabPanelBufName	guifg=#cccccc	guibg=black	gui=NONE	cterm=NONE
+
+"? hi TabPanelBufType	guifg=#d0c5a9	guibg=NONE	gui=NONE	cterm=NONE
+"? hi TabPanelBufName	guifg=#cccccc	guibg=NONE	gui=NONE	cterm=NONE
+"? hi TabPanelBg		          	guibg=black	gui=NONE	cterm=NONE
+"? hi TabPanelCur		guifg=red	           	gui=NONE	cterm=NONE
 
 
 "----------------------------------------------------------------------------------------
