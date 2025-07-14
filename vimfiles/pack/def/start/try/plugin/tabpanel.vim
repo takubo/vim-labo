@@ -4,17 +4,68 @@ scriptencoding utf-8
 
 
 def TabPanelHeader(): string
-  return "\n"
+  return '%#TblDate# '
+    .. strftime('%Y/%m/%d (%a)')
+    .. '%=' .. strftime('%H:%M  ')
+    .. "\n"
+
+ #return "\n"
 enddef
+
+
+def TabPanelFooter(): string
+  return '%#TblDate# '
+ #return g:Demo() -> join("\n") .. "\n" .. '%#TblDate# '
+ #return "\n"
+ #return join(conts, "\n") .. repeat("\n%#tabpanel#", &lines - (&cmdheight) - len(conts)) .. '%#StlGoldLeaf#            [Footer]'
+enddef
+
+
+def CountChar(str: string, c: string): number
+  return [str] -> matchstrlist(c) -> len()
+enddef
+
+var LinesAccum = 0
 
 def g:TabPanel(): string
   var str = ''
 
-  # Header
-  const header = TabPanelHeader()
-
   const tabnr = g:actual_curtabpage
 
+  # Header
+  const header = tabnr == 1 ? TabPanelHeader() : ''
+
+  # Tabs
+  const body = Tabs(tabnr)
+
+  if tabnr == 1
+    LinesAccum = header -> CountChar("\n")
+  endif
+
+  LinesAccum += body -> CountChar("\n") + 1
+
+  if tabnr == tabpagenr('$')
+    # Footer
+    const footer = TabPanelFooter()
+
+    # Padding
+    const footer_lines = footer -> CountChar("\n")
+    const tabpanel_height = &lines - &cmdheight
+    const padding = '%#tabpanel#' .. repeat("\n", tabpanel_height - (LinesAccum + footer_lines))
+
+    # 返り値
+    return header .. body .. padding .. footer
+  else
+    # 返り値
+    return header .. body
+  endif
+enddef
+
+
+def Tabs(tabnr: number): string
+  var str = ''
+
+  # Tab Number
   if 0
     if tabnr == tabpagenr()
       str ..= '%#TabLineSel#'
@@ -40,59 +91,11 @@ def g:TabPanel(): string
     str ..= "\n"
   endif
 
-  # str ..= "  %t%<\n"
+  # ウィンドウのリスト
+  const wins = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinStr(i + 1, winid, tabnr))
+  str ..= '  ' .. join(wins, "\n  ") .. "\n"
+ #str ..= '   ' .. join(wins, "\n   ") .. "\n"
 
-  if 0
-    # タブ内のバッファのリスト
-    const bufnrs = tabpagebuflist(tabnr)
-
-    # バッファ数
-    # const bufnum_str = '(' .. len(bufnrs) .. ')'
-
-    # カレントバッファ番号
-    const curbufnr = bufnrs[tabpagewinnr(tabnr) - 1]  # tabpagewinnr()は、 1始まり。
-
-    # カレントバッファ名
-    const bufname_tmp = expand('#' .. curbufnr .. ':t')
-
-    const bufname = bufname_tmp == '' ? 'No Name' : bufname_tmp  # 無名バッファは、バッファ名が出ない。
-
-    str ..= '  ' .. bufname
-  endif
-
-  if 0
-    # タブ内のバッファのリスト
-    const bufnrs = tabpagebuflist(tabnr)
-
-    # バッファ名のリスト
-    const bufnames = bufnrs -> mapnew((i, bufnr) => BufNameStr(i + 1, bufnr))
-
-    # 無名バッファは、バッファ名が出ない。
-
-    # const bufnames = bufname_tmp == '' ? 'No Name' : bufname_tmp
-
-    str ..= '   ' .. join(bufnames, "\n   ") .. "\n"
-  endif
-
-  if 0
-    # タブ内のウィンドウのリスト
-    const winnrs = range(1, tabpagewinnr(tabnr, '$'))
-
-    # ウィンドウ名のリスト
-    const winnames = winnrs -> mapnew((i, winnr) => WinStr(winnr, 0))
-
-    str ..= '   ' .. join(winnames, "\n   ") .. "\n"
-  endif
-
-  if 1
-    # ウィンドウ名のリスト
-    const winnames = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinStr(i + 1, winid, tabnr))
-
-    str ..= '  ' .. join(winnames, "\n  ") .. "\n"
-   #str ..= '   ' .. join(winnames, "\n   ") .. "\n"
-  endif
-
-  #str ..= "\n"
   return str
 enddef
 
@@ -104,7 +107,7 @@ def WinStr(winnr: number, winid: number, tabnr: number): string
   const wininfo = getwininfo(winid)[0]
   const wintype = win_gettype(winid)
   const buftype = getbufvar(wininfo.bufnr, '&buftype')
-  const bufname = BufName(wininfo.bufnr)
+  const bufname = expand('#' .. wininfo.bufnr .. ':t')
   const diff    = win_execute(winid, "setl diff?")  # getwinvar(winid, '&diff')
   #const diff2   =  getwinvar(winid, '&diff')
 
@@ -146,109 +149,6 @@ def WinStr(winnr: number, winid: number, tabnr: number): string
   return winstr
 enddef
 
-def BufNameStr(winnr: number, bufnr: number): string
- #const bufnamestr = winnr .. '. ' .. BufName(bufnr) .. '%<'
-  var bufnamestr = ''
-  bufnamestr ..= '%#TabPanelBufName#'
-  bufnamestr ..= '%##'
-  bufnamestr ..= winnr .. '. ' .. BufName(bufnr) .. '%<'
-  return bufnamestr
-enddef
-
-def BufName(bufnr: number): string
-  var bufname_tmp = expand('#' .. bufnr .. ':t')
-  #if bufname_tmp == ''
-  #  bufname_tmp = '[No Name]'
-  #endif
-  const bufinfo = getbufinfo(bufnr)
-  return bufname_tmp
-enddef
-
-
-def g:TabPanel_last_only(): string
- #if g:actual_curtabpage == tabpagenr('$')
-  if g:actual_curtabpage == 1
-    return '%#TabLineSel#Func' .. repeat("\n", 200)
-  endif
-  return '\b%#tabpanel#'
- #return '\b%#tabpanel#' .. repeat("\n", 200)
-enddef
-
-def g:TabPanel_cur_only_0(): string
-  return "%#tabpanel#" .. printf("[ %d ]", g:actual_curtabpage) .. repeat("\n%#tabpanel#", &lines - (&cmdheight) - 1)
- #return '\b%#tabpanel#'
-enddef
-
-def g:TabPanel_cur_only(): string
-  var cont =    printf('[ %d ]', g:actual_curtabpage)
-    .. "\n" ..  printf('[ %d ]', g:actual_curtabpage)
-    .. "\n" ..  printf('[ %d ]', g:actual_curtabpage)
-    .. "\n" ..  printf('[ %d ]', g:actual_curtabpage)
-    .. "\n" ..  line('.') # getcurpos()
-
-
-    .. "\n" .. ''
-    .. "\n" .. ''
-    .. "\n" .. ''
-    .. "\n" .. ''
-   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
-   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
-   #.. "\n" .. '@@                  @@@@'
-   #.. "\n" .. '@@                    @@'
-   #.. "\n" .. '@@                    @@'
-   #.. "\n" .. '@@                  @@@@'
-   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
-   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
-
-
- #const sinc = sins -> mapnew((_, v) => repeat('*', 12 + float2nr(v * 10))) -> join("\n") .. "\n"
- #const sinc = sins -> mapnew((_, v) => repeat('*', abs(float2nr(v * 20)))) -> join("\n") .. "\n"
- #cont ..= sinc
-
-
-  const grfs = range(30) -> mapnew((_, v) => repeat('*', float2nr(20 * rand() / pow(2, 32)))) -> join("\n") .. "\n"
- #cont ..= grfs
-
-
-  cont ..=
-       "\n" .. ''
-    .. "\n" .. ''
-    .. "\n" .. ''
-    .. "\n" .. ''
-   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
-   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
-   #.. "\n" .. '@@                  @@@@'
-   #.. "\n" .. '@@                    @@'
-   #.. "\n" .. '@@                    @@'
-   #.. "\n" .. '@@                  @@@@'
-   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
-   #.. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
-
-
-  const conts = split(cont, "\n", 1) -> map((_, v) => '%#tabpanel#' .. v)
-
-  return join(conts, "\n") .. repeat("\n%#tabpanel#", &lines - (&cmdheight) - len(conts)) .. '%#StlGoldLeaf#            [Footer]'
- #return join(conts, "\n") .. repeat("\n%#tabpanel#", &lines - (&cmdheight) - len(conts))
- #return '\b%#tabpanel#'
-enddef
-
-def g:TabPanel_cur_only_over_test(): string
-  # set line=102 cmdheight=2
-  const t = g:actual_curtabpage
-  const l = (&lines - 2)
-  const ADD = 0
-  # const sta = ((t - 1) * l) + ((t - 1) * 2) + 1 + 1
-  const sta = line('w0')
-  const end = sta + l - &cmdheight - 1 + ADD
-  var cont =    printf('[ %d ]', g:actual_curtabpage)
-  #.. ( range(2, 100) -> map((_, v) => "\n" .. v) -> join(''))
-  .. ( range(sta, end) -> map((_, v) => "\n" .. v) -> join(''))
-  #.. repeat("\n$", 98 + 98)
-
-  const conts = split(cont, "\n", 1) -> map((_, v) => '%#tabpanel#' .. v)
-
-  return join(conts, "\n") .. "\n" .. '%#StlGoldLeaf#            [Footer]'
-enddef
 
 
 #----------------------------------------------------------------------------------------
@@ -261,6 +161,7 @@ set tabpanel=%!g:TabPanel()
 set tabpanelopt=align:right,columns:26
 
 
+
 #----------------------------------------------------------------------------------------
 # Toggle Sho Tab Panel
 
@@ -271,4 +172,5 @@ com! ShowTabPanel {
     &showtabpanel = 0
   endif
 }
+
 nnoremap <Leader>t <Cmd>ShowTabPanel<CR>
