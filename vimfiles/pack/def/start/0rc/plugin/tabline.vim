@@ -218,18 +218,32 @@ def MakeTabpageLabel(tabn: number, cur_tab: bool): string
 
   if contents_switch.Bufname
     # タブ内のバッファのリスト
-    var bufnrs = tabpagebuflist(tabn)
+    const bufnrs = tabpagebuflist(tabn)
 
     # バッファ数
     # const bufnum_str = '(' .. len(bufnrs) .. ')'
 
+    # カレントウィンドウ番号
+    const curwinnr = tabpagewinnr(tabn)
+
+    # カレントウィンドウID
+    #const tabinfo = gettabinfo(tabn)
+    const winid = gettabinfo(tabn)[0].windows[curwinnr - 1]  # tabpagewinnr()は1始まりなので、リストのインデックスにするために1を引く。
+
+    # ウィンドウ情報
+    const wininfo = getwininfo(winid)[0]
+
     # カレントバッファ番号
-    const curbufnr = bufnrs[tabpagewinnr(tabn) - 1]  # tabpagewinnr()は、 1始まり。
+    const curbufnr = bufnrs[curwinnr - 1]  # tabpagewinnr()は1始まりなので、リストのインデックスにするために1を引く。
 
     # カレントバッファ名
     const bufname_tmp = expand('#' .. curbufnr .. ':t')
 
-    const bufname = bufname_tmp == '' ? 'No Name' : bufname_tmp  # 無名バッファは、バッファ名が出ない。
+    const bufname = bufname_tmp == '' ?
+                        wininfo.loclist  == 1 ? '[Locationリスト]' :  # [Location List]
+                        wininfo.quickfix == 1 ? '[Quickfixリスト]' :  # [Quickfix List]
+                        '[無名]'  # 'No Name'
+                    : bufname_tmp
 
     label = tabn_str .. ' ' .. bufname
 
