@@ -7,10 +7,10 @@ scriptencoding utf-8
 # Focus Wrap Move
 #----------------------------------------------------------------------------------------
 
-const NotTerminal = (win: number): bool => {
+def NotTerminal(win: number): bool
   const bufnr = winbufnr(win)
   return getbufvar(bufnr, '&l:buftype') !~ 'terminal' || term_getstatus(bufnr) =~ 'normal'
-}
+enddef
 
 export def WindowFocus_WrapMove(dir_key: string, count: number): void
   const cur_win = winnr()
@@ -77,15 +77,12 @@ enddef
 # Optimal Window Width
 #----------------------------------------------------------------------------------------
 
-const OptimalWidth = () => (
-    range(line('w0'), line('w$')) -> map((_, val) => virtcol([val, '$'])) -> max()
-    +
-    (bufname(0) =~ '^NERD_tree' ? -2 : 0)
-    +
-    (&number || &l:number || &relativenumber || &l:relativenumber ? 5 : 0)
-    +
-    &l:foldcolumn
-  )
+def OptimalWidth(): number
+  return range(line('w0'), line('w$')) -> map((_, val) => virtcol([val, '$'])) -> max()
+    + (bufname(0) =~ '^NERD_tree' ? -2 : 0)
+    + (&number || &l:number || &relativenumber || &l:relativenumber ? 5 : 0)
+    + &l:foldcolumn
+enddef
 
 export def WindowResizeOptimalWidth()
   exe ':' OptimalWidth() 'wincmd |'
@@ -107,9 +104,9 @@ enddef
 #----------------------------------------------------------------------------------------
 
 # TODO wrapされた行の考慮も必要。
-const OptimalHeightBuf        = (): dict<number> => {
+def OptimalHeightBuf(): dict<number>
   return {height: line('$') + 2, top_line: 1}  # 2に根拠はない。
-}
+enddef
 
 # TODO この下の関数をλにすると、ロード時に評価されて、PushPosが未定義のエラーになる。
 # TODO const OptimalHeightFunction = (): dict<number> => {
@@ -136,11 +133,21 @@ def WindowResizeOptimalHeight(arg: dict<number>)
   #call repeat("\<C-Y>", line('$'))->feedkeys('n')
 enddef
 
-export const WindowResizeOptimalHeightBuf        = () => OptimalHeightBuf()->WindowResizeOptimalHeight()
-# TODO この下の行を実行すると、OptimalHeightFunction()が評価されていまって、「PushPosが未定義エラー」となる。
-# TODO export const WindowResizeOptimalHeightFunction = () => OptimalHeightFunction()->WindowResizeOptimalHeight()
-# export const WindowResizeOptimalHeightBlock    = () => OptimalHeightBlock()->WindowResizeOptimalHeight()
-# export const WindowResizeOptimalHeightIfBlock  = () => OptimalHeightIfBlock()->WindowResizeOptimalHeight()
+def WindowResizeOptimalHeightBuf()
+  OptimalHeightBuf() -> WindowResizeOptimalHeight()
+enddef
+
+def WindowResizeOptimalHeightFunction()
+  OptimalHeightFunction() -> WindowResizeOptimalHeight()
+enddef
+
+def WindowResizeOptimalHeightBlock()
+  OptimalHeightBlock() -> WindowResizeOptimalHeight()
+enddef
+
+def WindowResizeOptimalHeightIfBlock()
+  OptimalHeightIfBlock() -> WindowResizeOptimalHeight()
+enddef
 
 
 
@@ -150,15 +157,15 @@ export const WindowResizeOptimalHeightBuf        = () => OptimalHeightBuf()->Win
 #----------------------------------------------------------------------------------------
 
 # Wrap Focus
-nnoremap <Plug>(Window-Focus-WrapMove-h) <cmd>call <SID>WindowFocus_WrapMove('h', v:count1)<CR>
-nnoremap <Plug>(Window-Focus-WrapMove-j) <cmd>call <SID>WindowFocus_WrapMove('j', v:count1)<CR>
-nnoremap <Plug>(Window-Focus-WrapMove-k) <cmd>call <SID>WindowFocus_WrapMove('k', v:count1)<CR>
-nnoremap <Plug>(Window-Focus-WrapMove-l) <cmd>call <SID>WindowFocus_WrapMove('l', v:count1)<CR>
+nnoremap <Plug>(Window-Focus-WrapMove-h) <Cmd>call <SID>WindowFocus_WrapMove('h', v:count1)<CR>
+nnoremap <Plug>(Window-Focus-WrapMove-j) <Cmd>call <SID>WindowFocus_WrapMove('j', v:count1)<CR>
+nnoremap <Plug>(Window-Focus-WrapMove-k) <Cmd>call <SID>WindowFocus_WrapMove('k', v:count1)<CR>
+nnoremap <Plug>(Window-Focus-WrapMove-l) <Cmd>call <SID>WindowFocus_WrapMove('l', v:count1)<CR>
 
 
 # Optimal Width
 com! -nargs=0 -bar WindowResizeOptimalWidth call <SID>WindowResizeOptimalWidth()
-nnoremap <Plug>(Window-Resize-OptimalWidth) <cmd>>WindowResizeOptimalWidth<CR>
+nnoremap <Plug>(Window-Resize-OptimalWidth) <Cmd>>WindowResizeOptimalWidth<CR>
 
 # Toggle `Optimal Width' <=> `Equal Width'
 com! -nargs=0 -bar WindowResizeToggleOptimalWidthEqual call <SID>WindowResizeToggleOptimalWidthEqual()
@@ -166,11 +173,11 @@ nnoremap <Plug>(Window-Resize-Toggle-OptimalWidth-Equal) <Cmd>WindowResizeToggle
 
 # Optimal Height (Buf)
 com! -nargs=0 -bar OptimalHeightBuf call WindowResizeOptimalHeightBuf()
-nnoremap <Plug>(Window-Resize-OptimalHeight-Buf) <cmd>OptimalHeightBuf<CR>
+nnoremap <Plug>(Window-Resize-OptimalHeight-Buf) <Cmd>OptimalHeightBuf<CR>
 
 # Optimal Height (Function)
 com! -nargs=0 -bar OptimalHeightFunction call WindowResizeOptimalHeightFunction()
-nnoremap <Plug>(Window-Resize-OptimalHeight-Function) <cmd>OptimalHeightFunction<CR>
+nnoremap <Plug>(Window-Resize-OptimalHeight-Function) <Cmd>OptimalHeightFunction<CR>
 
 
 # Equal Only Height
@@ -524,7 +531,7 @@ def GetCleanBuf(): number
                 -> filter((_, bufnr) => getbufoneline(bufnr, 1) == '')                                       # (唯一存在する行である)1行目は空文字である。
                 -> filter((_, bufnr) => undotree(bufnr).seq_last == 0)                                       # 変更履歴が一切ない(バッファ生成後、1度も編集されていない。)
                 -> filter((_, bufnr) => index(curtab_bufnrs, bufnr) == -1)                                   # 既に、このタブにあるバッファを除外。
-  echo bufs
+  # echo bufs
   return len(bufs) >= 1 ? bufs[0] : -1
 enddef
 
