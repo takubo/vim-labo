@@ -34,22 +34,42 @@ Hl()
 # 他から自由に干渉できるよう、グローバルスコープとしておく。
 g:BatDemoRem = 100
 
-def BatteryRemaining(): number
+def BatteryReduce(dummy: number)
   var rem = g:BatDemoRem
 
   if rem <= 0
     rem = 100
   else
-    # 0..4の範囲の乱数を生成して引く
-    rem -= (rand() / pow(2, 32) * 4) -> float2nr()
+    # 0..6の範囲の乱数を生成して引く
+    rem -= (rand() / pow(2, 32) * 6) -> float2nr()
     if rem < 0
       rem = 0
     endif
   endif
 
   g:BatDemoRem = rem
-  return rem
 enddef
+
+# 旧タイマの削除 (再読み込みする際、古いタイマを削除しないと、どんどん貯まっていってしまう。)
+if exists('g:BatteryDemoTimerId') | timer_stop(g:BatteryDemoTimerId) | endif
+
+g:BatteryDemoTimerId = 0
+
+def SetTimer(on: bool)
+  if on
+    if timer_info(g:BatteryDemoTimerId) == []
+      g:BatteryDemoTimerId = timer_start(1000, BatteryReduce, {'repeat': -1})
+    endif
+  else
+    timer_stop(g:BatteryDemoTimerId)
+  endif
+enddef
+
+def BatteryRemaining(): number
+  return g:BatDemoRem
+enddef
+
+SetTimer(true)
 
 
 #----------------------------------------------------------------------------------------

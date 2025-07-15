@@ -3,6 +3,9 @@ vim9script
 scriptencoding utf-8
 
 
+finish
+
+
 def g:TabPanel_Demo_new(): string
   # Header
   const header = TabPanel_Demo_Header()

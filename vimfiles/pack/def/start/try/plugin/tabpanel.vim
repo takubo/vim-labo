@@ -8,10 +8,7 @@ scriptencoding utf-8
 # Make TabPanelStr
 
 def TabpanelHeader(): string
-  return '%#TblDate# '
-    .. strftime('%Y/%m/%d (%a)')
-    .. '%=' .. strftime('%H:%M  ')
-    .. "\n"
+  return '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '%=' .. strftime('%H:%M  ') .. "\n\n"
 
  #return "\n"
 enddef
@@ -19,14 +16,14 @@ enddef
 
 def TabpanelFooter(): string
   if 1
-    return '%#TblDate# '
-  # return '%#StlGoldLeaf# '
+    return '%#TblDate#'
   elseif 0
-  # return join(conts, "\n") .. repeat("\n%#tabpanel#", &lines - (&cmdheight) - len(conts)) .. '%#StlGoldLeaf#            [Footer]'
+    return '%#StlGoldLeaf#'
+  elseif 0
+    return '%#StlGoldLeaf#%=[Footer]%='
   else
-    return g:BatteryGraph() -> join("\n") .. "\n" .. '%#TblDate# '
+    return g:BatteryGraph() -> join("\n") .. "\n" .. '%#TblDate#'
   endif
-  return ''
 enddef
 
 
@@ -43,7 +40,7 @@ def CountChar(str: string, c: string): number
 enddef
 
 
-var AccumLine: number
+var AccumNumLine: number
 
 def g:TabPanel(): string
   var str = ''
@@ -51,31 +48,32 @@ def g:TabPanel(): string
   const tabnr = g:actual_curtabpage
 
   # Header
-  const header = tabnr == 1 ? TabpanelHeader() : ''
+  const header = (tabnr == 1 ? TabpanelHeader() : '')
 
   # Tabs
   const body = Tabs(tabnr)
 
   if tabnr == 1
-    AccumLine = header -> CountChar("\n")
+    AccumNumLine = header -> CountChar("\n")
   endif
 
-  AccumLine += body -> CountChar("\n") + 1
+  AccumNumLine += body -> CountChar("\n") + 1
 
   if tabnr == tabpagenr('$')
     # Adding
     const adding = TabpanelAdding()
-    AccumLine += adding -> CountChar("\n")
+    AccumNumLine += adding -> CountChar("\n")
 
     # Footer
     const footer = TabpanelFooter()
-    AccumLine += footer -> CountChar("\n")
+    AccumNumLine += footer -> CountChar("\n")
 
     # Padding
     const tabpanel_height = &lines - &cmdheight
-    const padding = '%#TabPanelFill#' .. repeat("\n", tabpanel_height - AccumLine)
+    const padding = '%#TabPanelFill#' .. repeat("\n", tabpanel_height - AccumNumLine)
 
     # 返り値
+    # タブが1つしかない場合に備えて、ここでもheaderを含める必要がある。
     return header .. body .. adding .. padding .. footer
   else
     # 返り値
@@ -85,40 +83,37 @@ enddef
 
 
 def Tabs(tabnr: number): string
-  var str = ''
-
   # Tab Number
-  if 0
+  var tabnrstr = ''
+
+  if 1
     if tabnr == tabpagenr()
-      str ..= '%#TabLineSel#'
+      tabnrstr ..= '%#TabLineSel#'
     else
-      str ..= '%#PopupNotification#'
+      tabnrstr ..= '%#TabPanelTabnr#'
+      tabnrstr ..= '%#StlFill#'
+      tabnrstr ..= '%#PopupNotification#'
     endif
-    str ..= printf("[%d]\n", tabnr)
   elseif 0
-    str ..= '%#StlFill#'
-    str ..= '%#TabLineSel#'
-    str ..= printf("[%d]", tabnr)
-    str ..= '%##'
-    str ..= "\n"
+    tabnrstr ..= '%#TabLineSel#'
   else
-    if tabnr == tabpagenr()
-      str ..= '%#TabLineSel#'
-    else
-      str ..= '%#StlFill#'
-      str ..= '%#PopupNotification#'
-    endif
-    str ..= printf("[%d]", tabnr)
-    str ..= '%##'
-    str ..= "\n"
+    tabnrstr ..= '%#StlFill#'
+    tabnrstr ..= '%#PopupNotification#'
   endif
+
+  tabnrstr ..= printf("[%d]", tabnr)
+  if true  # 行全体に色を付けたいなら、falseにする。
+    tabnrstr ..= '%##'
+  endif
+  tabnrstr ..= "\n"
 
   # ウィンドウのリスト
   const wins = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinStr(i + 1, winid, tabnr))
-  str ..= '  ' .. join(wins, "\n  ") .. "\n"
- #str ..= '   ' .. join(wins, "\n   ") .. "\n"
+  const winstr = 1 ?
+                 ('  '  .. join(wins, "\n  ")  .. "\n") :
+                 ('   ' .. join(wins, "\n   ") .. "\n")
 
-  return str
+  return tabnrstr .. winstr
 enddef
 
 
@@ -128,12 +123,22 @@ def WinStr(winnr: number, winid: number, tabnr: number): string
   const buftype = getbufvar(wininfo.bufnr, '&buftype')
   const bufname = expand('#' .. wininfo.bufnr .. ':t')
   const diff    = gettabwinvar(tabnr, winnr, '&diff')
+  const curwin = tabnr == tabpagenr() && winnr == tabpagewinnr(tabnr)
 
-  const curwin_sign = tabnr == tabpagenr() && winnr == tabpagewinnr(tabnr) ? '%#TabLineSel#>%## ' : '  '
+  const hl_line = true
+
+  const curwin_sign = hl_line ?
+                      (curwin ? ' %#TabPanelMySel# ' : '  ') :
+                      (curwin ? '%#TabPanelMySel#>%## ' : '  ')
+
+  const winnr_hl   = (hl_line && curwin ? '%#TabPanelWinInfoSel#' : '%#TabPanelWinInfo#')
+  const info_hl    = (hl_line && curwin ? '%#TabPanelWinInfoSel#' : '%#TabPanelWinInfo#')
+  const bufname_hl = (hl_line && curwin ? '%#TabPanelMySel#'      : '%#TabPanelBufName#')
+
+  const winnr_str = winnr .. '. '
 
   var info = ''
 
-  # diffの先頭には、なぜか改行が付く。
   info ..= (diff ? '[Diff] ' : '')
 
   info ..=
@@ -154,12 +159,10 @@ def WinStr(winnr: number, winid: number, tabnr: number): string
                        ''
 
   return curwin_sign
-      .. '%#TabPanelWinInfo#'
-      .. winnr .. '. '
-      .. '%#TabPanelWinInfo#'
-      .. info
-      .. '%#TabPanelBufName#'
-      .. bufname_show .. '%<'
+      .. winnr_hl   .. winnr_str
+      .. info_hl    .. info
+      .. bufname_hl .. bufname_show
+      .. '%<'
 enddef
 
 

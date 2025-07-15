@@ -72,7 +72,8 @@ def Funcs_Body(): list<string>
     return []
   endif
 
-  return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>') -> map((_, v) => v .. '%<')
+  return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>') -> map((_, v) => v .. '%<') -> map((_, v) => substitute(v, '^\s*\%(\%[export]\s\+\)\?\%[def]\>\s*', '▶ ', ''))
+ #return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>') -> map((_, v) => v .. '%<')
  #return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>')
 enddef
 
