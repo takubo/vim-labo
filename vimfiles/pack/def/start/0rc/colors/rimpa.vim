@@ -187,10 +187,19 @@ hi TabPanelWinInfo	guifg=#d0c5a9	guibg=black	gui=NONE	cterm=NONE
 hi TabPanelBufName	guifg=#cccccc	guibg=black	gui=NONE	cterm=NONE
 hi! link TabPanelBufName	TabPanel
 
-"? hi TabPanelWinInfo	guifg=#d0c5a9	guibg=NONE	gui=NONE	cterm=NONE
-"? hi TabPanelBufName	guifg=#cccccc	guibg=NONE	gui=NONE	cterm=NONE
-"? hi TabPanelBg		          	guibg=black	gui=NONE	cterm=NONE
-"? hi TabPanelCur		guifg=red	           	gui=NONE	cterm=NONE
+if 0
+  hi! link TabPanelMySel	TblDate
+  hi TabPanelMySel	guifg=#cccccc	guibg=#7f1f1a	gui=NONE	cterm=NONE		" TblDate
+  hi TabPanelWinInfoSel	guifg=#d0c5a9	guibg=#7f1f1a	gui=NONE	cterm=NONE		" TblDate
+else
+  hi! link TabPanelMySel	QuickFixLine
+  hi TabPanelMySel	guifg=#cccccc	guibg=#603a36	gui=NONE	cterm=NONE		" QuickFixLine
+  hi TabPanelWinInfoSel	guifg=#d0c5a9	guibg=#603a36	gui=NONE	cterm=NONE		" QuickFixLine
+endif
+
+hi! link TabPanelTabnr	StlFill
+hi! link TabPanelTabnr	TblDate
+hi! link TabPanelTabnr	PopupNotification
 
 
 "----------------------------------------------------------------------------------------
