@@ -149,9 +149,10 @@ else
   hi! link TabLineFill	StlFill
 endif
 
-hi TabPanel		guifg=#d0c5a9	guibg=black	gui=NONE	cterm=NONE
-hi! link TabPanelSel	TabPanel
+"hi TabPanel		guifg=#d0c5a9	guibg=black	gui=NONE	cterm=NONE
+hi TabPanel		guifg=#cccccc	guibg=black	gui=NONE	cterm=NONE
 hi TabPanelFill		guifg=black	guibg=black	gui=NONE	cterm=NONE
+hi! link TabPanelSel	TabPanelFill
 
 
 "----------------------------------------------------------------------------------------
@@ -181,10 +182,12 @@ hi StlFill		guifg=#cf302d	guibg=#000000	gui=NONE	cterm=NONE
 hi StlNoNameDir		guifg=#5c5a4f	guibg=#000000	gui=NONE	cterm=NONE
 hi! link StlFuncName	stl_blue_char
 
-hi! link TabPanelBufType	TabPanel
+hi! link TabPanelWinInfo	TabPanel
+hi TabPanelWinInfo	guifg=#d0c5a9	guibg=black	gui=NONE	cterm=NONE
 hi TabPanelBufName	guifg=#cccccc	guibg=black	gui=NONE	cterm=NONE
+hi! link TabPanelBufName	TabPanel
 
-"? hi TabPanelBufType	guifg=#d0c5a9	guibg=NONE	gui=NONE	cterm=NONE
+"? hi TabPanelWinInfo	guifg=#d0c5a9	guibg=NONE	gui=NONE	cterm=NONE
 "? hi TabPanelBufName	guifg=#cccccc	guibg=NONE	gui=NONE	cterm=NONE
 "? hi TabPanelBg		          	guibg=black	gui=NONE	cterm=NONE
 "? hi TabPanelCur		guifg=red	           	gui=NONE	cterm=NONE
