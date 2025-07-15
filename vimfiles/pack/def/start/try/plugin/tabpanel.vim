@@ -3,7 +3,11 @@ vim9script
 scriptencoding utf-8
 
 
-def TabPanelHeader(): string
+
+#----------------------------------------------------------------------------------------
+# Make TabPanelStr
+
+def TabpanelHeader(): string
   return '%#TblDate# '
     .. strftime('%Y/%m/%d (%a)')
     .. '%=' .. strftime('%H:%M  ')
@@ -13,27 +17,33 @@ def TabPanelHeader(): string
 enddef
 
 
-def TabPanelFooter(): string
-  return '%#TblDate# '
- #return '%#StlGoldLeaf# '
- #return g:Demo() -> join("\n") .. "\n" .. '%#TblDate# '
- #return "\n"
- #return join(conts, "\n") .. repeat("\n%#tabpanel#", &lines - (&cmdheight) - len(conts)) .. '%#StlGoldLeaf#            [Footer]'
+def TabpanelFooter(): string
+  if 1
+    return '%#TblDate# '
+  # return '%#StlGoldLeaf# '
+  elseif 0
+  # return join(conts, "\n") .. repeat("\n%#tabpanel#", &lines - (&cmdheight) - len(conts)) .. '%#StlGoldLeaf#            [Footer]'
+  else
+    return g:BatteryGraph() -> join("\n") .. "\n" .. '%#TblDate# '
+  endif
+  return ''
 enddef
 
 
-def TabPanelAdding(): string
+def TabpanelAdding(): string
  #return '%#TblDate# '
   return "\n\n\n" .. g:FuncsString()
  #return "\n"
 enddef
 
 
+# str内のcの数を数える
 def CountChar(str: string, c: string): number
   return [str] -> matchstrlist(c) -> len()
 enddef
 
-var LinesAccum = 0
+
+var AccumLine: number
 
 def g:TabPanel(): string
   var str = ''
@@ -41,29 +51,29 @@ def g:TabPanel(): string
   const tabnr = g:actual_curtabpage
 
   # Header
-  const header = tabnr == 1 ? TabPanelHeader() : ''
+  const header = tabnr == 1 ? TabpanelHeader() : ''
 
   # Tabs
   const body = Tabs(tabnr)
 
   if tabnr == 1
-    LinesAccum = header -> CountChar("\n")
+    AccumLine = header -> CountChar("\n")
   endif
 
-  LinesAccum += body -> CountChar("\n") + 1
+  AccumLine += body -> CountChar("\n") + 1
 
   if tabnr == tabpagenr('$')
     # Adding
-    const adding = TabPanelAdding()
-    LinesAccum += adding -> CountChar("\n")
+    const adding = TabpanelAdding()
+    AccumLine += adding -> CountChar("\n")
 
     # Footer
-    const footer = TabPanelFooter()
-    LinesAccum += footer -> CountChar("\n")
+    const footer = TabpanelFooter()
+    AccumLine += footer -> CountChar("\n")
 
     # Padding
     const tabpanel_height = &lines - &cmdheight
-    const padding = '%#tabpanel#' .. repeat("\n", tabpanel_height - LinesAccum)
+    const padding = '%#TabPanelFill#' .. repeat("\n", tabpanel_height - AccumLine)
 
     # 返り値
     return header .. body .. adding .. padding .. footer
@@ -111,72 +121,78 @@ def Tabs(tabnr: number): string
   return str
 enddef
 
+
 def WinStr(winnr: number, winid: number, tabnr: number): string
-  var winstr = ''
-
-  winstr ..= tabnr == tabpagenr() && winnr == tabpagewinnr(tabnr) ? '%#TabLineSel#>%## ' : '  '
-
   const wininfo = getwininfo(winid)[0]
   const wintype = win_gettype(winid)
   const buftype = getbufvar(wininfo.bufnr, '&buftype')
   const bufname = expand('#' .. wininfo.bufnr .. ':t')
-  const diff    = win_execute(winid, "setl diff?")  # getwinvar(winid, '&diff')
-  #const diff2   =  getwinvar(winid, '&diff')
+  const diff    = gettabwinvar(tabnr, winnr, '&diff')
 
-  var type = ''
+  const curwin_sign = tabnr == tabpagenr() && winnr == tabpagewinnr(tabnr) ? '%#TabLineSel#>%## ' : '  '
 
-  #type ..= (diff == 'diff' ? '[Diff]' : '')
-  #type ..= (type(diff2) == v:t_bool && diff2 || type(diff2) == v:t_string && diff == 'diff' ? '[Diff2] ' : '')
-  type ..= (diff !~# 'nodiff' ? '[Diff] ' : '')
-  #if diff !~# 'nodiff'
-  #  type ..= (type != '' ? ' ' : '') .. '[Diff]'
-  #endif
+  var info = ''
 
-  type ..=
-  wininfo.loclist  == 1 ? '[Locationリスト]' :  # [Location List]
-  wininfo.quickfix == 1 ? '[Quickfixリスト]' :  # [Quickfix List]
-  wininfo.terminal == 1 ? '[Terminal]' :
-  wintype == 'preview'  ? '[Preview]' :
-  buftype == 'help'     ? '[Help]' :
-  buftype == 'prompt'   ? '[Prompt]' :
-  buftype == 'nowrite'  ? '[No Write]' :
-  buftype == 'nofile'   ? '[No File]' :
-  bufname == ''         ? '[無名]' :  # '[No Name]' :
-  ''
+  # diffの先頭には、なぜか改行が付く。
+  info ..= (diff ? '[Diff] ' : '')
 
-  type ..= (type != '' && type[-1] != ' ' ? ' ' : '')
+  info ..=
+        wininfo.loclist  == 1 ? '[Locationリスト]' :  # [Location List]
+        wininfo.quickfix == 1 ? '[Quickfixリスト]' :  # [Quickfix List]
+        wininfo.terminal == 1 ? '[Terminal]' :
+        wintype == 'preview'  ? '[Preview]' :
+        buftype == 'help'     ? '[Help]' :
+        buftype == 'prompt'   ? '[Prompt]' :
+        buftype == 'nowrite'  ? '[No Write]' :
+        buftype == 'nofile'   ? '[No File]' :
+        ''
 
-  winstr ..= ''
-    .. '%#TabPanelBufName#'
-    .. '%##'
-    .. winnr .. '. '
-    .. '%#TabPanelBufName#'
-    .. '%##'
-    .. type
-    #.. type(diff2) .. ' ' .. type(diff)
-    .. '%##'
-    .. '%#TabPanelBufName#'
-    .. bufname .. '%<'
+  info ..= (info != '' && info[-1] != ' ' ? ' ' : '')
 
-  return winstr
+  const bufname_show = bufname != '' ? bufname :
+                       wininfo.loclist  == 0 && wininfo.quickfix == 0 ? '[無名]' :  # [No Name]
+                       ''
+
+  return curwin_sign
+      .. '%#TabPanelWinInfo#'
+      .. winnr .. '. '
+      .. '%#TabPanelWinInfo#'
+      .. info
+      .. '%#TabPanelBufName#'
+      .. bufname_show .. '%<'
 enddef
 
 
 
 #----------------------------------------------------------------------------------------
-# Options
+# TabPanel Timer
 
-set tabpanel=%!g:TabPanel_last_only()
-set tabpanel=%!g:TabPanel_cur_only_over_test()
-set tabpanel=%!g:TabPanel()
+# 旧タイマの削除 (再読み込みする際、古いタイマを削除しないと、どんどん貯まっていってしまう。)
+if exists('g:RedrawTabpanelTimerId') | timer_stop(g:RedrawTabpanelTimerId) | endif
 
-set tabpanelopt=align:right,columns:26
-set tabpanelopt=align:right,columns:36
+g:RedrawTabpanelTimerId = 0
+
+def SetTimer(on: bool)
+#?  # 一定間隔で更新する必要があるコンテンツがあるときのみ、タイマーを有効にする。
+#?  const req_timer_cont = ( ['Battery', 'Date', 'Time', 'TimeSecond']
+#?    -> map((_, val) => TabpanelContentsSwitch[val])
+#?    -> reduce((acc, val) => acc || val, true)
+#?  )
+  const req_timer_cont = true
+
+  if on && req_timer_cont
+    if timer_info(g:RedrawTabpanelTimerId) == []
+      g:RedrawTabpanelTimerId = timer_start(RedrawTabpanelInterval, (dummy) => execute('redrawtabpanel'), {'repeat': -1})
+    endif
+  else
+    timer_stop(g:RedrawTabpanelTimerId)
+  endif
+enddef
 
 
 
 #----------------------------------------------------------------------------------------
-# Toggle Sho Tab Panel
+# Toggle Show TabPanel
 
 com! ShowTabPanel {
   if &showtabpanel == 0
@@ -187,3 +203,26 @@ com! ShowTabPanel {
 }
 
 nnoremap <Leader>t <Cmd>ShowTabPanel<CR>
+
+
+
+#----------------------------------------------------------------------------------------
+# Initialize
+
+#--------------------------------------------
+# Options
+
+set tabpanel=%!g:TabPanel_last_only()
+set tabpanel=%!g:TabPanel_cur_only_over_test()
+set tabpanel=%!g:TabPanel()
+
+set tabpanelopt=align:right,columns:26
+set tabpanelopt=align:right,columns:36
+
+
+#--------------------------------------------
+# Timer
+
+const RedrawTabpanelInterval = 1000
+
+SetTimer(true)
