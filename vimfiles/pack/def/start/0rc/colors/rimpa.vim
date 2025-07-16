@@ -201,6 +201,8 @@ hi! link TabPanelTabnr	StlFill
 hi! link TabPanelTabnr	TblDate
 hi! link TabPanelTabnr	PopupNotification
 
+hi! link TblDiffRedOn	TblDate
+hi TblDiffRedOff	guifg=#7f6358	guibg=#7f1f1a	gui=NONE	cterm=NONE
 
 "----------------------------------------------------------------------------------------
 " Message, Question
