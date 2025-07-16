@@ -169,9 +169,7 @@ def Tabs(tabnr: number): string
 
   # ウィンドウのリスト
   const wins = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinStr(i + 1, winid, tabnr))
-  const winstr = 1 ?
-                 ('  '  .. join(wins, "\n  ")  .. "\n") :
-                 ('   ' .. join(wins, "\n   ") .. "\n")
+  const winstr = join(wins, "\n")  .. "\n"
 
   return tabnrstr .. winstr
 enddef
@@ -187,9 +185,13 @@ def WinStr(winnr: number, winid: number, tabnr: number): string
 
   const hl_line = true
 
+  const indent = 1 ? ('  ')  : ('   ')
+ #const indent = ( curwin ? '%#TabPanelMySel#' : '' ) ..
+ #               (1 ? ('  ')  : ('   '))
+
   const curwin_sign = hl_line ?
                       (curwin ? ' %#TabPanelMySel# ' : '  ') :
-                      (curwin ? '%#TabPanelMySel#>%## ' : '  ')
+                      (curwin ? '%#StlFill#>%## ' : '  ')
 
   const winnr_hl   = (hl_line && curwin ? '%#TabPanelWinInfoSel#' : '%#TabPanelWinInfo#')
   const info_hl    = (hl_line && curwin ? '%#TabPanelWinInfoSel#' : '%#TabPanelWinInfo#')
@@ -218,7 +220,7 @@ def WinStr(winnr: number, winid: number, tabnr: number): string
                        wininfo.loclist  == 0 && wininfo.quickfix == 0 ? '[無名]' :  # [No Name]
                        ''
 
-  return curwin_sign
+  return indent .. curwin_sign
       .. winnr_hl   .. winnr_str
       .. info_hl    .. info
       .. bufname_hl .. bufname_show
