@@ -566,7 +566,8 @@ submode#map(       'TabMove', 'n', '',  '<C-B>', "<Cmd>exe tabpagenr() == 1     
 submode#map(       'TabMove', 'n', '',      'j', "<Cmd>exe tabpagenr() == tabpagenr('$') ? 'tabmove 0' : 'tabmove +1'<CR>")
 submode#map(       'TabMove', 'n', '',      'k', "<Cmd>exe tabpagenr() == 1              ? 'tabmove $' : 'tabmove -1'<CR>")
 
-nnoremap gt <Cmd>tabs<CR>:tabnext<Space>
+nnoremap gT <Cmd>tabs<CR>:tabnext<Space>
+nnoremap gt <Cmd>exe 'tabnext' tabpagenr('#')<CR>
 
 
 #--------------------------------------------

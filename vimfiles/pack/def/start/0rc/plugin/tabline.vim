@@ -303,7 +303,9 @@ def SwitchTabline(...args: list<string>)
     return
   endif
 
-  args -> foreach((_, val) => TablineContentsSwitch[val] = !TablineContentsSwitch[val])
+  args -> foreach((_, val) => {
+                    TablineContentsSwitch[val] = !TablineContentsSwitch[val]
+                  } )
 
   redrawtabline
 
