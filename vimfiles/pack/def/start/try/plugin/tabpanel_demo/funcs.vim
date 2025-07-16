@@ -72,13 +72,15 @@ def Funcs_Body(): list<string>
     return []
   endif
 
-  return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>') -> map((_, v) => v .. '%<') -> map((_, v) => substitute(v, '^\s*\%(\%[export]\s\+\)\?\%[def]\>\s*', '▶ ', ''))
+  return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>') -> map((_, v) => v .. '%<') -> map((_, v) => substitute(v, '^\s*\%(\%[export]\s\+\)\?\%[def]\>\s*', '%#StlFill#▶ %#TabPanel#', ''))
+ #return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>') -> map((_, v) => v .. '%<') -> map((_, v) => substitute(v, '^\s*\%(\%[export]\s\+\)\?\%[def]\>\s*', '▶ ', ''))
  #return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>') -> map((_, v) => v .. '%<')
  #return getline(1, '$') -> filter((_, v) => v =~# '^\s*\%(\%[export]\s\+\)\?\%[def]\>')
 enddef
 
 
 export def g:FuncsString(): string
+ #return Funcs_Body() -> map((_, v) => substitute(v, '^', '%#TabPanel#', '')) -> join("\n")
   return Funcs_Body() -> join("\n")
 enddef
 

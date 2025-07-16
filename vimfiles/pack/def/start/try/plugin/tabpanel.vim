@@ -32,8 +32,9 @@ def TabpanelFooter(): string
     const bat_str =
       false ? g:BatteryBar() -> join("\n") :
       false ? g:BatteryGraph_Center() -> join("\n") : ''
+    return bat_str .. "\n" .. '%#StlGoldLeaf#%=%#TblDate# [ ' .. DiffOptStr() .. ' ] %#StlGoldLeaf#%='
+   #return bat_str .. "\n" .. '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ] %='
    #return bat_str .. "\n" .. '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ]  '
-    return bat_str .. "\n" .. '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ] %='
    #return bat_str .. "\n" .. '%#TblDate#%=%#StlFill# [ ' .. DiffOptStr() .. ' ] %#TblDate#%='
   endif
 enddef
@@ -44,7 +45,7 @@ def TabpanelAdding(): string
   if fs == ''
     return "\n\n"
   else
-    return "\n\n" .. Border() .. g:FuncsString() .. "\n" .. Border() .. "\n"
+    return "\n\n" .. Border() .. fs .. "\n" .. Border() .. "\n"
   endif
  #return '%#TblDate# '
  #return "\n\n\n" .. g:FuncsString()
@@ -54,10 +55,10 @@ def TabpanelAdding(): string
 enddef
 
 
-def Border(c: string = '─', hl: string = '%##'): string
+def Border(c: string = '─', hl: string = '%#TabPanel#'): string
   const tc = TabPanelColumn()
   const cw = c -> strdisplaywidth()
-  return repeat(c, tc / cw) .. "\n"
+  return hl .. repeat(c, tc / cw) .. "\n"
 enddef
 
 
@@ -256,15 +257,108 @@ enddef
 #----------------------------------------------------------------------------------------
 # Toggle Show TabPanel
 
-com! ShowTabPanel {
+def SwitchShowTabPanel()
   if &showtabpanel == 0
     &showtabpanel = 2
   else
     &showtabpanel = 0
   endif
-}
+enddef
 
-nnoremap <Leader>t <Cmd>ShowTabPanel<CR>
+nnoremap <Leader>t <ScriptCmd>SwitchShowTabPanel()<CR>
+
+
+def SwitchShowTabLine()
+  if &showtabline == 0
+    &showtabline = 2
+  else
+    &showtabline = 0
+  endif
+enddef
+
+nnoremap <Leader>T <ScriptCmd>SwitchShowTabLine()<CR>
+
+def SetTabPanelAlign(align: string)
+  const tabpanelopt = &tabpanelopt
+
+  if match(tabpanelopt, 'align:\w\+') != -1
+    &tabpanelopt = substitute(tabpanelopt, 'align:\zs\w\+', align, '')
+  else
+    &tabpanelopt ..= ',align:' .. align
+  endif
+enddef
+
+nnoremap <Leader>[ <ScriptCmd>SetTabPanelAlign('left')<CR>
+nnoremap <Leader>] <ScriptCmd>SetTabPanelAlign('right')<CR>
+
+
+def SetTabPanelColumnNum(column: number)
+  const tabpanelopt = &tabpanelopt
+
+  if match(tabpanelopt, 'columns:\d\+') != -1
+    &tabpanelopt = substitute(tabpanelopt, 'columns:\zs\d\+', column, '')
+  else
+    &tabpanelopt ..= ',columns:' .. column
+  endif
+enddef
+
+def SetTabPanelColumn(arg: string)
+  const cur_column = TabPanelColumn()
+
+  const ope = arg == '+' ? '+1' :
+              arg == '-' ? '-1' : arg
+
+  const sign = matchstr(ope, '^[+-]')
+  const num  = matchstr(ope, '^[+-]\?\zs\d\+') -> str2nr()
+
+  var new_column = cur_column
+
+  if sign == '+'
+    new_column = cur_column + num
+  elseif sign == '-'
+    new_column = cur_column - num
+  elseif num > 0
+    new_column = num
+  endif
+
+  SetTabPanelColumnNum(new_column)
+enddef
+
+com! -nargs=1 SetTabPanelColumn call <SID>SetTabPanelColumn(<f-args>)
+
+# nnoremap <Leader><lt> <ScriptCmd>SetTabPanelColumn('-2')<CR>
+# nnoremap <Leader>>    <ScriptCmd>SetTabPanelColumn('+2')<CR>
+# nnoremap <Leader>-    <ScriptCmd>SetTabPanelColumn('-2')<CR>
+# nnoremap <Leader>+    <ScriptCmd>SetTabPanelColumn('+2')<CR>
+
+#call submode#enter_with('TabPanelColumn', 'n', 's', "\<Space>+",    ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+#call submode#enter_with('TabPanelColumn', 'n', 's', "\<Space>-",    ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+#call submode#enter_with('TabPanelColumn', 'n', 's', "\<Space>>",    ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+#call submode#enter_with('TabPanelColumn', 'n', 's', "\<Space><lt>", ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+#call submode#map(       'TabPanelColumn', 'n', 's', "+",            ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+#call submode#map(       'TabPanelColumn', 'n', 's', "-",            ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+#call submode#map(       'TabPanelColumn', 'n', 's', ">",            ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+#call submode#map(       'TabPanelColumn', 'n', 's', "\<lt>",        ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+
+def SetTabPanelColumnRepeat(arg: string)
+  SetTabPanelColumn(arg)
+
+  while true
+    const c = getchar(-1) -> nr2char()
+    if c !~# '[+-><]'
+      return
+    endif
+
+    const a = c == '>' ? '+' : c == '<' ? '-' : c
+
+    SetTabPanelColumn(a)
+  endwhile
+enddef
+
+nnoremap <Leader><lt> <ScriptCmd>SetTabPanelColumnRepeat('-')<CR>
+nnoremap <Leader>>    <ScriptCmd>SetTabPanelColumnRepeat('+')<CR>
+nnoremap <Leader>-    <ScriptCmd>SetTabPanelColumnRepeat('-')<CR>
+nnoremap <Leader>+    <ScriptCmd>SetTabPanelColumnRepeat('+')<CR>
 
 
 
@@ -282,6 +376,7 @@ set tabpanelopt=align:right,columns:26
 set tabpanelopt=align:right,columns:36
 set tabpanelopt=align:right,columns:28
 
+set showtabpanel=2
 
 #--------------------------------------------
 # Timer
