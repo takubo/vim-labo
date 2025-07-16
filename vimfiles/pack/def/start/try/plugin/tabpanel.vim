@@ -245,7 +245,11 @@ def SetTimer(on: bool)
 
   if on && req_timer_cont
     if timer_info(g:RedrawTabpanelTimerId) == []
-      g:RedrawTabpanelTimerId = timer_start(RedrawTabpanelInterval, (dummy) => execute('redrawtabpanel'), {'repeat': -1})
+      g:RedrawTabpanelTimerId = timer_start(RedrawTabpanelInterval, (dummy) => {
+        if mode() != 'c'
+          execute('redrawtabpanel')
+        endif
+      }, {'repeat': -1})
     endif
   else
     timer_stop(g:RedrawTabpanelTimerId)
