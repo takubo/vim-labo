@@ -9,34 +9,93 @@ scriptencoding utf-8
 
 def TabpanelHeader(): string
   return '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '%=' .. strftime('%H:%M  ') .. "\n\n"
-
  #return "\n"
 enddef
 
 
 def TabpanelFooter(): string
-  if 1
+  if 0
+    return '%#TblDate#%=[Footer]%='
+  elseif 0
     return '%#TblDate#'
   elseif 0
     return '%#StlGoldLeaf#'
   elseif 0
     return '%#StlGoldLeaf#%=[Footer]%='
+  elseif 0
+    return g:BatteryBar() -> join("\n") .. "\n" .. '%#TblDate#'
+  elseif 0
+    return g:BatteryGraph_Center() -> join("\n") .. "\n" .. '%#TblDate#'
+   #return Border() .. "\n" .. g:BatteryGraph_Center() -> join("\n") .. "\n" .. '%#TblDate#'
+   #return g:BatteryGraph() -> join("\n") .. "\n" .. '%#TblDate#'
   else
-    return g:BatteryGraph() -> join("\n") .. "\n" .. '%#TblDate#'
+    const bat_str =
+      false ? g:BatteryBar() -> join("\n") :
+      false ? g:BatteryGraph_Center() -> join("\n") : ''
+   #return bat_str .. "\n" .. '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ]  '
+    return bat_str .. "\n" .. '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ] %='
+   #return bat_str .. "\n" .. '%#TblDate#%=%#StlFill# [ ' .. DiffOptStr() .. ' ] %#TblDate#%='
   endif
 enddef
 
 
 def TabpanelAdding(): string
+  const fs = g:FuncsString()
+  if fs == ''
+    return "\n\n"
+  else
+    return "\n\n" .. Border() .. g:FuncsString() .. "\n" .. Border() .. "\n"
+  endif
  #return '%#TblDate# '
-  return "\n\n\n" .. g:FuncsString()
+ #return "\n\n\n" .. g:FuncsString()
+ #return "\n\n" .. repeat('-', 36) .. "\n" .. g:FuncsString() .. "\n" .. repeat('-', 36) .. "\n"
+ #return "\n\n" .. repeat('─', 18) .. "\n" .. g:FuncsString() .. "\n" .. repeat('─', 18) .. "\n"
  #return "\n"
+enddef
+
+
+def Border(c: string = '─', hl: string = '%##'): string
+  const tc = TabPanelColumn()
+  const cw = c -> strdisplaywidth()
+  return repeat(c, tc / cw) .. "\n"
+enddef
+
+
+# TabPanelの桁数を返す
+# TODO tabline.vimと重複
+def TabPanelColumn(): number
+  #? if &showtabpanel == 0 # || (&showtabpanel == 1 && tabpagenr('$') <= 1)
+  #?   return 0
+  #? endif
+
+  const columns = matchstr(&tabpanelopt, 'columns:\zs\d\+')
+  return columns == '' ? 20 : str2nr(columns)
 enddef
 
 
 # str内のcの数を数える
 def CountChar(str: string, c: string): number
   return [str] -> matchstrlist(c) -> len()
+enddef
+
+
+# TODO tabline.vimと重複
+def DiffOptStr(): string
+  const diffopt = split(&diffopt, ',')
+
+  const case = (index(diffopt, 'icase') == -1 ?  '%#TblDiffRedOn#' : '%#TblDiffRedOff#') ..  'Case'
+
+  const white =
+    ( ['iblank', 'iwhite', 'iwhiteall', 'iwhiteeol']
+        -> map((_, val) => index(diffopt, val))
+        -> reduce((acc, val) => acc && (val == -1), true)
+      ?  '%#TblDiffRedOn#' : '%#TblDiffRedOff#'
+    ) ..  'White'
+
+  # 'Blank'
+
+  return ' ' .. case .. ' ' .. white .. ' '
+  # return '%#StlFill# [  ' .. case .. ' ' .. white .. '%#StlFill#  ] '
 enddef
 
 
@@ -221,6 +280,7 @@ set tabpanel=%!g:TabPanel()
 
 set tabpanelopt=align:right,columns:26
 set tabpanelopt=align:right,columns:36
+set tabpanelopt=align:right,columns:28
 
 
 #--------------------------------------------

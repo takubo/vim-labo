@@ -121,3 +121,80 @@ export def g:BatteryGraph(): list<string>
 
   return bat_draw
 enddef
+
+export def g:BatteryGraph_Center(): list<string>
+  const remain_percent = BatteryRemaining()
+  const remaining = remain_percent / GraphCellPerCent
+  const consumed  = GraphCellNum - remaining
+
+  const bat_hl =
+    remain_percent <= 12 ? '%#BatteryLvlFtl#' :
+    remain_percent <= 30 ? '%#BatteryLvlLow#' :
+    remain_percent <= 45 ? '%#BatteryLvlMid#' : '%#BatteryLvlNrm#'
+
+  const remaining_str = bat_hl .. repeat('!', remaining)
+  const consumed_str  = '%#BatteryLvlNon#' .. repeat('!', consumed)
+
+  # echo remaining_str consumed_str
+
+  # 電池の出っ張り部分
+  const bat_str_pro = '%#BatteryLvlBrd#@@' .. remaining_str .. consumed_str .. '%#BatteryLvlBrd#@@'
+  # 電池の出っ張りでない部分
+  const bat_str = (bat_str_pro -> substitute('!\ze[^!]*$', '', '')
+                             # -> substitute('!\ze[^!]*$', '', '')
+                  ) .. '%#BatteryLvlBrd#'
+
+  # echo bat_str_pro bat_str
+  const brd_str = '%#BatteryLvlBrd#' .. repeat('@', GraphCellNum + 2 * 2)
+
+  const bat_draw = [ $'%=%#TabLine#[ %3({remain_percent}%)%% ]%=',
+                     '%=' .. brd_str .. '%=',
+                     '%=' .. bat_str .. '%=',
+                     '%=' .. bat_str_pro .. '%=',
+                     '%=' .. bat_str_pro .. '%=',
+                     '%=' .. bat_str .. '%=',
+                     '%=' .. brd_str .. '%=',
+                   ]
+  # echo bat_draw
+  # .. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+  # .. "\n" .. '@@                  @@@@'
+  # .. "\n" .. '@@                    @@'
+  # .. "\n" .. '@@                    @@'
+  # .. "\n" .. '@@                  @@@@'
+  # .. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+
+  return bat_draw
+enddef
+
+export def g:BatteryBar(): list<string>
+  const remain_percent = BatteryRemaining()
+  const remaining = remain_percent / GraphCellPerCent
+  const consumed  = GraphCellNum - remaining
+
+  const bat_hl =
+    remain_percent <= 12 ? '%#BatteryLvlFtl#' :
+    remain_percent <= 30 ? '%#BatteryLvlLow#' :
+    remain_percent <= 45 ? '%#BatteryLvlMid#' : '%#BatteryLvlNrm#'
+
+  const remaining_str = bat_hl .. repeat('!', remaining)
+  const consumed_str  = '%#BatteryLvlNon#' .. repeat('!', consumed)
+
+  # echo remaining_str consumed_str
+
+  # 電池の出っ張り部分
+  const bat_str = '%#BatteryLvlBrd#@@' .. remaining_str .. consumed_str .. '%#BatteryLvlBrd#@@'
+
+  const brd_str = '%#BatteryLvlBrd#' .. repeat('@', GraphCellNum + 2 * 2)
+
+  const bat_draw = [ $'%=%#TabLine#[ %3({remain_percent}%)%% ]%=',
+                     '%=' .. brd_str .. '%=',
+                     '%=' .. bat_str .. '%=',
+                     '%=' .. brd_str .. '%=',
+                   ]
+  # echo bat_draw
+  # .. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+  # .. "\n" .. '@@                    @@'
+  # .. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
+
+  return bat_draw
+enddef
