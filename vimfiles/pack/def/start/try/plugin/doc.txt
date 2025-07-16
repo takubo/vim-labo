@@ -1,0 +1,2025 @@
+#----------------------------------------------------------------------------------------
+
+パーセント
+パーセント文字
+
+残り時間(秒)
+残り時間(フォーマット済み)
+
+フル時間(秒)
+フル時間(フォーマット済み)
+
+接続状態
+接続状態絵文字
+
+充電状態
+充電状態絵文字
+
+#----------------------------------------------------------------------------------------
+
+
+  % find . -type f -newermt '2025-07-01 17:50:00' | cat -n
+       1  ./pack/def/start/0rc/autoload/popup_info.vim
+       2  ./pack/def/start/0rc/colors/rimpa.vim
+       3  ./pack/def/start/0rc/ftplugin/qf.vim
+       4  ./pack/def/start/0rc/plugin/tabline.vim
+       5  ./pack/def/start/0rc/plugin/window.vim
+       6  ./pack/def/start/try/plugin/doc.txt
+       7  ./pack/def/start/try/plugin/tabpanel.vim
+       8  ./pack/def/start/try/plugin/tabpanel.vim.bak
+       9  ./pack/def/start/try/plugin/tabpanel.vim.bak3
+      10  ./pack/def/start/try/plugin/tabpanel.vim.bak4
+      11  ./pack/def/start/try/plugin/tabpanel_demo/battery_demo.vim
+      12  ./pack/def/start/try/plugin/tabpanel_demo/funcs.vim
+      13  ./pack/def/start/try/plugin/test.vim
+      14  ./pack/def/start/try/plugin/try.vim
+      15  ./plugin_cfg.vim
+
+  % find . -type f -newermt '2025-07-01 17:50:00' | cat -n
+       6  ./pack/def/start/try/plugin/doc.txt
+
+       8  ./pack/def/start/try/plugin/tabpanel.vim.bak
+       9  ./pack/def/start/try/plugin/tabpanel.vim.bak3
+      10  ./pack/def/start/try/plugin/tabpanel.vim.bak4
+
+
+
+
+      未使用バッファ選択の汎化  カレントタブをはずす
+      CtrlT は、Mなどにも拡大する
+      window内のλをなくす
+      sign
+      Tbp bufname
+      タブパネルのタイマ
+      タブパネルのセパレータ
+      前のタブに戻る
+Tbpコマンド
+tabpanelコンテンツのファイナライズ
+qfの編集の汎化
+qfの内容を、pluginへ持って行く
+goの数字
+diff の d+のsubmode化
+snipettの導入
+ExpandTab問題
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+vim-labo/uni_2021228.vim
+vim-labo/uni_2021229.vim
+
+-------------------------------------------------------------------------------
+find
+.
+./env
+./env/darwin
+./env/darwin/vimrc_local.vim
+./env/dos
+./env/dos/dos_mklink_cyg64.bat
+./env/dos/startuptime.bat
+./env/dos/system_vimrc
+./env/unix
+./env/unix/setup.sh
+./gvimrc
+./options.vim
+./pack
+./pack/def
+./pack/def/start
+./pack/def/start/0rc
+./pack/def/start/0rc/autoload
+./pack/def/start/0rc/autoload/get_project_root.vim
+./pack/def/start/0rc/autoload/multihighlight.vim
+./pack/def/start/0rc/autoload/popup_info.vim
+./pack/def/start/0rc/autoload/util_func.vim
+./pack/def/start/0rc/autoload/window_ratio.vim
+./pack/def/start/0rc/colors
+./pack/def/start/0rc/colors/asche.vim
+./pack/def/start/0rc/colors/rimpa.vim
+./pack/def/start/0rc/dict
+./pack/def/start/0rc/dict/gene.txt
+./pack/def/start/0rc/ftplugin
+./pack/def/start/0rc/ftplugin/c.vim
+./pack/def/start/0rc/ftplugin/diff.vim
+./pack/def/start/0rc/ftplugin/help.vim
+./pack/def/start/0rc/ftplugin/qf.vim
+./pack/def/start/0rc/ftplugin/sh.vim
+./pack/def/start/0rc/ftplugin/vim.vim
+./pack/def/start/0rc/plugin
+./pack/def/start/0rc/plugin/basic.vim
+./pack/def/start/0rc/plugin/buffer.vim
+./pack/def/start/0rc/plugin/completion.vim
+./pack/def/start/0rc/plugin/configuration.vim
+./pack/def/start/0rc/plugin/cursor_move_and_scroll.vim
+./pack/def/start/0rc/plugin/diff.vim
+./pack/def/start/0rc/plugin/grep.vim
+./pack/def/start/0rc/plugin/qf.vim
+./pack/def/start/0rc/plugin/search.vim
+./pack/def/start/0rc/plugin/statusline.vim
+./pack/def/start/0rc/plugin/substitute.vim
+./pack/def/start/0rc/plugin/tabline.vim
+./pack/def/start/0rc/plugin/terminal.vim
+./pack/def/start/0rc/plugin/unified_cr.vim
+./pack/def/start/0rc/plugin/unified_tab.vim
+./pack/def/start/0rc/plugin/visualmode.vim
+./pack/def/start/0rc/plugin/window.vim
+./pack/def/start/org
+./pack/def/start/org/plugin
+./pack/def/start/org/plugin/Battery_Dos.vim
+./pack/def/start/org/plugin/CommnadOutput.vim
+./pack/def/start/org/plugin/CygTerm.vim
+./pack/def/start/org/plugin/dicwin.vim
+./pack/def/start/org/plugin/PrjTree.vim
+./pack/def/start/std
+./pack/def/start/std/plugin
+./pack/def/start/std/plugin/auto_make_tag.vim
+./pack/def/start/std/plugin/axe.vim
+./pack/def/start/std/plugin/current_function_name.vim
+./pack/def/start/std/plugin/goto_func.vim
+./pack/def/start/std/plugin/jindent.vim
+./pack/def/start/std/plugin/MoveToEdge.vim
+./pack/def/start/std/plugin/PushPosPopPos.vim
+./pack/def/start/std/plugin/set_path.vim
+./pack/def/start/std/plugin/textobj_match_pairs.vim
+./pack/def/start/try
+./pack/def/start/try/ftplugin
+./pack/def/start/try/ftplugin/awk.vim
+./pack/def/start/try/plugin
+./pack/def/start/try/plugin/doc.txt
+./pack/def/start/try/plugin/recv.vim
+./pack/def/start/try/plugin/selector.vim
+./pack/def/start/try/plugin/tag.org.vim
+./pack/def/start/try/plugin/test.vim
+./pack/def/start/try/plugin/try.vim
+./pack/def/start/try/plugin/uni_211228.vim
+./pack/def/start/try/plugin/util_cmd.vim
+./pack/ext
+./pack/ext/start
+./pack/ext/start/numbers
+./pack/ext/start/numbers/autoload
+./pack/ext/start/numbers/autoload/numbers.vim
+./pack/ext/start/numbers/plugin
+./pack/ext/start/numbers/plugin/numbers.vim
+./pack/reg
+./pack/reg/start
+./pack/reg/start/BlockDiff
+./pack/reg/start/BlockDiff/autoload
+./pack/reg/start/BlockDiff/autoload/BlockDiff.vim
+./pack/reg/start/BlockDiff/plugin
+./pack/reg/start/BlockDiff/plugin/BlockDiff.vim
+./pack/reg/start/BlockDiff/README
+./pack/reg/start/CamelCaseMotion
+./pack/reg/start/CamelCaseMotion/.gitignore
+./pack/reg/start/CamelCaseMotion/autoload
+./pack/reg/start/CamelCaseMotion/autoload/camelcasemotion.vim
+./pack/reg/start/CamelCaseMotion/CHANGES.md
+./pack/reg/start/CamelCaseMotion/doc
+./pack/reg/start/CamelCaseMotion/doc/camelcasemotion.txt
+./pack/reg/start/CamelCaseMotion/plugin
+./pack/reg/start/CamelCaseMotion/plugin/camelcasemotion.vim
+./pack/reg/start/CamelCaseMotion/README.md
+./pack/reg/start/clever-f.vim
+./pack/reg/start/clever-f.vim/.codecov.yml
+./pack/reg/start/clever-f.vim/.github
+./pack/reg/start/clever-f.vim/.github/workflows
+./pack/reg/start/clever-f.vim/.github/workflows/ci.yml
+./pack/reg/start/clever-f.vim/.github/workflows/weekly.yml
+./pack/reg/start/clever-f.vim/.gitignore
+./pack/reg/start/clever-f.vim/autoload
+./pack/reg/start/clever-f.vim/autoload/clever_f
+./pack/reg/start/clever-f.vim/autoload/clever_f/compat.vim
+./pack/reg/start/clever-f.vim/autoload/clever_f/migemo
+./pack/reg/start/clever-f.vim/autoload/clever_f/migemo/cp932.vim
+./pack/reg/start/clever-f.vim/autoload/clever_f/migemo/eucjp.vim
+./pack/reg/start/clever-f.vim/autoload/clever_f/migemo/utf8.vim
+./pack/reg/start/clever-f.vim/autoload/clever_f.vim
+./pack/reg/start/clever-f.vim/doc
+./pack/reg/start/clever-f.vim/doc/clever_f.txt
+./pack/reg/start/clever-f.vim/plugin
+./pack/reg/start/clever-f.vim/plugin/clever-f.vim
+./pack/reg/start/clever-f.vim/README.md
+./pack/reg/start/clever-f.vim/test
+./pack/reg/start/clever-f.vim/test/.coveragerc
+./pack/reg/start/clever-f.vim/test/.themisrc
+./pack/reg/start/clever-f.vim/test/README.md
+./pack/reg/start/clever-f.vim/test/test.vimspec
+./pack/reg/start/current-func-info.vim
+./pack/reg/start/current-func-info.vim/.git
+./pack/reg/start/current-func-info.vim/.git/config
+./pack/reg/start/current-func-info.vim/.git/description
+./pack/reg/start/current-func-info.vim/.git/HEAD
+./pack/reg/start/current-func-info.vim/.git/hooks
+./pack/reg/start/current-func-info.vim/.git/hooks/applypatch-msg.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/commit-msg.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/fsmonitor-watchman.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/post-update.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/pre-applypatch.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/pre-commit.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/pre-merge-commit.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/pre-push.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/pre-rebase.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/pre-receive.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/prepare-commit-msg.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/push-to-checkout.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/sendemail-validate.sample
+./pack/reg/start/current-func-info.vim/.git/hooks/update.sample
+./pack/reg/start/current-func-info.vim/.git/index
+./pack/reg/start/current-func-info.vim/.git/info
+./pack/reg/start/current-func-info.vim/.git/info/exclude
+./pack/reg/start/current-func-info.vim/.git/logs
+./pack/reg/start/current-func-info.vim/.git/logs/HEAD
+./pack/reg/start/current-func-info.vim/.git/logs/refs
+./pack/reg/start/current-func-info.vim/.git/logs/refs/heads
+./pack/reg/start/current-func-info.vim/.git/logs/refs/heads/master
+./pack/reg/start/current-func-info.vim/.git/logs/refs/remotes
+./pack/reg/start/current-func-info.vim/.git/logs/refs/remotes/origin
+./pack/reg/start/current-func-info.vim/.git/logs/refs/remotes/origin/HEAD
+./pack/reg/start/current-func-info.vim/.git/objects
+./pack/reg/start/current-func-info.vim/.git/objects/info
+./pack/reg/start/current-func-info.vim/.git/objects/pack
+./pack/reg/start/current-func-info.vim/.git/objects/pack/pack-bb941a7c6e0e08b7fffe0bcdcf8e22219980ca2f.idx
+./pack/reg/start/current-func-info.vim/.git/objects/pack/pack-bb941a7c6e0e08b7fffe0bcdcf8e22219980ca2f.pack
+./pack/reg/start/current-func-info.vim/.git/objects/pack/pack-bb941a7c6e0e08b7fffe0bcdcf8e22219980ca2f.rev
+./pack/reg/start/current-func-info.vim/.git/packed-refs
+./pack/reg/start/current-func-info.vim/.git/refs
+./pack/reg/start/current-func-info.vim/.git/refs/heads
+./pack/reg/start/current-func-info.vim/.git/refs/heads/master
+./pack/reg/start/current-func-info.vim/.git/refs/remotes
+./pack/reg/start/current-func-info.vim/.git/refs/remotes/origin
+./pack/reg/start/current-func-info.vim/.git/refs/remotes/origin/HEAD
+./pack/reg/start/current-func-info.vim/.git/refs/tags
+./pack/reg/start/current-func-info.vim/autoload
+./pack/reg/start/current-func-info.vim/autoload/cfi.vim
+./pack/reg/start/current-func-info.vim/doc
+./pack/reg/start/current-func-info.vim/doc/cfi.txt
+./pack/reg/start/current-func-info.vim/ftplugin
+./pack/reg/start/current-func-info.vim/ftplugin/bash
+./pack/reg/start/current-func-info.vim/ftplugin/bash/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/c
+./pack/reg/start/current-func-info.vim/ftplugin/c/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/elixir
+./pack/reg/start/current-func-info.vim/ftplugin/elixir/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/go
+./pack/reg/start/current-func-info.vim/ftplugin/go/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/javascript
+./pack/reg/start/current-func-info.vim/ftplugin/javascript/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/perl
+./pack/reg/start/current-func-info.vim/ftplugin/perl/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/php
+./pack/reg/start/current-func-info.vim/ftplugin/php/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/python
+./pack/reg/start/current-func-info.vim/ftplugin/python/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/ruby
+./pack/reg/start/current-func-info.vim/ftplugin/ruby/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/sh
+./pack/reg/start/current-func-info.vim/ftplugin/sh/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/sql
+./pack/reg/start/current-func-info.vim/ftplugin/sql/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/vim
+./pack/reg/start/current-func-info.vim/ftplugin/vim/cfi.vim
+./pack/reg/start/current-func-info.vim/ftplugin/zsh
+./pack/reg/start/current-func-info.vim/ftplugin/zsh/cfi.vim
+./pack/reg/start/current-func-info.vim/plugin
+./pack/reg/start/current-func-info.vim/plugin/cfi.vim
+./pack/reg/start/current-func-info.vim/README.md
+./pack/reg/start/easybuffer.vim
+./pack/reg/start/easybuffer.vim/.gitignore
+./pack/reg/start/easybuffer.vim/autoload
+./pack/reg/start/easybuffer.vim/autoload/easybuffer.vim
+./pack/reg/start/easybuffer.vim/doc
+./pack/reg/start/easybuffer.vim/doc/easybuffer.txt
+./pack/reg/start/easybuffer.vim/plugin
+./pack/reg/start/easybuffer.vim/plugin/easybuffer.vim
+./pack/reg/start/easybuffer.vim/README.md
+./pack/reg/start/easybuffer.vim/syntax
+./pack/reg/start/easybuffer.vim/syntax/easybuffer.vim
+./pack/reg/start/mru.vim
+./pack/reg/start/mru.vim/plugin
+./pack/reg/start/mru.vim/plugin/mru.vim
+./pack/reg/start/mru.vim/README
+./pack/reg/start/vim-prettyprint
+./pack/reg/start/vim-prettyprint/autoload
+./pack/reg/start/vim-prettyprint/autoload/prettyprint.vim
+./pack/reg/start/vim-prettyprint/doc
+./pack/reg/start/vim-prettyprint/doc/prettyprint.txt
+./pack/reg/start/vim-prettyprint/plugin
+./pack/reg/start/vim-prettyprint/plugin/prettyprint.vim
+./pack/reg/start/vim-submode
+./pack/reg/start/vim-submode/.git
+./pack/reg/start/vim-submode/.git/config
+./pack/reg/start/vim-submode/.git/description
+./pack/reg/start/vim-submode/.git/HEAD
+./pack/reg/start/vim-submode/.git/hooks
+./pack/reg/start/vim-submode/.git/hooks/applypatch-msg.sample
+./pack/reg/start/vim-submode/.git/hooks/commit-msg.sample
+./pack/reg/start/vim-submode/.git/hooks/fsmonitor-watchman.sample
+./pack/reg/start/vim-submode/.git/hooks/post-update.sample
+./pack/reg/start/vim-submode/.git/hooks/pre-applypatch.sample
+./pack/reg/start/vim-submode/.git/hooks/pre-commit.sample
+./pack/reg/start/vim-submode/.git/hooks/pre-merge-commit.sample
+./pack/reg/start/vim-submode/.git/hooks/pre-push.sample
+./pack/reg/start/vim-submode/.git/hooks/pre-rebase.sample
+./pack/reg/start/vim-submode/.git/hooks/pre-receive.sample
+./pack/reg/start/vim-submode/.git/hooks/prepare-commit-msg.sample
+./pack/reg/start/vim-submode/.git/hooks/push-to-checkout.sample
+./pack/reg/start/vim-submode/.git/hooks/sendemail-validate.sample
+./pack/reg/start/vim-submode/.git/hooks/update.sample
+./pack/reg/start/vim-submode/.git/index
+./pack/reg/start/vim-submode/.git/info
+./pack/reg/start/vim-submode/.git/info/exclude
+./pack/reg/start/vim-submode/.git/logs
+./pack/reg/start/vim-submode/.git/logs/HEAD
+./pack/reg/start/vim-submode/.git/logs/refs
+./pack/reg/start/vim-submode/.git/logs/refs/heads
+./pack/reg/start/vim-submode/.git/logs/refs/heads/master
+./pack/reg/start/vim-submode/.git/logs/refs/remotes
+./pack/reg/start/vim-submode/.git/logs/refs/remotes/origin
+./pack/reg/start/vim-submode/.git/logs/refs/remotes/origin/HEAD
+./pack/reg/start/vim-submode/.git/objects
+./pack/reg/start/vim-submode/.git/objects/info
+./pack/reg/start/vim-submode/.git/objects/pack
+./pack/reg/start/vim-submode/.git/objects/pack/pack-6d75c1b05db3ea4d07e75173437cd4ce1db3d771.idx
+./pack/reg/start/vim-submode/.git/objects/pack/pack-6d75c1b05db3ea4d07e75173437cd4ce1db3d771.pack
+./pack/reg/start/vim-submode/.git/objects/pack/pack-6d75c1b05db3ea4d07e75173437cd4ce1db3d771.rev
+./pack/reg/start/vim-submode/.git/packed-refs
+./pack/reg/start/vim-submode/.git/refs
+./pack/reg/start/vim-submode/.git/refs/heads
+./pack/reg/start/vim-submode/.git/refs/heads/master
+./pack/reg/start/vim-submode/.git/refs/remotes
+./pack/reg/start/vim-submode/.git/refs/remotes/origin
+./pack/reg/start/vim-submode/.git/refs/remotes/origin/HEAD
+./pack/reg/start/vim-submode/.git/refs/tags
+./pack/reg/start/vim-submode/.gitignore
+./pack/reg/start/vim-submode/.travis.yml
+./pack/reg/start/vim-submode/autoload
+./pack/reg/start/vim-submode/autoload/submode.vim
+./pack/reg/start/vim-submode/autoload/test.vim
+./pack/reg/start/vim-submode/autoload/test2.vim
+./pack/reg/start/vim-submode/doc
+./pack/reg/start/vim-submode/doc/submode.txt
+./pack/reg/start/vim-submode/Gemfile
+./pack/reg/start/vim-submode/Rakefile
+./pack/reg/start/vim-submode/t
+./pack/reg/start/vim-submode/t/current.vim
+./pack/reg/start/vim-submode/t/expr.vim
+./pack/reg/start/vim-submode/t/keep-leaving-key.vim
+./pack/reg/start/vimdoc-ja
+./pack/reg/start/vimdoc-ja/.gitattributes
+./pack/reg/start/vimdoc-ja/.gitignore
+./pack/reg/start/vimdoc-ja/doc
+./pack/reg/start/vimdoc-ja/doc/arabic.jax
+./pack/reg/start/vimdoc-ja/doc/autocmd.jax
+./pack/reg/start/vimdoc-ja/doc/builtin.jax
+./pack/reg/start/vimdoc-ja/doc/change.jax
+./pack/reg/start/vimdoc-ja/doc/channel.jax
+./pack/reg/start/vimdoc-ja/doc/cmdline.jax
+./pack/reg/start/vimdoc-ja/doc/debug.jax
+./pack/reg/start/vimdoc-ja/doc/debugger.jax
+./pack/reg/start/vimdoc-ja/doc/develop.jax
+./pack/reg/start/vimdoc-ja/doc/diff.jax
+./pack/reg/start/vimdoc-ja/doc/digraph.jax
+./pack/reg/start/vimdoc-ja/doc/editing.jax
+./pack/reg/start/vimdoc-ja/doc/eval.jax
+./pack/reg/start/vimdoc-ja/doc/farsi.jax
+./pack/reg/start/vimdoc-ja/doc/filetype.jax
+./pack/reg/start/vimdoc-ja/doc/fold.jax
+./pack/reg/start/vimdoc-ja/doc/ft_ada.jax
+./pack/reg/start/vimdoc-ja/doc/ft_context.jax
+./pack/reg/start/vimdoc-ja/doc/ft_hare.jax
+./pack/reg/start/vimdoc-ja/doc/ft_mp.jax
+./pack/reg/start/vimdoc-ja/doc/ft_ps1.jax
+./pack/reg/start/vimdoc-ja/doc/ft_raku.jax
+./pack/reg/start/vimdoc-ja/doc/ft_rust.jax
+./pack/reg/start/vimdoc-ja/doc/ft_sql.jax
+./pack/reg/start/vimdoc-ja/doc/gui.jax
+./pack/reg/start/vimdoc-ja/doc/gui_w32.jax
+./pack/reg/start/vimdoc-ja/doc/gui_x11.jax
+./pack/reg/start/vimdoc-ja/doc/hangulin.jax
+./pack/reg/start/vimdoc-ja/doc/help.jax
+./pack/reg/start/vimdoc-ja/doc/helphelp.jax
+./pack/reg/start/vimdoc-ja/doc/howto.jax
+./pack/reg/start/vimdoc-ja/doc/if_cscop.jax
+./pack/reg/start/vimdoc-ja/doc/if_lua.jax
+./pack/reg/start/vimdoc-ja/doc/if_mzsch.jax
+./pack/reg/start/vimdoc-ja/doc/if_ole.jax
+./pack/reg/start/vimdoc-ja/doc/if_perl.jax
+./pack/reg/start/vimdoc-ja/doc/if_pyth.jax
+./pack/reg/start/vimdoc-ja/doc/if_ruby.jax
+./pack/reg/start/vimdoc-ja/doc/if_sniff.jax
+./pack/reg/start/vimdoc-ja/doc/if_tcl.jax
+./pack/reg/start/vimdoc-ja/doc/indent.jax
+./pack/reg/start/vimdoc-ja/doc/index.jax
+./pack/reg/start/vimdoc-ja/doc/insert.jax
+./pack/reg/start/vimdoc-ja/doc/intro.jax
+./pack/reg/start/vimdoc-ja/doc/map.jax
+./pack/reg/start/vimdoc-ja/doc/mbyte.jax
+./pack/reg/start/vimdoc-ja/doc/message.jax
+./pack/reg/start/vimdoc-ja/doc/mlang.jax
+./pack/reg/start/vimdoc-ja/doc/motion.jax
+./pack/reg/start/vimdoc-ja/doc/netbeans.jax
+./pack/reg/start/vimdoc-ja/doc/options.jax
+./pack/reg/start/vimdoc-ja/doc/os_390.jax
+./pack/reg/start/vimdoc-ja/doc/os_amiga.jax
+./pack/reg/start/vimdoc-ja/doc/os_beos.jax
+./pack/reg/start/vimdoc-ja/doc/os_dos.jax
+./pack/reg/start/vimdoc-ja/doc/os_haiku.jax
+./pack/reg/start/vimdoc-ja/doc/os_mac.jax
+./pack/reg/start/vimdoc-ja/doc/os_mint.jax
+./pack/reg/start/vimdoc-ja/doc/os_msdos.jax
+./pack/reg/start/vimdoc-ja/doc/os_os2.jax
+./pack/reg/start/vimdoc-ja/doc/os_qnx.jax
+./pack/reg/start/vimdoc-ja/doc/os_risc.jax
+./pack/reg/start/vimdoc-ja/doc/os_unix.jax
+./pack/reg/start/vimdoc-ja/doc/os_vms.jax
+./pack/reg/start/vimdoc-ja/doc/os_win32.jax
+./pack/reg/start/vimdoc-ja/doc/pattern.jax
+./pack/reg/start/vimdoc-ja/doc/pi_getscript.jax
+./pack/reg/start/vimdoc-ja/doc/pi_gzip.jax
+./pack/reg/start/vimdoc-ja/doc/pi_logipat.jax
+./pack/reg/start/vimdoc-ja/doc/pi_netrw.jax
+./pack/reg/start/vimdoc-ja/doc/pi_paren.jax
+./pack/reg/start/vimdoc-ja/doc/pi_spec.jax
+./pack/reg/start/vimdoc-ja/doc/pi_tar.jax
+./pack/reg/start/vimdoc-ja/doc/pi_tutor.jax
+./pack/reg/start/vimdoc-ja/doc/pi_vimball.jax
+./pack/reg/start/vimdoc-ja/doc/pi_zip.jax
+./pack/reg/start/vimdoc-ja/doc/popup.jax
+./pack/reg/start/vimdoc-ja/doc/print.jax
+./pack/reg/start/vimdoc-ja/doc/quickfix.jax
+./pack/reg/start/vimdoc-ja/doc/quickref.jax
+./pack/reg/start/vimdoc-ja/doc/quotes.jax
+./pack/reg/start/vimdoc-ja/doc/recover.jax
+./pack/reg/start/vimdoc-ja/doc/remote.jax
+./pack/reg/start/vimdoc-ja/doc/repeat.jax
+./pack/reg/start/vimdoc-ja/doc/rileft.jax
+./pack/reg/start/vimdoc-ja/doc/russian.jax
+./pack/reg/start/vimdoc-ja/doc/scroll.jax
+./pack/reg/start/vimdoc-ja/doc/sign.jax
+./pack/reg/start/vimdoc-ja/doc/spell.jax
+./pack/reg/start/vimdoc-ja/doc/sponsor.jax
+./pack/reg/start/vimdoc-ja/doc/starting.jax
+./pack/reg/start/vimdoc-ja/doc/syntax.jax
+./pack/reg/start/vimdoc-ja/doc/tabpage.jax
+./pack/reg/start/vimdoc-ja/doc/tags-ja
+./pack/reg/start/vimdoc-ja/doc/tagsrch.jax
+./pack/reg/start/vimdoc-ja/doc/term.jax
+./pack/reg/start/vimdoc-ja/doc/terminal.jax
+./pack/reg/start/vimdoc-ja/doc/testing.jax
+./pack/reg/start/vimdoc-ja/doc/textprop.jax
+./pack/reg/start/vimdoc-ja/doc/tips.jax
+./pack/reg/start/vimdoc-ja/doc/uganda.jax
+./pack/reg/start/vimdoc-ja/doc/undo.jax
+./pack/reg/start/vimdoc-ja/doc/userfunc.jax
+./pack/reg/start/vimdoc-ja/doc/usr_01.jax
+./pack/reg/start/vimdoc-ja/doc/usr_02.jax
+./pack/reg/start/vimdoc-ja/doc/usr_03.jax
+./pack/reg/start/vimdoc-ja/doc/usr_04.jax
+./pack/reg/start/vimdoc-ja/doc/usr_05.jax
+./pack/reg/start/vimdoc-ja/doc/usr_06.jax
+./pack/reg/start/vimdoc-ja/doc/usr_07.jax
+./pack/reg/start/vimdoc-ja/doc/usr_08.jax
+./pack/reg/start/vimdoc-ja/doc/usr_09.jax
+./pack/reg/start/vimdoc-ja/doc/usr_10.jax
+./pack/reg/start/vimdoc-ja/doc/usr_11.jax
+./pack/reg/start/vimdoc-ja/doc/usr_12.jax
+./pack/reg/start/vimdoc-ja/doc/usr_20.jax
+./pack/reg/start/vimdoc-ja/doc/usr_21.jax
+./pack/reg/start/vimdoc-ja/doc/usr_22.jax
+./pack/reg/start/vimdoc-ja/doc/usr_23.jax
+./pack/reg/start/vimdoc-ja/doc/usr_24.jax
+./pack/reg/start/vimdoc-ja/doc/usr_25.jax
+./pack/reg/start/vimdoc-ja/doc/usr_26.jax
+./pack/reg/start/vimdoc-ja/doc/usr_27.jax
+./pack/reg/start/vimdoc-ja/doc/usr_28.jax
+./pack/reg/start/vimdoc-ja/doc/usr_29.jax
+./pack/reg/start/vimdoc-ja/doc/usr_30.jax
+./pack/reg/start/vimdoc-ja/doc/usr_31.jax
+./pack/reg/start/vimdoc-ja/doc/usr_32.jax
+./pack/reg/start/vimdoc-ja/doc/usr_40.jax
+./pack/reg/start/vimdoc-ja/doc/usr_41.jax
+./pack/reg/start/vimdoc-ja/doc/usr_42.jax
+./pack/reg/start/vimdoc-ja/doc/usr_43.jax
+./pack/reg/start/vimdoc-ja/doc/usr_44.jax
+./pack/reg/start/vimdoc-ja/doc/usr_45.jax
+./pack/reg/start/vimdoc-ja/doc/usr_50.jax
+./pack/reg/start/vimdoc-ja/doc/usr_51.jax
+./pack/reg/start/vimdoc-ja/doc/usr_52.jax
+./pack/reg/start/vimdoc-ja/doc/usr_90.jax
+./pack/reg/start/vimdoc-ja/doc/usr_toc.jax
+./pack/reg/start/vimdoc-ja/doc/various.jax
+./pack/reg/start/vimdoc-ja/doc/version4.jax
+./pack/reg/start/vimdoc-ja/doc/version8.jax
+./pack/reg/start/vimdoc-ja/doc/version9.jax
+./pack/reg/start/vimdoc-ja/doc/vietnamese.jax
+./pack/reg/start/vimdoc-ja/doc/vim9.jax
+./pack/reg/start/vimdoc-ja/doc/vim9class.jax
+./pack/reg/start/vimdoc-ja/doc/visual.jax
+./pack/reg/start/vimdoc-ja/doc/vi_diff.jax
+./pack/reg/start/vimdoc-ja/doc/windows.jax
+./pack/reg/start/vimdoc-ja/doc/workshop.jax
+./pack/reg/start/vimdoc-ja/README.md
+./pack/reg/start/vimdoc-ja/syntax
+./pack/reg/start/vimdoc-ja/syntax/help_ja.vim
+./pack/try
+./pack/try/opt
+./pack/try/opt/.gitkeep
+./pack/try/opt/comfortable-motion.vim
+./pack/try/opt/comfortable-motion.vim/autoload
+./pack/try/opt/comfortable-motion.vim/autoload/comfortable_motion.vim
+./pack/try/opt/comfortable-motion.vim/autoload/comfortable_motion.vim.new
+./pack/try/opt/comfortable-motion.vim/autoload/comfortable_motion.vim.org.v9
+./pack/try/opt/comfortable-motion.vim/LICENSE
+./pack/try/opt/comfortable-motion.vim/plugin
+./pack/try/opt/comfortable-motion.vim/plugin/comfortable_motion.vim
+./pack/try/opt/comfortable-motion.vim/README.md
+./pack/try/opt/rainbow
+./pack/try/opt/rainbow/.git
+./pack/try/opt/rainbow/.git/config
+./pack/try/opt/rainbow/.git/description
+./pack/try/opt/rainbow/.git/HEAD
+./pack/try/opt/rainbow/.git/hooks
+./pack/try/opt/rainbow/.git/hooks/applypatch-msg.sample
+./pack/try/opt/rainbow/.git/hooks/commit-msg.sample
+./pack/try/opt/rainbow/.git/hooks/fsmonitor-watchman.sample
+./pack/try/opt/rainbow/.git/hooks/post-update.sample
+./pack/try/opt/rainbow/.git/hooks/pre-applypatch.sample
+./pack/try/opt/rainbow/.git/hooks/pre-commit.sample
+./pack/try/opt/rainbow/.git/hooks/pre-merge-commit.sample
+./pack/try/opt/rainbow/.git/hooks/pre-push.sample
+./pack/try/opt/rainbow/.git/hooks/pre-rebase.sample
+./pack/try/opt/rainbow/.git/hooks/pre-receive.sample
+./pack/try/opt/rainbow/.git/hooks/prepare-commit-msg.sample
+./pack/try/opt/rainbow/.git/hooks/push-to-checkout.sample
+./pack/try/opt/rainbow/.git/hooks/sendemail-validate.sample
+./pack/try/opt/rainbow/.git/hooks/update.sample
+./pack/try/opt/rainbow/.git/index
+./pack/try/opt/rainbow/.git/info
+./pack/try/opt/rainbow/.git/info/exclude
+./pack/try/opt/rainbow/.git/logs
+./pack/try/opt/rainbow/.git/logs/HEAD
+./pack/try/opt/rainbow/.git/logs/refs
+./pack/try/opt/rainbow/.git/logs/refs/heads
+./pack/try/opt/rainbow/.git/logs/refs/heads/master
+./pack/try/opt/rainbow/.git/logs/refs/remotes
+./pack/try/opt/rainbow/.git/logs/refs/remotes/origin
+./pack/try/opt/rainbow/.git/logs/refs/remotes/origin/HEAD
+./pack/try/opt/rainbow/.git/objects
+./pack/try/opt/rainbow/.git/objects/info
+./pack/try/opt/rainbow/.git/objects/pack
+./pack/try/opt/rainbow/.git/objects/pack/pack-78f43827f9f545de941cd4570091e71d1ad93b28.idx
+./pack/try/opt/rainbow/.git/objects/pack/pack-78f43827f9f545de941cd4570091e71d1ad93b28.pack
+./pack/try/opt/rainbow/.git/objects/pack/pack-78f43827f9f545de941cd4570091e71d1ad93b28.rev
+./pack/try/opt/rainbow/.git/packed-refs
+./pack/try/opt/rainbow/.git/refs
+./pack/try/opt/rainbow/.git/refs/heads
+./pack/try/opt/rainbow/.git/refs/heads/master
+./pack/try/opt/rainbow/.git/refs/remotes
+./pack/try/opt/rainbow/.git/refs/remotes/origin
+./pack/try/opt/rainbow/.git/refs/remotes/origin/HEAD
+./pack/try/opt/rainbow/.git/refs/tags
+./pack/try/opt/rainbow/.github
+./pack/try/opt/rainbow/.github/ISSUE_TEMPLATE
+./pack/try/opt/rainbow/.github/ISSUE_TEMPLATE/bug_report.md
+./pack/try/opt/rainbow/.github/ISSUE_TEMPLATE/feature_request.md
+./pack/try/opt/rainbow/.github/ISSUE_TEMPLATE/not-issue.md
+./pack/try/opt/rainbow/.gitignore
+./pack/try/opt/rainbow/autoload
+./pack/try/opt/rainbow/autoload/rainbow.vim
+./pack/try/opt/rainbow/autoload/rainbow_main.vim
+./pack/try/opt/rainbow/doc
+./pack/try/opt/rainbow/doc/rainbow.txt
+./pack/try/opt/rainbow/LICENSE
+./pack/try/opt/rainbow/NOTICE
+./pack/try/opt/rainbow/plugin
+./pack/try/opt/rainbow/plugin/rainbow_main.vim
+./pack/try/opt/rainbow/README.md
+./pack/try/opt/rainbow/README_zh.md
+./pack/try/opt/rainbow/tests
+./pack/try/opt/rainbow/tests/test.c
+./pack/try/opt/rainbow/tests/test.css
+./pack/try/opt/rainbow/tests/test.csv
+./pack/try/opt/rainbow/tests/test.go
+./pack/try/opt/rainbow/tests/test.hs
+./pack/try/opt/rainbow/tests/test.html
+./pack/try/opt/rainbow/tests/test.html.txt
+./pack/try/opt/rainbow/tests/test.js
+./pack/try/opt/rainbow/tests/test.lua
+./pack/try/opt/rainbow/tests/test.php
+./pack/try/opt/rainbow/tests/test.pl
+./pack/try/opt/rainbow/tests/test.rb
+./pack/try/opt/rainbow/tests/test.sh
+./pack/try/opt/rainbow/tests/test.special-ft
+./pack/try/opt/rainbow/tests/test.styl
+./pack/try/opt/rainbow/tests/test.tex
+./pack/try/opt/rainbow/tests/test.xml
+./pack/try/opt/snipmate.vim
+./pack/try/opt/snipmate.vim/.git
+./pack/try/opt/snipmate.vim/.git/config
+./pack/try/opt/snipmate.vim/.git/description
+./pack/try/opt/snipmate.vim/.git/HEAD
+./pack/try/opt/snipmate.vim/.git/hooks
+./pack/try/opt/snipmate.vim/.git/hooks/applypatch-msg.sample
+./pack/try/opt/snipmate.vim/.git/hooks/commit-msg.sample
+./pack/try/opt/snipmate.vim/.git/hooks/fsmonitor-watchman.sample
+./pack/try/opt/snipmate.vim/.git/hooks/post-update.sample
+./pack/try/opt/snipmate.vim/.git/hooks/pre-applypatch.sample
+./pack/try/opt/snipmate.vim/.git/hooks/pre-commit.sample
+./pack/try/opt/snipmate.vim/.git/hooks/pre-merge-commit.sample
+./pack/try/opt/snipmate.vim/.git/hooks/pre-push.sample
+./pack/try/opt/snipmate.vim/.git/hooks/pre-rebase.sample
+./pack/try/opt/snipmate.vim/.git/hooks/pre-receive.sample
+./pack/try/opt/snipmate.vim/.git/hooks/prepare-commit-msg.sample
+./pack/try/opt/snipmate.vim/.git/hooks/push-to-checkout.sample
+./pack/try/opt/snipmate.vim/.git/hooks/sendemail-validate.sample
+./pack/try/opt/snipmate.vim/.git/hooks/update.sample
+./pack/try/opt/snipmate.vim/.git/index
+./pack/try/opt/snipmate.vim/.git/info
+./pack/try/opt/snipmate.vim/.git/info/exclude
+./pack/try/opt/snipmate.vim/.git/logs
+./pack/try/opt/snipmate.vim/.git/logs/HEAD
+./pack/try/opt/snipmate.vim/.git/logs/refs
+./pack/try/opt/snipmate.vim/.git/logs/refs/heads
+./pack/try/opt/snipmate.vim/.git/logs/refs/heads/master
+./pack/try/opt/snipmate.vim/.git/logs/refs/remotes
+./pack/try/opt/snipmate.vim/.git/logs/refs/remotes/origin
+./pack/try/opt/snipmate.vim/.git/logs/refs/remotes/origin/HEAD
+./pack/try/opt/snipmate.vim/.git/objects
+./pack/try/opt/snipmate.vim/.git/objects/info
+./pack/try/opt/snipmate.vim/.git/objects/pack
+./pack/try/opt/snipmate.vim/.git/objects/pack/pack-8c20de4e011cafe3352f30b10c3457ccf2dbb219.idx
+./pack/try/opt/snipmate.vim/.git/objects/pack/pack-8c20de4e011cafe3352f30b10c3457ccf2dbb219.pack
+./pack/try/opt/snipmate.vim/.git/objects/pack/pack-8c20de4e011cafe3352f30b10c3457ccf2dbb219.rev
+./pack/try/opt/snipmate.vim/.git/packed-refs
+./pack/try/opt/snipmate.vim/.git/refs
+./pack/try/opt/snipmate.vim/.git/refs/heads
+./pack/try/opt/snipmate.vim/.git/refs/heads/master
+./pack/try/opt/snipmate.vim/.git/refs/remotes
+./pack/try/opt/snipmate.vim/.git/refs/remotes/origin
+./pack/try/opt/snipmate.vim/.git/refs/remotes/origin/HEAD
+./pack/try/opt/snipmate.vim/.git/refs/tags
+./pack/try/opt/snipmate.vim/after
+./pack/try/opt/snipmate.vim/after/plugin
+./pack/try/opt/snipmate.vim/after/plugin/snipMate.vim
+./pack/try/opt/snipmate.vim/autoload
+./pack/try/opt/snipmate.vim/autoload/snipMate.vim
+./pack/try/opt/snipmate.vim/doc
+./pack/try/opt/snipmate.vim/doc/snipMate.txt
+./pack/try/opt/snipmate.vim/ftplugin
+./pack/try/opt/snipmate.vim/ftplugin/html_snip_helper.vim
+./pack/try/opt/snipmate.vim/plugin
+./pack/try/opt/snipmate.vim/plugin/snipMate.vim
+./pack/try/opt/snipmate.vim/plugin-info.txt
+./pack/try/opt/snipmate.vim/README.markdown
+./pack/try/opt/snipmate.vim/snippets
+./pack/try/opt/snipmate.vim/snippets/autoit.snippets
+./pack/try/opt/snipmate.vim/snippets/c.snippets
+./pack/try/opt/snipmate.vim/snippets/cpp.snippets
+./pack/try/opt/snipmate.vim/snippets/erlang.snippets
+./pack/try/opt/snipmate.vim/snippets/html.snippets
+./pack/try/opt/snipmate.vim/snippets/java.snippets
+./pack/try/opt/snipmate.vim/snippets/javascript.snippets
+./pack/try/opt/snipmate.vim/snippets/mako.snippets
+./pack/try/opt/snipmate.vim/snippets/objc.snippets
+./pack/try/opt/snipmate.vim/snippets/perl.snippets
+./pack/try/opt/snipmate.vim/snippets/php.snippets
+./pack/try/opt/snipmate.vim/snippets/python.snippets
+./pack/try/opt/snipmate.vim/snippets/ruby.snippets
+./pack/try/opt/snipmate.vim/snippets/sh.snippets
+./pack/try/opt/snipmate.vim/snippets/snippet.snippets
+./pack/try/opt/snipmate.vim/snippets/tcl.snippets
+./pack/try/opt/snipmate.vim/snippets/tex.snippets
+./pack/try/opt/snipmate.vim/snippets/vim.snippets
+./pack/try/opt/snipmate.vim/snippets/zsh.snippets
+./pack/try/opt/snipmate.vim/snippets/_.snippets
+./pack/try/opt/snipmate.vim/syntax
+./pack/try/opt/snipmate.vim/syntax/snippet.vim
+./pack/try/opt/undotree
+./pack/try/opt/undotree/.gitignore
+./pack/try/opt/undotree/autoload
+./pack/try/opt/undotree/autoload/undotree.vim
+./pack/try/opt/undotree/doc
+./pack/try/opt/undotree/doc/undotree.txt
+./pack/try/opt/undotree/doc/_static
+./pack/try/opt/undotree/doc/_static/undotree.png
+./pack/try/opt/undotree/LICENSE
+./pack/try/opt/undotree/plugin
+./pack/try/opt/undotree/plugin/undotree.vim
+./pack/try/opt/undotree/README.md
+./pack/try/opt/undotree/syntax
+./pack/try/opt/undotree/syntax/undotree.vim
+./pack/try/opt/vim-snipmate
+./pack/try/opt/vim-snipmate/.git
+./pack/try/opt/vim-snipmate/.git/config
+./pack/try/opt/vim-snipmate/.git/description
+./pack/try/opt/vim-snipmate/.git/HEAD
+./pack/try/opt/vim-snipmate/.git/hooks
+./pack/try/opt/vim-snipmate/.git/hooks/applypatch-msg.sample
+./pack/try/opt/vim-snipmate/.git/hooks/commit-msg.sample
+./pack/try/opt/vim-snipmate/.git/hooks/fsmonitor-watchman.sample
+./pack/try/opt/vim-snipmate/.git/hooks/post-update.sample
+./pack/try/opt/vim-snipmate/.git/hooks/pre-applypatch.sample
+./pack/try/opt/vim-snipmate/.git/hooks/pre-commit.sample
+./pack/try/opt/vim-snipmate/.git/hooks/pre-merge-commit.sample
+./pack/try/opt/vim-snipmate/.git/hooks/pre-push.sample
+./pack/try/opt/vim-snipmate/.git/hooks/pre-rebase.sample
+./pack/try/opt/vim-snipmate/.git/hooks/pre-receive.sample
+./pack/try/opt/vim-snipmate/.git/hooks/prepare-commit-msg.sample
+./pack/try/opt/vim-snipmate/.git/hooks/push-to-checkout.sample
+./pack/try/opt/vim-snipmate/.git/hooks/sendemail-validate.sample
+./pack/try/opt/vim-snipmate/.git/hooks/update.sample
+./pack/try/opt/vim-snipmate/.git/index
+./pack/try/opt/vim-snipmate/.git/info
+./pack/try/opt/vim-snipmate/.git/info/exclude
+./pack/try/opt/vim-snipmate/.git/logs
+./pack/try/opt/vim-snipmate/.git/logs/HEAD
+./pack/try/opt/vim-snipmate/.git/logs/refs
+./pack/try/opt/vim-snipmate/.git/logs/refs/heads
+./pack/try/opt/vim-snipmate/.git/logs/refs/heads/master
+./pack/try/opt/vim-snipmate/.git/logs/refs/remotes
+./pack/try/opt/vim-snipmate/.git/logs/refs/remotes/origin
+./pack/try/opt/vim-snipmate/.git/logs/refs/remotes/origin/HEAD
+./pack/try/opt/vim-snipmate/.git/objects
+./pack/try/opt/vim-snipmate/.git/objects/info
+./pack/try/opt/vim-snipmate/.git/objects/pack
+./pack/try/opt/vim-snipmate/.git/objects/pack/pack-db4fe97609691e541e8be684c9edb61dbc41b252.idx
+./pack/try/opt/vim-snipmate/.git/objects/pack/pack-db4fe97609691e541e8be684c9edb61dbc41b252.pack
+./pack/try/opt/vim-snipmate/.git/objects/pack/pack-db4fe97609691e541e8be684c9edb61dbc41b252.rev
+./pack/try/opt/vim-snipmate/.git/packed-refs
+./pack/try/opt/vim-snipmate/.git/refs
+./pack/try/opt/vim-snipmate/.git/refs/heads
+./pack/try/opt/vim-snipmate/.git/refs/heads/master
+./pack/try/opt/vim-snipmate/.git/refs/remotes
+./pack/try/opt/vim-snipmate/.git/refs/remotes/origin
+./pack/try/opt/vim-snipmate/.git/refs/remotes/origin/HEAD
+./pack/try/opt/vim-snipmate/.git/refs/tags
+./pack/try/opt/vim-snipmate/.gitignore
+./pack/try/opt/vim-snipmate/addon-info.json
+./pack/try/opt/vim-snipmate/after
+./pack/try/opt/vim-snipmate/after/plugin
+./pack/try/opt/vim-snipmate/after/plugin/snipMate.vim
+./pack/try/opt/vim-snipmate/autoload
+./pack/try/opt/vim-snipmate/autoload/snipmate
+./pack/try/opt/vim-snipmate/autoload/snipmate/jumping.vim
+./pack/try/opt/vim-snipmate/autoload/snipmate/legacy.vim
+./pack/try/opt/vim-snipmate/autoload/snipmate/parse.vim
+./pack/try/opt/vim-snipmate/autoload/snipmate/util.vim
+./pack/try/opt/vim-snipmate/autoload/snipMate.vim
+./pack/try/opt/vim-snipmate/autoload/snipMate_python_demo.vim
+./pack/try/opt/vim-snipmate/Contributors.md
+./pack/try/opt/vim-snipmate/doc
+./pack/try/opt/vim-snipmate/doc/SnipMate.txt
+./pack/try/opt/vim-snipmate/ftplugin
+./pack/try/opt/vim-snipmate/ftplugin/html_snip_helper.vim
+./pack/try/opt/vim-snipmate/ftplugin/snippets.vim
+./pack/try/opt/vim-snipmate/indent
+./pack/try/opt/vim-snipmate/indent/snippets.vim
+./pack/try/opt/vim-snipmate/plugin
+./pack/try/opt/vim-snipmate/plugin/snipMate.vim
+./pack/try/opt/vim-snipmate/README.md
+./pack/try/opt/vim-snipmate/syntax
+./pack/try/opt/vim-snipmate/syntax/snippet.vim
+./pack/try/opt/vim-snipmate/syntax/snippets.vim
+./pack/try/opt/vim-snipmate/t
+./pack/try/opt/vim-snipmate/t/jumping.vim
+./pack/try/opt/vim-snipmate/t/parser.vim
+./pack/try/opt/vim-snipmate/t/tests.sh
+./pack/try/opt/vim-startify
+./pack/try/opt/vim-startify/.gitignore
+./pack/try/opt/vim-startify/.travis.yml
+./pack/try/opt/vim-startify/autoload
+./pack/try/opt/vim-startify/autoload/startify
+./pack/try/opt/vim-startify/autoload/startify/fortune.vim
+./pack/try/opt/vim-startify/autoload/startify.vim
+./pack/try/opt/vim-startify/CONTRIBUTING.md
+./pack/try/opt/vim-startify/doc
+./pack/try/opt/vim-startify/doc/startify.txt
+./pack/try/opt/vim-startify/images
+./pack/try/opt/vim-startify/images/startify-logo.png
+./pack/try/opt/vim-startify/images/startify-menu.png
+./pack/try/opt/vim-startify/LICENSE
+./pack/try/opt/vim-startify/plugin
+./pack/try/opt/vim-startify/plugin/startify.vim
+./pack/try/opt/vim-startify/README.md
+./pack/try/opt/vim-startify/syntax
+./pack/try/opt/vim-startify/syntax/startify.vim
+./pack/try/opt/vim-startify/test
+./pack/try/opt/vim-startify/test/feature
+./pack/try/opt/vim-startify/test/feature/buffer.vader
+./pack/try/opt/vim-startify/test/feature/mapping.vader
+./pack/try/opt/vim-startify/test/feature/session.vader
+./pack/try/opt/vim-startify/test/include
+./pack/try/opt/vim-startify/test/include/testfile.txt
+./pack/try/opt/vim-startify/test/run
+./pack/try/opt/vim-startify/test/session
+./pack/try/opt/vim-startify/test/session/.gitkeep
+./pack/try/opt/vim-startify/test/viminfo
+./pack/try/opt/vim-startify/test/vimrc
+./pack/try/opt/winresizer
+./pack/try/opt/winresizer/.git
+./pack/try/opt/winresizer/.git/config
+./pack/try/opt/winresizer/.git/description
+./pack/try/opt/winresizer/.git/HEAD
+./pack/try/opt/winresizer/.git/hooks
+./pack/try/opt/winresizer/.git/hooks/applypatch-msg.sample
+./pack/try/opt/winresizer/.git/hooks/commit-msg.sample
+./pack/try/opt/winresizer/.git/hooks/fsmonitor-watchman.sample
+./pack/try/opt/winresizer/.git/hooks/post-update.sample
+./pack/try/opt/winresizer/.git/hooks/pre-applypatch.sample
+./pack/try/opt/winresizer/.git/hooks/pre-commit.sample
+./pack/try/opt/winresizer/.git/hooks/pre-merge-commit.sample
+./pack/try/opt/winresizer/.git/hooks/pre-push.sample
+./pack/try/opt/winresizer/.git/hooks/pre-rebase.sample
+./pack/try/opt/winresizer/.git/hooks/pre-receive.sample
+./pack/try/opt/winresizer/.git/hooks/prepare-commit-msg.sample
+./pack/try/opt/winresizer/.git/hooks/push-to-checkout.sample
+./pack/try/opt/winresizer/.git/hooks/sendemail-validate.sample
+./pack/try/opt/winresizer/.git/hooks/update.sample
+./pack/try/opt/winresizer/.git/index
+./pack/try/opt/winresizer/.git/info
+./pack/try/opt/winresizer/.git/info/exclude
+./pack/try/opt/winresizer/.git/logs
+./pack/try/opt/winresizer/.git/logs/HEAD
+./pack/try/opt/winresizer/.git/logs/refs
+./pack/try/opt/winresizer/.git/logs/refs/heads
+./pack/try/opt/winresizer/.git/logs/refs/heads/master
+./pack/try/opt/winresizer/.git/logs/refs/remotes
+./pack/try/opt/winresizer/.git/logs/refs/remotes/origin
+./pack/try/opt/winresizer/.git/logs/refs/remotes/origin/HEAD
+./pack/try/opt/winresizer/.git/objects
+./pack/try/opt/winresizer/.git/objects/info
+./pack/try/opt/winresizer/.git/objects/pack
+./pack/try/opt/winresizer/.git/objects/pack/pack-e414eedec1c5c04b8930933be6b57fe5d72c09f8.idx
+./pack/try/opt/winresizer/.git/objects/pack/pack-e414eedec1c5c04b8930933be6b57fe5d72c09f8.pack
+./pack/try/opt/winresizer/.git/objects/pack/pack-e414eedec1c5c04b8930933be6b57fe5d72c09f8.rev
+./pack/try/opt/winresizer/.git/packed-refs
+./pack/try/opt/winresizer/.git/refs
+./pack/try/opt/winresizer/.git/refs/heads
+./pack/try/opt/winresizer/.git/refs/heads/master
+./pack/try/opt/winresizer/.git/refs/remotes
+./pack/try/opt/winresizer/.git/refs/remotes/origin
+./pack/try/opt/winresizer/.git/refs/remotes/origin/HEAD
+./pack/try/opt/winresizer/.git/refs/tags
+./pack/try/opt/winresizer/.gitignore
+./pack/try/opt/winresizer/autoload
+./pack/try/opt/winresizer/autoload/winresizer.vim
+./pack/try/opt/winresizer/doc
+./pack/try/opt/winresizer/doc/winresizer.txt
+./pack/try/opt/winresizer/LICENSE
+./pack/try/opt/winresizer/plugin
+./pack/try/opt/winresizer/plugin/winresizer.vim
+./pack/try/opt/winresizer/README.md
+./pack/try/start
+./pack/try/start/gitkeep
+./plugin_cfg.vim
+./submodules.sh
+./vimrc
+
+-------------------------------------------------------------------------------
+find -type d
+.
+./env
+./env/darwin
+./env/dos
+./env/unix
+./pack
+./pack/def
+./pack/def/start
+./pack/def/start/0rc
+./pack/def/start/0rc/autoload
+./pack/def/start/0rc/colors
+./pack/def/start/0rc/dict
+./pack/def/start/0rc/ftplugin
+./pack/def/start/0rc/plugin
+./pack/def/start/org
+./pack/def/start/org/plugin
+./pack/def/start/std
+./pack/def/start/std/plugin
+./pack/def/start/try
+./pack/def/start/try/ftplugin
+./pack/def/start/try/plugin
+./pack/ext
+./pack/ext/start
+./pack/ext/start/numbers
+./pack/ext/start/numbers/autoload
+./pack/ext/start/numbers/plugin
+./pack/reg
+./pack/reg/start
+./pack/reg/start/BlockDiff
+./pack/reg/start/BlockDiff/autoload
+./pack/reg/start/BlockDiff/plugin
+./pack/reg/start/CamelCaseMotion
+./pack/reg/start/CamelCaseMotion/autoload
+./pack/reg/start/CamelCaseMotion/doc
+./pack/reg/start/CamelCaseMotion/plugin
+./pack/reg/start/clever-f.vim
+./pack/reg/start/clever-f.vim/.github
+./pack/reg/start/clever-f.vim/.github/workflows
+./pack/reg/start/clever-f.vim/autoload
+./pack/reg/start/clever-f.vim/autoload/clever_f
+./pack/reg/start/clever-f.vim/autoload/clever_f/migemo
+./pack/reg/start/clever-f.vim/doc
+./pack/reg/start/clever-f.vim/plugin
+./pack/reg/start/clever-f.vim/test
+./pack/reg/start/current-func-info.vim
+./pack/reg/start/current-func-info.vim/.git
+./pack/reg/start/current-func-info.vim/.git/hooks
+./pack/reg/start/current-func-info.vim/.git/info
+./pack/reg/start/current-func-info.vim/.git/logs
+./pack/reg/start/current-func-info.vim/.git/logs/refs
+./pack/reg/start/current-func-info.vim/.git/logs/refs/heads
+./pack/reg/start/current-func-info.vim/.git/logs/refs/remotes
+./pack/reg/start/current-func-info.vim/.git/logs/refs/remotes/origin
+./pack/reg/start/current-func-info.vim/.git/objects
+./pack/reg/start/current-func-info.vim/.git/objects/info
+./pack/reg/start/current-func-info.vim/.git/objects/pack
+./pack/reg/start/current-func-info.vim/.git/refs
+./pack/reg/start/current-func-info.vim/.git/refs/heads
+./pack/reg/start/current-func-info.vim/.git/refs/remotes
+./pack/reg/start/current-func-info.vim/.git/refs/remotes/origin
+./pack/reg/start/current-func-info.vim/.git/refs/tags
+./pack/reg/start/current-func-info.vim/autoload
+./pack/reg/start/current-func-info.vim/doc
+./pack/reg/start/current-func-info.vim/ftplugin
+./pack/reg/start/current-func-info.vim/ftplugin/bash
+./pack/reg/start/current-func-info.vim/ftplugin/c
+./pack/reg/start/current-func-info.vim/ftplugin/elixir
+./pack/reg/start/current-func-info.vim/ftplugin/go
+./pack/reg/start/current-func-info.vim/ftplugin/javascript
+./pack/reg/start/current-func-info.vim/ftplugin/perl
+./pack/reg/start/current-func-info.vim/ftplugin/php
+./pack/reg/start/current-func-info.vim/ftplugin/python
+./pack/reg/start/current-func-info.vim/ftplugin/ruby
+./pack/reg/start/current-func-info.vim/ftplugin/sh
+./pack/reg/start/current-func-info.vim/ftplugin/sql
+./pack/reg/start/current-func-info.vim/ftplugin/vim
+./pack/reg/start/current-func-info.vim/ftplugin/zsh
+./pack/reg/start/current-func-info.vim/plugin
+./pack/reg/start/easybuffer.vim
+./pack/reg/start/easybuffer.vim/autoload
+./pack/reg/start/easybuffer.vim/doc
+./pack/reg/start/easybuffer.vim/plugin
+./pack/reg/start/easybuffer.vim/syntax
+./pack/reg/start/mru.vim
+./pack/reg/start/mru.vim/plugin
+./pack/reg/start/vim-prettyprint
+./pack/reg/start/vim-prettyprint/autoload
+./pack/reg/start/vim-prettyprint/doc
+./pack/reg/start/vim-prettyprint/plugin
+./pack/reg/start/vim-submode
+./pack/reg/start/vim-submode/.git
+./pack/reg/start/vim-submode/.git/hooks
+./pack/reg/start/vim-submode/.git/info
+./pack/reg/start/vim-submode/.git/logs
+./pack/reg/start/vim-submode/.git/logs/refs
+./pack/reg/start/vim-submode/.git/logs/refs/heads
+./pack/reg/start/vim-submode/.git/logs/refs/remotes
+./pack/reg/start/vim-submode/.git/logs/refs/remotes/origin
+./pack/reg/start/vim-submode/.git/objects
+./pack/reg/start/vim-submode/.git/objects/info
+./pack/reg/start/vim-submode/.git/objects/pack
+./pack/reg/start/vim-submode/.git/refs
+./pack/reg/start/vim-submode/.git/refs/heads
+./pack/reg/start/vim-submode/.git/refs/remotes
+./pack/reg/start/vim-submode/.git/refs/remotes/origin
+./pack/reg/start/vim-submode/.git/refs/tags
+./pack/reg/start/vim-submode/autoload
+./pack/reg/start/vim-submode/doc
+./pack/reg/start/vim-submode/t
+./pack/reg/start/vimdoc-ja
+./pack/reg/start/vimdoc-ja/doc
+./pack/reg/start/vimdoc-ja/syntax
+./pack/try
+./pack/try/opt
+./pack/try/opt/comfortable-motion.vim
+./pack/try/opt/comfortable-motion.vim/autoload
+./pack/try/opt/comfortable-motion.vim/plugin
+./pack/try/opt/rainbow
+./pack/try/opt/rainbow/.git
+./pack/try/opt/rainbow/.git/hooks
+./pack/try/opt/rainbow/.git/info
+./pack/try/opt/rainbow/.git/logs
+./pack/try/opt/rainbow/.git/logs/refs
+./pack/try/opt/rainbow/.git/logs/refs/heads
+./pack/try/opt/rainbow/.git/logs/refs/remotes
+./pack/try/opt/rainbow/.git/logs/refs/remotes/origin
+./pack/try/opt/rainbow/.git/objects
+./pack/try/opt/rainbow/.git/objects/info
+./pack/try/opt/rainbow/.git/objects/pack
+./pack/try/opt/rainbow/.git/refs
+./pack/try/opt/rainbow/.git/refs/heads
+./pack/try/opt/rainbow/.git/refs/remotes
+./pack/try/opt/rainbow/.git/refs/remotes/origin
+./pack/try/opt/rainbow/.git/refs/tags
+./pack/try/opt/rainbow/.github
+./pack/try/opt/rainbow/.github/ISSUE_TEMPLATE
+./pack/try/opt/rainbow/autoload
+./pack/try/opt/rainbow/doc
+./pack/try/opt/rainbow/plugin
+./pack/try/opt/rainbow/tests
+./pack/try/opt/snipmate.vim
+./pack/try/opt/snipmate.vim/.git
+./pack/try/opt/snipmate.vim/.git/hooks
+./pack/try/opt/snipmate.vim/.git/info
+./pack/try/opt/snipmate.vim/.git/logs
+./pack/try/opt/snipmate.vim/.git/logs/refs
+./pack/try/opt/snipmate.vim/.git/logs/refs/heads
+./pack/try/opt/snipmate.vim/.git/logs/refs/remotes
+./pack/try/opt/snipmate.vim/.git/logs/refs/remotes/origin
+./pack/try/opt/snipmate.vim/.git/objects
+./pack/try/opt/snipmate.vim/.git/objects/info
+./pack/try/opt/snipmate.vim/.git/objects/pack
+./pack/try/opt/snipmate.vim/.git/refs
+./pack/try/opt/snipmate.vim/.git/refs/heads
+./pack/try/opt/snipmate.vim/.git/refs/remotes
+./pack/try/opt/snipmate.vim/.git/refs/remotes/origin
+./pack/try/opt/snipmate.vim/.git/refs/tags
+./pack/try/opt/snipmate.vim/after
+./pack/try/opt/snipmate.vim/after/plugin
+./pack/try/opt/snipmate.vim/autoload
+./pack/try/opt/snipmate.vim/doc
+./pack/try/opt/snipmate.vim/ftplugin
+./pack/try/opt/snipmate.vim/plugin
+./pack/try/opt/snipmate.vim/snippets
+./pack/try/opt/snipmate.vim/syntax
+./pack/try/opt/undotree
+./pack/try/opt/undotree/autoload
+./pack/try/opt/undotree/doc
+./pack/try/opt/undotree/doc/_static
+./pack/try/opt/undotree/plugin
+./pack/try/opt/undotree/syntax
+./pack/try/opt/vim-snipmate
+./pack/try/opt/vim-snipmate/.git
+./pack/try/opt/vim-snipmate/.git/hooks
+./pack/try/opt/vim-snipmate/.git/info
+./pack/try/opt/vim-snipmate/.git/logs
+./pack/try/opt/vim-snipmate/.git/logs/refs
+./pack/try/opt/vim-snipmate/.git/logs/refs/heads
+./pack/try/opt/vim-snipmate/.git/logs/refs/remotes
+./pack/try/opt/vim-snipmate/.git/logs/refs/remotes/origin
+./pack/try/opt/vim-snipmate/.git/objects
+./pack/try/opt/vim-snipmate/.git/objects/info
+./pack/try/opt/vim-snipmate/.git/objects/pack
+./pack/try/opt/vim-snipmate/.git/refs
+./pack/try/opt/vim-snipmate/.git/refs/heads
+./pack/try/opt/vim-snipmate/.git/refs/remotes
+./pack/try/opt/vim-snipmate/.git/refs/remotes/origin
+./pack/try/opt/vim-snipmate/.git/refs/tags
+./pack/try/opt/vim-snipmate/after
+./pack/try/opt/vim-snipmate/after/plugin
+./pack/try/opt/vim-snipmate/autoload
+./pack/try/opt/vim-snipmate/autoload/snipmate
+./pack/try/opt/vim-snipmate/doc
+./pack/try/opt/vim-snipmate/ftplugin
+./pack/try/opt/vim-snipmate/indent
+./pack/try/opt/vim-snipmate/plugin
+./pack/try/opt/vim-snipmate/syntax
+./pack/try/opt/vim-snipmate/t
+./pack/try/opt/vim-startify
+./pack/try/opt/vim-startify/autoload
+./pack/try/opt/vim-startify/autoload/startify
+./pack/try/opt/vim-startify/doc
+./pack/try/opt/vim-startify/images
+./pack/try/opt/vim-startify/plugin
+./pack/try/opt/vim-startify/syntax
+./pack/try/opt/vim-startify/test
+./pack/try/opt/vim-startify/test/feature
+./pack/try/opt/vim-startify/test/include
+./pack/try/opt/vim-startify/test/session
+./pack/try/opt/winresizer
+./pack/try/opt/winresizer/.git
+./pack/try/opt/winresizer/.git/hooks
+./pack/try/opt/winresizer/.git/info
+./pack/try/opt/winresizer/.git/logs
+./pack/try/opt/winresizer/.git/logs/refs
+./pack/try/opt/winresizer/.git/logs/refs/heads
+./pack/try/opt/winresizer/.git/logs/refs/remotes
+./pack/try/opt/winresizer/.git/logs/refs/remotes/origin
+./pack/try/opt/winresizer/.git/objects
+./pack/try/opt/winresizer/.git/objects/info
+./pack/try/opt/winresizer/.git/objects/pack
+./pack/try/opt/winresizer/.git/refs
+./pack/try/opt/winresizer/.git/refs/heads
+./pack/try/opt/winresizer/.git/refs/remotes
+./pack/try/opt/winresizer/.git/refs/remotes/origin
+./pack/try/opt/winresizer/.git/refs/tags
+./pack/try/opt/winresizer/autoload
+./pack/try/opt/winresizer/doc
+./pack/try/opt/winresizer/plugin
+./pack/try/start
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#    1 doc-ja
+#    2 submode
+#    3 cfi
+#    4 clever_f
+#    5 Fugitive
+#    6 CamelCaseMotion
+#    7 MRU
+#    8 BlockDiff
+#    9 PrettyPrint
+#   10 undotree
+#   11 Rainbow Parentheses
+#   12 ComfortableMotion
+#   13 Surround
+#   14 snippets
+#   15 Easy Buffer
+#   16 Tagbar
+
+#	doc vim-jp/vimdoc-ja.git
+#	ini takubo/vim-submode.git
+#	ref takubo/current-func-info.vim.git
+#	def rhysd/clever-f.vim.git
+#	def tpope/vim-fugitive.git
+#	def bkad/CamelCaseMotion.git
+#	def takubo/mru.vim.git
+#	def takubo/BlockDiff.git
+#	dev thinca/vim-prettyprint.git
+#	def takubo/undotree.git
+#	ext takubo/comfortable-motion.vim.git
+#	ext kien/rainbow_parentheses.vim.git
+#	#def snippets
+#	#def EasyBuffer
+#	#def Surround
+#	#def Tagbar
+
+#	#std Tabubo/BlockMove
+#	#std Tabubo/Battery
+#	#std Tabubo/Numbers
+#	#std Tabubo/CursorJumped
+#	#std Tabubo/CAX Axes
+
+
+
+#	dev     vim-jp/vimdoc-ja.git
+#	dev     thinca/vim-prettyprint.git
+#	std     takubo/vim-submode.git
+#	std     takubo/current-func-info.vim.git
+#	std     rhysd/clever-f.vim.git
+#	std     tpope/vim-fugitive.git
+#	std     bkad/CamelCaseMotion.git
+#	std     takubo/mru.vim.git
+#
+#	ext     takubo/undotree.git
+#	ext     kien/rainbow_parentheses.vim.git
+#
+#	try     takubo/comfortable-motion.vim.git
+#        # try   X troydm/easybuffer.vim
+#	# try     snippets
+#	# try     Surround
+#	# try     Tagbar
+#
+#	myp     takubo/BlockDiff.git
+#	# myp     tabubo/Battery
+#	# myp     tabubo/CursorJumped
+#	# myp     tabubo/EdgeMove BlockMove
+#	# myp     tabubo/Numbers
+#	# myp     tabubo/Axes
+
+----------------------------
+
+# doc
+# ref
+# ini
+# def, std
+# dev
+# ext
+# div, std
+
+
+
+
+
+
+
+
+ToDo
+    qf.vim
+    gvimrc
+    try/
+    cax.vim
+    impauto を分ける
+
+    window.vimのlambdaがロード時に評価される
+
+
+
+----------------------------------------------------------------------------------------------------
+
+
+final/
+│ env/
+│ │ dos/
+│ │ │ dos_mklink_cyg64.bat
+│ │ │ startuptime.bat*
+│ │ │ vimrc_local.vim
+│ │ unix/
+│ │ │ mklink.sh
+│ │ │ vimrc_local.vim
+│ pack/
+│ │ def/
+│ │ │ start/
+│ │ │ │ rc/
+│ │ │ │ │ colors/
+│ │ │ │ │ ftplugin/
+│ │ │ │ │ plugin/
+│ │ │ │ │ import/
+│ │ │ │ std/
+│ │ │ │ │ plugin/
+│ │ │ │ │ autoload/
+│ │ │ │ │ import/
+│ │ ext/
+│ │ │ opt/
+│ │ │ start/
+│ │ try/
+│ │ │ opt/
+│ │ │ start/
+
+
+│ .gitignore
+│ README.md
+│ options.vim
+│ config.vim
+│ vimrc
+│ gvimrc
+│ submodule
+
+
+----------------------------------------------------------------------------------------------------
+
+vimfiles/
+│ autoload/
+│ colors/
+│ dict/
+│ doc/
+│ ftplugin/
+│ indent/
+│ macros/
+│ pack/
+│ │ custom/
+│ │ doc-ja/
+│ │ new/
+│ │ try/
+│ plugin/
+│ syntax/
+│ tools/
+│ .gitignore
+│ .gvimrc
+│ .netrwhist
+│ README.md
+│ _.spx
+│ _.spy
+│ dos_mklink_cyg64.bat*
+│ ema.vim
+│ gvimrc
+│ pack_clone
+│ pack_pull
+│ pack_st
+│ packgit
+│ recv.vim
+│ recv.vim.bk
+│ repos.txt
+│ startuptime.bat*
+│ test.vim
+│ vimrc
+│ vimrc_local.vim
+
+----------------------------------------------------------------------------------------------------
+
+
+
+  MRU
+    以下は、無条件に飛べばよい
+        if winnr() != winnum
+            " If not already in the window, jump to it
+            exe winnum . 'wincmd w'
+        endif
+    完全一致で開く場合
+      pat -> a:pat
+    MRU_Open_Window
+      save Window id
+      MRU_Window_Height は、動的に変更。
+      ↓は要らないのでは？
+        setlocal winfixheight
+      マッピングごとの開き方を変える
+    MRU_Open_File_In_Tab
+      右となりのタブで開く
+    MRU_Window_Edit_File
+      ↓は、多分バグ。ifの最初にないといけないはず。
+        elseif a:open_type ==# 'newtab' || g:MRU_Open_File_Use_Tabs
+      ↓preview windowがtopに来るのは、嫌だ。
+        exe 'topleft pedit ' . esc_fname
+
+  https://qiita.com/neras_1215/items/8e5412bf5a45a056e1fb
+  Plugin
+     1 doc-ja
+     2 submode
+     3 cfi
+     4 clever_f
+     5 Fugitive
+     6 BlockDiff
+     7 CamelCaseMotion
+     8 Rainbow Parentheses
+     9 ComfortableMotion
+    10 PrettyPrint
+    11 snippets
+    12 MRU
+    13 Easy Buffer
+    14 Tagbar
+    15 undotree
+    16 Surround
+
+
+  2025年4月7日 12:03
+    以下を更新
+      rimpa
+      Statusline
+      Tabline
+      submode
+      PopUpInfo
+      cursor_scroll.vim
+      util_v9s
+      Completion
+      impauto/WindowRatio
+      Window
+      multihighlight
+      search
+
+
+  2025年4月4日 18:03
+    以下を更新
+      misc
+      util_cmd
+
+  TODO
+    qf
+    misc
+    tag jump
+    case motion
+
+  ftplugin
+    要
+        完 vim.vim
+        完 diff.vim
+        完 sh.vim
+        完 qf.vim
+        完 c.vim
+    vimfiles
+        不要 awk.vim
+        完 c.vim
+        完 diff.vim
+        不要 help.vim
+        qf.vim
+        完 vim.vim
+    vim-labo
+        完 c
+        qf
+        完sh
+        完 vim
+
+  新バッファで、コマンド結果取込
+  MakeTags 
+  tag_only
+  clever_f
+  Swap_Exists
+  MRU
+  " Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+  snipet
+
+
+2025年3月19日   13時50分
+    全て更新。
+    残りは
+      doc
+      rimpa
+      submode
+      comfortable-motion
+    のみ。
+    vimrc は？
+    CSS-resize
+
+
+言語
+     1. アセンブリ
+     2. C
+     3. C++
+     4. Ada
+     5. Forth
+     6. Rust
+     7. VimScript
+     8. AWK
+     9. sed
+    10. sh / Zsh
+
+1228の主要残り
+    MakeTags
+    tag_only
+    JumpToDefine
+
+新機能
+    ラウンドの拡張
+    テキストオブジェクト dis, das
+    edgemove.vim
+    いくつかのユーティリティコマンド
+    PopUpInfo.vim
+    カラーチェンジ(金、暗)
+    HHLコマンド
+
+
+pack
+    1. rc
+    2. doc / ext / std / contrib
+    3. infra
+    4. mypackage
+    5. expackage
+    6. dev
+    7. (lib)
+
+pack
+    1. default, std
+       1. _rc
+       2. infra
+       3. std_plugins
+       4. (lib)
+    2. mypackage, expackageg
+    4. necesaary
+          fugitive
+          clever-f
+          cfi
+    3. expackage, otherpackages
+          MRU
+    5. doc
+       1. ja-doc
+    6. dev
+
+# TODO
+  Statusline
+  Tabline
+  Color
+  Window Wrap
+  Unified_CR
+
+----------------------------------------------------------------------------------------------------
+
+Winnr
+  Not       OK
+  Gold      OK
+
+Not Winnr
+  Not       OK
+  Gold      OK
+
+通常
+Help
+無名
+
+編集なし
+編集あり
+
+----------------------------------------------------------------------------------------------------
+1.  submode
+2.  clever-f
+3.  comfortable scroll
+4.  current function info
+5.  fugitive
+6.  user text object
+7.    under score
+8.  rainbow
+9.  snippets
+10. toggle case
+11. MRU
+12. PrettyPrint
+13. 
+14. 
+15. 
+16. 
+----------------------------------------------------------------------------------------------------
+Window split
+Asterisk
+Completion
+f motion
+----------------------------------------------------------------------------------------------------
+
+
+2024年12月27日 12時15分 plugin全て更新
+  次は、まだ。
+   jindent
+   cfi vim9
+   Colorscheme
+   impauto
+
+2024年12月26日 13時00分 アスキーコード順で、plugin/util,vimまで更新
+  次は、まだ。
+   Completion
+   jindent
+   PopUpInfo
+   util_v9s
+
+2024年12月16日 12時48分 アスキーコード順で、plugin/search,vimまで更新
+pluginディレクトリ以外は未更新
+  cfi vim9
+  Colorscheme
+  impauto
+
+
+
+# TODO
+
+Search          Line-Search
+Statusline
+Tabline
+
+
+
+#----------------------------------------------------------------------------------------
+# Doc
+
+
+
+# 複雑化
+#
+#  補完
+#  CWordSearch
+#  Tag
+#  Window Focus
+#  Visual, Stl, Tabline
+
+
+
+# Grep
+#
+#   2 grep vimgrep
+#   2 new add
+#   2 qfix location
+#   3 指定拡張子 同じ拡張子 git下
+#   3 プロジェクト全体 カレントディレクトリのみ カレントディレクトリと下
+#   6 文字列入力 カーソル下単語 カーソル下文字列 検索文字列 レジスタ 単語境界で自由入力
+#   72 * 6 = 432
+
+
+
+# 重点実施
+#
+#    1. Window
+#    2. Completion
+#    3. CWord Search
+#
+#    4. Tag & Browse
+#    5. Clever-f
+#    6. Block Visual
+
+
+
+# packages
+#
+#  begin         o vimrc内で呼び出すプラグイン
+#  lib           o ライブラリ
+#  util         s  細かいユーティリティ
+#  dev          s  vim scriptのデバッグ、vimのカスタマイズ用
+#  mypackage    so submodule化しないプラグイン vimrcで直接使う    (defaultでもよい)
+#  default      so 必須のプラグイン    (mypackageでもよい)
+#  plugin       so なくてもよいプラグイン
+#  doc          so vim-jp doc など doc
+
+
+
+# Category
+#
+#	 1	Basic
+#	 2	Battery
+#	 3	Buffer
+#	 4	Clever-f
+#	 5	Completion
+#	 6	Configuration
+#	 7	Cursor Move, CursorLine, CursorColumn, and Scroll
+#	 8	Diff
+#	 9	EasyMotionn
+#	10	Emacs
+#	11	EscEsc
+#	12	FuncName
+#	13	Grep
+#	14	i_Esc
+#	15	Mru
+#	16	NERDTree
+#	17	Other Key-Maps
+#	18	Quickfix & Locationlist
+#	19	Search
+#	20	SetPath
+#	21	Snippets
+#	22	Statusline
+#	23	Substitute
+#	24	Swap Exists
+#	25	Tab
+#	26	Tabline
+#	27	Tag, Jump, and Unified CR
+#	28	Terminal
+#	29	Text_Objects
+#	30	Transparency
+#	31	Undo Redo
+#	32	Unified_Space
+#	33	Util
+#	34	Util Commands
+#	35	Util Functions
+#	36	Vertical-f
+#	37	Visual_Mode
+#	38	Window
+#
+#	39	BlockMove
+#	40	CursorJumped
+#	41	Circled Number
+#	42	mode popup
+#	43	Numbers
+
+
+
+# Plugins
+#
+#	1	submode
+#	2	cfi
+#
+#	3	fugitive
+#
+#	4	PrettyPrint
+#
+#	5	clever-f
+#	6	Rainbow Parentheses
+#	7	Battery
+#	8	numbers
+#	9	smooth Scroll
+
+
+
+#  lib          ライブラリ
+#
+#	1. PushposPopPos
+#	2. CursorJumped
+#	3. WindowRatio
+#	4. submode
+#
+#	5. popup
+#	6. func name
+#	7. basic
+
+
+
+# Vim 本体
+#
+# CursorJumped
+# ModeChangePre ModeLeave
+
+
+
+
+# Category New Temp
+#
+#	 1	Basic & Emacs
+#	 3	Buffer & Mru & NERDTree
+#	 5	Completion
+#	 7	Cursor Move, CursorLine, CursorColumn, and Scroll & Clever-f
+#	 8	Diff
+#	13	Grep
+#	19	Search
+#	22	Statusline
+#	23	Substitute
+#	26	Tabline
+#	27	Tag, Jump, and Unified CR
+#	33	Util
+#	37	Visual_Mode
+#	38	Window & Tab
+#	44	plugin
+#	45	Unified_CR
+#	46	Unified_Tab
+#       47      Misc
+#	48	GUI
+#       49      insert & Snippets & i_Esc
+#	49	Make Tag
+#
+#	 2	Battery
+#	 6	Configuration
+#	18	Quickfix and Locationlist
+#	11	EscEsc
+#	12	FuncName
+#	20	SetPath
+#	24	Swap Exists
+#	28	Terminal
+#	29	Text_Objects
+#	31	Undo Redo
+#	42	mode popup
+
+
+
+# Category New
+#
+#	 1	Basic & Emacs
+#	 7	Cursor Move, CursorLine, CursorColumn, and Scroll & Clever-f
+#	29	Text_Objects
+#	11	EscEsc
+#	37	Visual_Mode
+#	31	Undo Redo
+#	24	Swap Exists
+#	26	Tabline
+#	22	Statusline
+#	19	Search
+#	13	Grep
+#	23	Substitute
+#	 8	Diff
+#	18	Quickfix and Locationlist
+#	38	Window & Tab
+#	 3	Buffer & Mru & NERDTree
+#	20	SetPath
+#	49	Make Tag
+#	27	Tag, Jump
+#       49      insert & Snippets & i_Esc
+#	 5	Completion
+#	28	Terminal
+#	45	Unified_CR
+#	46	Unified_Tab
+#	 6	Configuration
+#	42	mode popup
+#	33	Util
+#       47      Misc
+#	44	plugin
+#	 2	Battery
+#	12	FuncName
+#	48	GUI
+
+
+
+# Category New 0307
+#
+#	1	Basic & Emacs
+    #	3	Text_Objects
+    #	6	Undo Redo
+    #	7	Swap Exists
+#	2	Cursor Move, CursorLine, CursorColumn, and Scroll & Clever-f
+#	4	EscEsc
+#	5	Visual_Mode
+r	8	Tabline
+r	9	Statusline
+r	10	Search
+r	11	Grep
+r	12	Substitute
+r	13	Diff
+#	14	Quickfix and Locationlist
+r	15	Window & Tab
+#	16	Buffer & Mru & NERDTree
+r	17	SetPath
+#	18	Make Tag
+#	19	Tag, Jump
+#	20	insert & Snippets & i_Esc
+r	21	Completion
+#	22	Terminal
+#	23	Unified_CR
+#	24	Unified_Tab
+#	25	Configuration
+#	26	mode popup
+#	27	Util Cmd
+#	28	Misc
+#	29	plugin
+#	30	Battery
+#	31	FuncName
+#	32	GUI
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+" TODO 
+" BrowserJump  Orgへのジャンプもキーバインドを提供する
+
+
+
+" Basic {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Cursor Move, CursorLine, CursorColumn, and Scroll {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Emacs {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" EscEsc {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Search {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Substitute {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Grep {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Tag, Jump, and Unified CR {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Diff {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Buffer {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Tab {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Tabline {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Battery {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Unified_Space {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Mru {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" i_Esc {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Snippets {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Configuration {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Swap Exists {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Other Key-Maps {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Clever-f {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Transparency {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" FuncName {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Util {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Basic {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+
+
+
+" Cursor Move, CursorLine, CursorColumn, and Scroll {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Tag, Jump, and Unified CR {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Unified_Space {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Tabline {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Battery {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Buffer {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Tab {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Search {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Grep {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Substitute {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Diff {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Snippets {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" i_Esc {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" EscEsc {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Configuration {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Emacs {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Swap Exists {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Clever-f {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Mru {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Transparency {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" FuncName {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Other Key-Maps {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Util {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+
+
+" Basic {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Emacs {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Cursor Move, CursorLine, CursorColumn, and Scroll {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" EscEsc {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Tag, Jump, and Unified CR {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+
+" Search {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Substitute {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Grep {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Quickfix & Locationlist {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Diff {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Buffer {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Tab {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Tabline {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Battery {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Snippets {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" i_Esc {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Swap Exists {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" EscEsc {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Configuration {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+" Emacs {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+
+" MRU {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" FuncName {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" GUI {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Clever-f {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+" Other Key-Maps {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+
+
+" Util {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+
+
+nnoremap go :<C-u>MRU<Space>
+nnoremap gO :<C-u>MRU<CR>
+nnoremap <C-o>  :<C-u>MRU<Space>
+nnoremap g<C-o> :<C-u>MRU<CR>
+nmap gt <Plug>(PrjTree-MyExplore)
+
+
+
+
+let g:submode_timeoutlen = 5000
+
+
+
+com! -nargs=1 -complete=custom,VimrcContents V VIMRC <Bar> silent 1 <Bar> call search(<q-args> . ' {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{', 'cW')
+com! -nargs=1 -complete=custom,VimrcContents V VIMRC <Bar> silent 1 <Bar> call search(<q-args> . ' {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{', 'cW') <Bar> normal! z<CR>
+
+" function! Grep()
+"   let g:strs = ''
+"   redir => g:strs
+"   g/ {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{/p
+"   redir END
+" endfunction
+" 
+" function! Grep()
+"   let g:strs = execute('vimgrep ' . '" {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{" %')
+" endfunction
+
+function! Grep()
+  vimgrep ' {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{' %
+endfunction
+
+let s:vimrc_conts = [ 'Basic', 'Text_Objects', 'Visual_Mode', 'Cursor Move, CursorLine, CursorColumn, and Scroll', 'Emacs', 'EscEsc', 'Search', 'Substitute', 'Grep', 'Quickfix & Locationlist', 'Tag, Jump, and Unified CR', 'Diff', 'Window', 'Terminal', 'Buffer', 'Tab', 'Tabline', 'Statusline', 'Unified_Space', 'Mru', 'Completion', 'i_Esc', 'Snippets', 'Configuration', 'Swap Exists', 'Other Key-Maps', 'Clever-f', 'Vertical-f', 'NERDTree', 'EasyMotionn', 'Transparency', 'FuncName', 'Undo Redo', 'Util Functions', 'Util Commands', 'Basic', 'Cursor Move, CursorLine, CursorColumn, and Scroll', 'Emacs', 'EscEsc', 'Search', 'Substitute', 'Grep', 'Quickfix & Locationlist', 'Tag, Jump, and Unified CR', 'Diff', 'Window', 'Terminal', 'Buffer', 'Tab', 'Tabline', 'Statusline', 'Battery', 'Unified_Space', 'Mru', 'Completion', 'i_Esc', 'Snippets', 'Configuration', 'Swap Exists', 'Other Key-Maps', 'Clever-f', 'Transparency', 'FuncName', 'Util', 'Basic', 'Cursor Move, CursorLine, CursorColumn, and Scroll', 'Tag, Jump, and Unified CR', 'Unified_Space', 'Tabline', 'Statusline', 'Battery', 'Window', 'Terminal', 'Buffer', 'Tab', 'Search', 'Grep', 'Quickfix & Locationlist', 'Substitute', 'Diff', 'Completion', 'Snippets', 'i_Esc', 'EscEsc', 'Configuration', 'Emacs', 'Swap Exists', 'Clever-f', 'Mru', 'Transparency', 'FuncName', 'Other Key-Maps', 'Util', 'SetPath' ]
+
+function! VimrcContents(ArgLead, CmdLine, CusorPos)
+  return join(s:vimrc_conts,"\n")
+endfunction
+
+
+
+
+" TODO
+" Diff Specialの判定では、NERDTreeのWindowを無視して、2個ならDiffするようにする。おなじくTerminalも。Quickfix, Locationlistも。
+
+"
+"■お気に入り
+"
+"Window
+"
+"CWord Search
+"
+"Completion
+"
+"Numbers (Em)
+"
+"
+"■力を入れざるを得ないもの
+"
+"Scroll
+"
+"Tag Browsing
+"
+"
+"■力を入れてしまったもの
+"
+"Diff
+"
+"Stl
+"
+"(Esc_Esc)
+"
+
+
+" 🐹
+" 🌀
+" 🐎
+" 🐬
+" 🐜
+" 🐝
+" 👉
+" 💀
+" 💉
+" 💻
+" 💮
+" 📜
+" 📓
+" 💎
+" 💿
+" 📎
+" 🔗
+" 🔘
+" 🔃
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
