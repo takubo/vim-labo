@@ -1,3 +1,66 @@
+#----------------------------------------------------------------------------------------
+
+パーセント
+パーセント文字
+
+残り時間(秒)
+残り時間(フォーマット済み)
+
+フル時間(秒)
+フル時間(フォーマット済み)
+
+接続状態
+接続状態絵文字
+
+充電状態
+充電状態絵文字
+
+#----------------------------------------------------------------------------------------
+
+
+  % find . -type f -newermt '2025-07-01 17:50:00' | cat -n
+       1  ./pack/def/start/0rc/autoload/popup_info.vim
+       2  ./pack/def/start/0rc/colors/rimpa.vim
+       3  ./pack/def/start/0rc/ftplugin/qf.vim
+       4  ./pack/def/start/0rc/plugin/tabline.vim
+       5  ./pack/def/start/0rc/plugin/window.vim
+       6  ./pack/def/start/try/plugin/doc.txt
+       7  ./pack/def/start/try/plugin/tabpanel.vim
+       8  ./pack/def/start/try/plugin/tabpanel.vim.bak
+       9  ./pack/def/start/try/plugin/tabpanel.vim.bak3
+      10  ./pack/def/start/try/plugin/tabpanel.vim.bak4
+      11  ./pack/def/start/try/plugin/tabpanel_demo/battery_demo.vim
+      12  ./pack/def/start/try/plugin/tabpanel_demo/funcs.vim
+      13  ./pack/def/start/try/plugin/test.vim
+      14  ./pack/def/start/try/plugin/try.vim
+      15  ./plugin_cfg.vim
+
+  % find . -type f -newermt '2025-07-01 17:50:00' | cat -n
+       6  ./pack/def/start/try/plugin/doc.txt
+
+       8  ./pack/def/start/try/plugin/tabpanel.vim.bak
+       9  ./pack/def/start/try/plugin/tabpanel.vim.bak3
+      10  ./pack/def/start/try/plugin/tabpanel.vim.bak4
+
+
+
+
+      未使用バッファ選択の汎化  カレントタブをはずす
+      CtrlT は、Mなどにも拡大する
+      window内のλをなくす
+      sign
+      Tbp bufname
+      タブパネルのタイマ
+      タブパネルのセパレータ
+      前のタブに戻る
+Tbpコマンド
+tabpanelコンテンツのファイナライズ
+qfの編集の汎化
+qfの内容を、pluginへ持って行く
+goの数字
+diff の d+のsubmode化
+snipettの導入
+ExpandTab問題
 
 
 
