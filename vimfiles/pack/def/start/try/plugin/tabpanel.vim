@@ -7,13 +7,28 @@ scriptencoding utf-8
 #----------------------------------------------------------------------------------------
 # Make TabPanelStr
 
-def TabpanelHeader(): string
+def Header(): string
   return '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '%=' .. strftime('%H:%M  ') .. "\n\n"
  #return "\n"
 enddef
 
 
-def TabpanelFooter(): string
+def After(): string
+  const fs = g:FuncsString()
+  if fs == ''
+    return "\n\n"
+  else
+    return "\n\n" .. Border() .. fs .. "\n" .. Border() .. "\n"
+  endif
+ #return '%#TblDate# '
+ #return "\n\n\n" .. g:FuncsString()
+ #return "\n\n" .. repeat('-', 36) .. "\n" .. g:FuncsString() .. "\n" .. repeat('-', 36) .. "\n"
+ #return "\n\n" .. repeat('─', 18) .. "\n" .. g:FuncsString() .. "\n" .. repeat('─', 18) .. "\n"
+ #return "\n"
+enddef
+
+
+def Footer(): string
   if 0
     return '%#TblDate#%=[Footer]%='
   elseif 0
@@ -40,63 +55,10 @@ def TabpanelFooter(): string
 enddef
 
 
-def TabpanelAdding(): string
-  const fs = g:FuncsString()
-  if fs == ''
-    return "\n\n"
-  else
-    return "\n\n" .. Border() .. fs .. "\n" .. Border() .. "\n"
-  endif
- #return '%#TblDate# '
- #return "\n\n\n" .. g:FuncsString()
- #return "\n\n" .. repeat('-', 36) .. "\n" .. g:FuncsString() .. "\n" .. repeat('-', 36) .. "\n"
- #return "\n\n" .. repeat('─', 18) .. "\n" .. g:FuncsString() .. "\n" .. repeat('─', 18) .. "\n"
- #return "\n"
-enddef
-
-
 def Border(c: string = '─', hl: string = '%#TabPanel#'): string
   const tc = TabPanelColumn()
   const cw = c -> strdisplaywidth()
   return hl .. repeat(c, tc / cw) .. "\n"
-enddef
-
-
-# TabPanelの桁数を返す
-# TODO tabline.vimと重複
-def TabPanelColumn(): number
-  #? if &showtabpanel == 0 # || (&showtabpanel == 1 && tabpagenr('$') <= 1)
-  #?   return 0
-  #? endif
-
-  const columns = matchstr(&tabpanelopt, 'columns:\zs\d\+')
-  return columns == '' ? 20 : str2nr(columns)
-enddef
-
-
-# str内のcの数を数える
-def CountChar(str: string, c: string): number
-  return [str] -> matchstrlist(c) -> len()
-enddef
-
-
-# TODO tabline.vimと重複
-def DiffOptStr(): string
-  const diffopt = split(&diffopt, ',')
-
-  const case = (index(diffopt, 'icase') == -1 ?  '%#TblDiffRedOn#' : '%#TblDiffRedOff#') ..  'Case'
-
-  const white =
-    ( ['iblank', 'iwhite', 'iwhiteall', 'iwhiteeol']
-        -> map((_, val) => index(diffopt, val))
-        -> reduce((acc, val) => acc && (val == -1), true)
-      ?  '%#TblDiffRedOn#' : '%#TblDiffRedOff#'
-    ) ..  'White'
-
-  # 'Blank'
-
-  return ' ' .. case .. ' ' .. white .. ' '
-  # return '%#StlFill# [  ' .. case .. ' ' .. white .. '%#StlFill#  ] '
 enddef
 
 
@@ -108,10 +70,10 @@ def g:TabPanel(): string
   const tabnr = g:actual_curtabpage
 
   # Header
-  const header = (tabnr == 1 ? TabpanelHeader() : '')
+  const header = (tabnr == 1 ? Header() : '')
 
-  # Tabs
-  const body = Tabs(tabnr)
+  # TabLabel
+  const body = TabLabel(tabnr)
 
   if tabnr == 1
     AccumNumLine = header -> CountChar("\n")
@@ -120,12 +82,12 @@ def g:TabPanel(): string
   AccumNumLine += body -> CountChar("\n") + 1
 
   if tabnr == tabpagenr('$')
-    # Adding
-    const adding = TabpanelAdding()
-    AccumNumLine += adding -> CountChar("\n")
+    # After
+    const after = After()
+    AccumNumLine += after -> CountChar("\n")
 
     # Footer
-    const footer = TabpanelFooter()
+    const footer = Footer()
     AccumNumLine += footer -> CountChar("\n")
 
     # Padding
@@ -134,7 +96,7 @@ def g:TabPanel(): string
 
     # 返り値
     # タブが1つしかない場合に備えて、ここでもheaderを含める必要がある。
-    return header .. body .. adding .. padding .. footer
+    return header .. body .. after .. padding .. footer
   else
     # 返り値
     return header .. body
@@ -142,11 +104,11 @@ def g:TabPanel(): string
 enddef
 
 
-def Tabs(tabnr: number): string
+def TabLabel(tabnr: number): string
   # Tab Number
   var tabnrstr = ''
 
-  if 1
+  if true
     if tabnr == tabpagenr()
       tabnrstr ..= '%#TabLineSel#'
     else
@@ -154,33 +116,32 @@ def Tabs(tabnr: number): string
       tabnrstr ..= '%#StlFill#'
       tabnrstr ..= '%#PopupNotification#'
     endif
-  elseif 0
-    tabnrstr ..= '%#TabLineSel#'
   else
-    tabnrstr ..= '%#StlFill#'
-    tabnrstr ..= '%#PopupNotification#'
+    if true
+      tabnrstr ..= '%#TabLineSel#'
+    else
+      tabnrstr ..= '%#StlFill#'
+      tabnrstr ..= '%#PopupNotification#'
+    endif
   endif
 
-  tabnrstr ..= printf("[%d]", tabnr)
-  if true  # 行全体に色を付けたいなら、falseにする。
-    tabnrstr ..= '%##'
-  endif
-  tabnrstr ..= "\n"
+  tabnrstr ..= printf("[%d]", tabnr) .. "%##\n"
 
   # ウィンドウのリスト
-  const wins = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinStr(i + 1, winid, tabnr))
-  const winstr = join(wins, "\n")  .. "\n"
+  const winlabels = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinLabel(i + 1, winid, tabnr))
+  const winstr = join(winlabels, "\n")  .. "\n"
 
   return tabnrstr .. winstr
 enddef
 
 
-def WinStr(winnr: number, winid: number, tabnr: number): string
+def WinLabel(winnr: number, winid: number, tabnr: number): string
   const wininfo = getwininfo(winid)[0]
   const wintype = win_gettype(winid)
   const buftype = getbufvar(wininfo.bufnr, '&buftype')
   const bufname = expand('#' .. wininfo.bufnr .. ':t')
   const diff    = gettabwinvar(tabnr, winnr, '&diff')
+
   const curwin = tabnr == tabpagenr() && winnr == tabpagewinnr(tabnr)
 
   const hl_line = true
@@ -228,6 +189,50 @@ def WinStr(winnr: number, winid: number, tabnr: number): string
 enddef
 
 
+# TODO tabline.vimと重複
+def DiffOptStr(): string
+  const diffopt = split(&diffopt, ',')
+
+  const case = (index(diffopt, 'icase') == -1 ?  '%#TblDiffRedOn#' : '%#TblDiffRedOff#') ..  'Case'
+
+  const white =
+    ( ['iblank', 'iwhite', 'iwhiteall', 'iwhiteeol']
+        -> map((_, val) => index(diffopt, val))
+        -> reduce((acc, val) => acc && (val == -1), true)
+      ?  '%#TblDiffRedOn#' : '%#TblDiffRedOff#'
+    ) ..  'White'
+
+  # 'Blank'
+
+  return ' ' .. case .. ' ' .. white .. ' '
+  # return '%#StlFill# [  ' .. case .. ' ' .. white .. '%#StlFill#  ] '
+enddef
+
+
+
+#----------------------------------------------------------------------------------------
+# Utility Functions
+
+
+# TabPanelの桁数を返す
+# TODO tabline.vimと重複
+def TabPanelColumn(): number
+  #? if &showtabpanel == 0 # || (&showtabpanel == 1 && tabpagenr('$') <= 1)
+  #?   return 0
+  #? endif
+
+  const columns = matchstr(&tabpanelopt, 'columns:\zs\d\+')
+  return columns == '' ? 20 : str2nr(columns)
+enddef
+
+
+# str内のcの数を数える
+# TODO utilへ
+def CountChar(str: string, c: string): number
+  return [str] -> matchstrlist(c) -> len()
+enddef
+
+
 
 #----------------------------------------------------------------------------------------
 # TabPanel Timer
@@ -261,6 +266,10 @@ enddef
 
 
 #----------------------------------------------------------------------------------------
+# Switch Show
+
+
+#--------------------------------------------
 # Toggle Show TabPanel
 
 def SwitchShowTabPanel()
@@ -274,6 +283,9 @@ enddef
 nnoremap <Leader>t <ScriptCmd>SwitchShowTabPanel()<CR>
 
 
+#--------------------------------------------
+# Toggle Show TabLine
+
 def SwitchShowTabLine()
   if &showtabline == 0
     &showtabline = 2
@@ -283,6 +295,10 @@ def SwitchShowTabLine()
 enddef
 
 nnoremap <Leader>T <ScriptCmd>SwitchShowTabLine()<CR>
+
+
+#--------------------------------------------
+# Switch TabPanel Align
 
 def SetTabPanelAlign(align: string)
   const tabpanelopt = &tabpanelopt
@@ -297,6 +313,9 @@ enddef
 nnoremap <Leader>[ <ScriptCmd>SetTabPanelAlign('left')<CR>
 nnoremap <Leader>] <ScriptCmd>SetTabPanelAlign('right')<CR>
 
+
+#--------------------------------------------
+# Change TabPanel Column
 
 def SetTabPanelColumnNum(column: number)
   const tabpanelopt = &tabpanelopt
