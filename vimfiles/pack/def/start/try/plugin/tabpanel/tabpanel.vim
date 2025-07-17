@@ -120,6 +120,11 @@ def TabLabel(tabnr: number): string
 enddef
 
 
+# TODO
+#   タブもhighlightするか
+#   マークか、highlightか
+#   インデント数
+#   ウィンドウ番号の左のhighlightの数
 def WinLabel(winnr: number, winid: number, tabnr: number): string
   const wininfo = getwininfo(winid)[0]
   const wintype = win_gettype(winid)
