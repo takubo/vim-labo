@@ -5,53 +5,80 @@ scriptencoding utf-8
 
 
 #----------------------------------------------------------------------------------------
+# TabPanel Contents Switch
+
+var TabpanelContentsSwitch = {
+  'BatteryBar':     false,
+  'BatteryGraph':   false,
+  'Footer':         true,
+  'FooterDiff':     true,
+  'FooterStr':      true,
+  'Functions':      true,
+  'Header':         true,
+  'HeaderDateTime': true,
+}
+
+
+
+#----------------------------------------------------------------------------------------
 # Make TabPanelStr
 
 def Header(): string
-  return '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '%=' .. strftime('%H:%M  ') .. "\n\n"
- #return "\n"
+  const contents_switch = TabpanelContentsSwitch
+
+  if !contents_switch.Header
+    return ''
+  endif
+
+  if contents_switch.Header && contents_switch.HeaderDateTime
+    return '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '%=' .. strftime('%H:%M  ') .. "\n\n"
+  elseif contents_switch.Header
+    return "%#TblDate#\n"
+  endif
+
+  return ''
 enddef
 
 
 def After(): string
+  const contents_switch = TabpanelContentsSwitch
+
   const fs = g:FuncsString()
-  if fs == ''
-    return "\n\n"
-  else
+
+  if fs != '' && contents_switch.Functions
     return "\n\n" .. Border() .. fs .. "\n" .. Border() .. "\n"
+  else
+    return "\n\n"
   endif
- #return '%#TblDate# '
- #return "\n\n\n" .. g:FuncsString()
- #return "\n\n" .. repeat('-', 36) .. "\n" .. g:FuncsString() .. "\n" .. repeat('-', 36) .. "\n"
- #return "\n\n" .. repeat('─', 18) .. "\n" .. g:FuncsString() .. "\n" .. repeat('─', 18) .. "\n"
- #return "\n"
 enddef
 
 
 def Footer(): string
-  if 0
-    return '%#TblDate#%=[Footer]%='
-  elseif 0
-    return '%#TblDate#'
-  elseif 0
-    return '%#StlGoldLeaf#'
-  elseif 0
-    return '%#StlGoldLeaf#%=[Footer]%='
-  elseif 0
-    return g:BatteryBar() -> join("\n") .. "\n" .. '%#TblDate#'
-  elseif 0
-    return g:BatteryGraph_Center() -> join("\n") .. "\n" .. '%#TblDate#'
-   #return Border() .. "\n" .. g:BatteryGraph_Center() -> join("\n") .. "\n" .. '%#TblDate#'
-   #return g:BatteryGraph() -> join("\n") .. "\n" .. '%#TblDate#'
-  else
-    const bat_str =
-      false ? g:BatteryBar() -> join("\n") :
-      false ? g:BatteryGraph_Center() -> join("\n") : ''
-    return bat_str .. "\n" .. '%#StlGoldLeaf#%=%#TblDate# [ ' .. DiffOptStr() .. ' ] %#StlGoldLeaf#%='
-   #return bat_str .. "\n" .. '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ] %='
-   #return bat_str .. "\n" .. '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ]  '
-   #return bat_str .. "\n" .. '%#TblDate#%=%#StlFill# [ ' .. DiffOptStr() .. ' ] %#TblDate#%='
+  const contents_switch = TabpanelContentsSwitch
+
+  var str = ''
+
+  if contents_switch.BatteryBar
+    str ..= g:BatteryBar() -> join("\n") .. "\n"
+  elseif contents_switch.BatteryGraph
+    str ..= g:BatteryGraph_Center() -> join("\n") .. "\n"
   endif
+
+  if !contents_switch.Footer
+  elseif contents_switch.FooterDiff
+    str ..= '%#StlGoldLeaf#%=%#TblDate# [ ' .. DiffOptStr() .. ' ] %#StlGoldLeaf#%='
+   #str ..= '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ] %='
+   #str ..= '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ]  '
+   #str ..= '%#TblDate#%=%#StlFill# [ ' .. DiffOptStr() .. ' ] %#TblDate#%='
+  elseif contents_switch.FooterStr
+    str ..= '%#TblDate#%=[Footer]%='
+   #str ..= '%#StlGoldLeaf#%=[Footer]%='
+  else
+    str ..= '%#TblDate#'
+   #str ..= '%#StlGoldLeaf#'
+  endif
+
+  return str
 enddef
 
 
@@ -261,6 +288,35 @@ def SetTimer(on: bool)
     timer_stop(g:RedrawTabpanelTimerId)
   endif
 enddef
+
+
+
+#----------------------------------------------------------------------------------------
+# Switch TabPanel Status & Contents
+
+def SwitchTabpanel(...args: list<string>)
+  if args == []
+    &showtabpanel = (&showtabpanel == 0 ? 2 : 0 )
+    SetTimer(&showtabpanel != 0)
+    return
+  endif
+
+  args -> foreach((_, val) => {
+                    TabpanelContentsSwitch[val] = !TabpanelContentsSwitch[val]
+                  } )
+
+  redrawtabpanel
+
+  SetTimer(true)
+enddef
+
+def CompletionTbpContents(ArgLead: string, CmdLine: string, CusorPos: number): list<string>
+  return keys(TabpanelContentsSwitch) -> filter((_, val) => val =~? ('^' .. ArgLead .. '.*')) -> sort()
+enddef
+
+com! -nargs=* -complete=customlist,CompletionTbpContents Tpnl {
+  SwitchTabpanel(<f-args>)
+}
 
 
 

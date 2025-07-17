@@ -40,8 +40,8 @@ def BatteryReduce(dummy: number)
   if rem <= 0
     rem = 100
   else
-    # 0..6の範囲の乱数を生成して引く
-    rem -= (rand() / pow(2, 32) * 6) -> float2nr()
+    # 0..N の範囲の乱数を生成して引く
+    rem -= (rand() / pow(2, 32) * 8) -> float2nr()
     if rem < 0
       rem = 0
     endif
