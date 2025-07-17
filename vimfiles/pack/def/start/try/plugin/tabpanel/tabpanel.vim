@@ -106,26 +106,11 @@ enddef
 
 def TabLabel(tabnr: number): string
   # Tab Number
-  var tabnrstr = ''
-
-  if true
-    if tabnr == tabpagenr()
-      tabnrstr ..= '%#TabLineSel#'
-    else
-      tabnrstr ..= '%#TabPanelTabnr#'
-      tabnrstr ..= '%#StlFill#'
-      tabnrstr ..= '%#PopupNotification#'
-    endif
-  else
-    if true
-      tabnrstr ..= '%#TabLineSel#'
-    else
-      tabnrstr ..= '%#StlFill#'
-      tabnrstr ..= '%#PopupNotification#'
-    endif
-  endif
-
-  tabnrstr ..= printf("[%d]", tabnr) .. "%##\n"
+  const tabnrstr = (false && tabnr == tabpagenr() ?
+                     '%#TabLineSel#'   :
+                     '%#TabPanelTabnr#'
+                   )
+                   .. printf("[%d]", tabnr) .. "%#TabPanelFill#\n"
 
   # ウィンドウのリスト
   const winlabels = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinLabel(i + 1, winid, tabnr))
@@ -146,13 +131,21 @@ def WinLabel(winnr: number, winid: number, tabnr: number): string
 
   const hl_line = true
 
-  const indent = 1 ? ('  ')  : ('   ')
- #const indent = ( curwin ? '%#TabPanelMySel#' : '' ) ..
- #               (1 ? ('  ')  : ('   '))
+  var indent = ''
+  var curwin_sign = ''
 
-  const curwin_sign = hl_line ?
-                      (curwin ? ' %#TabPanelMySel# ' : '  ') :
-                      (curwin ? '%#StlFill#>%## ' : '  ')
+  if hl_line
+    indent ..= (false && curwin ? '%#TabPanelMySel#' : '' )
+               .. (true ? ('  ') : ('   '))
+    indent ..= (curwin ? '%#TabPanelMySel#' : '' )
+               .. (false ? (' ') : (''))
+  else
+    indent ..= (1 ? ('  ') : ('   '))
+
+    curwin_sign = #(curwin ? '%#StlFill#>%##' : ' ')
+                   (curwin ? '%#TblDate#>%##' : ' ')
+                  .. ' '
+  endif
 
   const winnr_hl   = (hl_line && curwin ? '%#TabPanelWinInfoSel#' : '%#TabPanelWinInfo#')
   const info_hl    = (hl_line && curwin ? '%#TabPanelWinInfoSel#' : '%#TabPanelWinInfo#')
@@ -178,10 +171,11 @@ def WinLabel(winnr: number, winid: number, tabnr: number): string
   info ..= (info != '' && info[-1] != ' ' ? ' ' : '')
 
   const bufname_show = bufname != '' ? bufname :
-                       wininfo.loclist  == 0 && wininfo.quickfix == 0 ? '[無名]' :  # [No Name]
+                       wininfo.loclist == 0 && wininfo.quickfix == 0 ? '[無名]' :  # [No Name]
                        ''
 
-  return indent .. curwin_sign
+  return indent
+      .. curwin_sign
       .. winnr_hl   .. winnr_str
       .. info_hl    .. info
       .. bufname_hl .. bufname_show
@@ -215,7 +209,7 @@ enddef
 
 
 # TabPanelの桁数を返す
-# TODO tabline.vimと重複
+# TODO tabline.vimと重複?
 def TabPanelColumn(): number
   #? if &showtabpanel == 0 # || (&showtabpanel == 1 && tabpagenr('$') <= 1)
   #?   return 0
