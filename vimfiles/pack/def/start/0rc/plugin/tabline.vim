@@ -299,7 +299,7 @@ enddef
 def SwitchTabline(...args: list<string>)
   if args == []
     &showtabline = (&showtabline == 0 ? 2 : 0 )
-    SetTimer(false)
+    SetTimer(&showtabline != 0)
     return
   endif
 
