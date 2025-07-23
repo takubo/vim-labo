@@ -133,7 +133,7 @@ enddef
 
 def TabLabel(tabnr: number): string
   # Tab Number
-  const tabnrstr = (false && tabnr == tabpagenr() ?
+  const tabnrstr = (true && tabnr == tabpagenr() ?
                      '%#TabLineSel#'   :
                      '%#TabPanelTabnr#'
                    )
@@ -168,9 +168,9 @@ def WinLabel(winnr: number, winid: number, tabnr: number): string
 
   if hl_line
     indent ..= (false && curwin ? '%#TabPanelMySel#' : '' )
-               .. (true ? ('  ') : ('   '))
+               .. (false ? ('  ') : ('   '))
     indent ..= (curwin ? '%#TabPanelMySel#' : '' )
-               .. (false ? (' ') : (''))
+               .. (true ? (' ') : (''))
   else
     indent ..= (1 ? ('  ') : ('   '))
 
