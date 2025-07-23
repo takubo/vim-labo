@@ -12,10 +12,10 @@ scriptencoding utf-8
 # Config Parameters
 #----------------------------------------------------------------------------------------
 
-g:em_use_octal  = false
-g:em_extend_bin = true
-g:em_extend_dec = false
-g:em_extend_hex = false
+const numbers_use_octal  = exists('g:numbers_use_octal' ) ? g:numbers_use_octal  : false
+const numbers_extend_bin = exists('g:numbers_extend_bin') ? g:numbers_extend_bin : true
+const numbers_extend_dec = exists('g:numbers_extend_dec') ? g:numbers_extend_dec : false
+const numbers_extend_hex = exists('g:numbers_extend_hex') ? g:numbers_extend_hex : false
 
 
 
@@ -93,48 +93,48 @@ def AnalizeNumberString(src_str: string): dict<any>
   var base = 0
 
   if str =~? '[lLuU]\{,3\}$'  # long long型リテラルは、0x56LLのようにLが2つ付く
-    str = substitute(str, '[ulUL]\+$', '', '')
+    str = str -> substitute('[ulUL]\+$', '', '')
   endif
 
   if true  # 桁区切りのアンダースコア
-    str = substitute(str, '_', '', 'g')
+    str = str -> substitute('_', '', 'g')
   endif
 
   if     str =~? '^0x\x\+$'  # 16進数
     base   = 16
-    numstr = strpart(str, 2)
+    numstr = str -> strpart(2)
 
   elseif str =~? '^\%([1-9]\d*\|0\+\)$'  # 0のみから構成される数は、Cの仕様上、厳密には8進であるが、便宜上10進として扱う。
     base   = 10
     numstr = str
 
-  elseif g:em_use_octal && str =~? '^0\o\+$'  # 8進数
+  elseif numbers_use_octal && str =~? '^0\o\+$'  # 8進数
     base   = 8
     numstr = str
 
   elseif str =~? '^0b[01]\+$'  # 2進リテラル(C99)
     base   = 2
-    numstr = strpart(str, 2)
+    numstr = str -> strpart(2)
 
-  elseif g:em_extend_bin && str =~? '^\%(0b\)\?[_01]\+$'  # Cの接頭辞がない2進数 および 桁区切りにアンダースコアを使う2進数
+  elseif numbers_extend_bin && str =~? '^\%(0b\)\?[_01]\+$'  # Cの接頭辞がない2進数 および 桁区切りにアンダースコアを使う2進数
     base   = 2
-    numstr = substitute(str, '^0b\|_', '', 'g')
+    numstr = str -> substitute('^0b\|_', '', 'g')
 
-  elseif g:em_extend_hex && str =~? '^\x\+$'  # Cの接頭辞がない16進数
+  elseif numbers_extend_hex && str =~? '^\x\+$'  # Cの接頭辞がない16進数
     base  =  16
     numstr = str
 
-  elseif g:em_extend_dec && str =~? '^[1-9][0-9,]\+$'  # 桁区切りにカンマを使う10進数
+  elseif numbers_extend_dec && str =~? '^[1-9][0-9,]\+$'  # 桁区切りにカンマを使う10進数
     base   = 10
-    numstr = substitute(str, '^0\+\|,', '', 'g')
+    numstr = str -> substitute('^0\+\|,', '', 'g')
 
-  elseif !g:em_use_octal && str =~? '^[0-9]\+$'  # 0で始まる10進数 (8進数が無効のときのみ)
+  elseif !numbers_use_octal && str =~? '^[0-9]\+$'  # 0で始まる10進数 (8進数が無効のときのみ)
     base  =  10
-    numstr = substitute(str, '^0\+', '', 'g')
+    numstr = str -> substitute('^0\+', '', 'g')
 
-  elseif g:em_extend_dec && !g:em_use_octal && str =~? '^[0-9][0-9,]\+$'  # 桁区切りにカンマを使う10進数
+  elseif numbers_extend_dec && !numbers_use_octal && str =~? '^[0-9][0-9,]\+$'  # 桁区切りにカンマを使う10進数
     base   = 10
-    numstr = substitute(str, '^0\+\|,', '', 'g')
+    numstr = str -> substitute('^0\+\|,', '', 'g')
 
   endif
 
@@ -214,7 +214,7 @@ enddef
 
 
 def Bin2Hex_LeadingZero(bin_str: string): string
-  return Bin2Hex(bin_str) -> HexAddLeadingZero()
+  return bin_str -> Bin2Hex() -> HexAddLeadingZero()
 enddef
 
 
@@ -242,7 +242,7 @@ enddef
 
 
 def Dec2Hex_LeadingZero(dec_str: string): string
-  return Dec2Hex(dec_str) -> HexAddLeadingZero()
+  return dec_str -> Dec2Hex() -> HexAddLeadingZero()
 enddef
 
 
@@ -278,30 +278,30 @@ export def NumberDisplay(str: string): bool
   const base = ana.base
 
   if base == 16
-    const dec = Hex2Dec(ana.numstr)
-    const bin = Hex2Bin_Disp(ana.numstr)
-    const byt = float2nr(ceil(len(ana.numstr) / 2.0))
-    const bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
+    const dec = ana.numstr -> Hex2Dec()
+    const bin = ana.numstr -> Hex2Bin_Disp()
+    const byt = (len(ana.numstr) / 2.0) -> ceil() -> float2nr()
+    const bit = substitute(bin, '^[ o]\+\| ', '', 'g') -> len()
 
     echo ' [Dec]' dec '    [Bin]' bin '' (winwidth(0) > 100 ? '    ' : '\n') '[Byt]' byt '    [Bit]' bit '    [Dig]' dig
 
     now_disp = true
 
   elseif base == 10
-    const hex = Dec2Hex(ana.numstr)
-    const bin = Hex2Bin_Disp(hex)
-    const byt = float2nr(ceil(len(hex) / 2.0))
-    const bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
+    const hex = ana.numstr -> Dec2Hex()
+    const bin = hex -> Hex2Bin_Disp()
+    const byt = (len(hex) / 2.0) -> ceil() -> float2nr()
+    const bit = substitute(bin, '^[ o]\+\| ', '', 'g') -> len()
 
     echo ' [Hex] 0x' .. hex '    [Bin]' bin  '' (winwidth(0) > 100 ? '    ' : '\n') '[byt]' byt '    [Bit]' bit '    [Dig]' dig
 
     now_disp = true
 
   elseif base == 2
-    const hex = Bin2Hex(ana.numstr)
-    const dec = Hex2Dec(hex)
-    const byt = float2nr(ceil(len(ana.numstr) / 8.0))
-    const bit = len(substitute(ana.numstr, '^0\+', '', ''))
+    const hex = ana.numstr -> Bin2Hex()
+    const dec = hex -> Hex2Dec()
+    const byt = (len(ana.numstr) / 8.0) -> ceil() -> float2nr()
+    const bit = substitute(ana.numstr, '^0\+', '', '') -> len()
 
     echo ' [Hex] 0x' .. hex '    [Dec] ' dec '    [byt]' byt '    [Bit]' bit '    [Dig]' dig
 
@@ -418,11 +418,11 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
 
   if base == 16
     hex = ana.numstr
-    dec = Hex2Dec(ana.numstr) -> DecimalComma()
+    dec = ana.numstr -> Hex2Dec() -> DecimalComma()
     # dec = dec .. ' ' .. (dec->DecimalComma())
-    bin = Hex2Bin_Disp(ana.numstr)
-    byt = float2nr(ceil(len(ana.numstr) / 2.0))
-    bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
+    bin = ana.numstr -> Hex2Bin_Disp()
+    byt = (len(ana.numstr) / 2.0) -> ceil() -> float2nr()
+    bit = bin -> substitute('^[ o]\+\| ', '', 'g') -> len()
 
     now_disp = true
 
@@ -430,19 +430,19 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
     hex = Dec2Hex(ana.numstr)
     dec = ana.numstr -> DecimalComma()
     # dec = dec .. ' ' .. (dec->DecimalComma())
-    bin = Hex2Bin_Disp(hex)
-    byt = float2nr(ceil(len(hex) / 2.0))
-    bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
+    bin = hex -> Hex2Bin_Disp()
+    byt = (len(hex) / 2.0) -> ceil() -> float2nr()
+    bit = bin -> substitute('^[ o]\+\| ', '', 'g') -> len()
 
     now_disp = true
 
   elseif base == 2
-    hex = Bin2Hex(ana.numstr)
-    dec = Hex2Dec(hex) -> DecimalComma()
+    hex = ana.numstr -> Bin2Hex()
+    dec = hex -> Hex2Dec() -> DecimalComma()
     # dec = dec .. ' ' .. (dec->DecimalComma())
     bin = ana.numstr
-    byt = float2nr(ceil(len(ana.numstr) / 8.0))
-    bit = len(substitute(ana.numstr, '^0\+', '', ''))
+    byt = (len(ana.numstr) / 8.0) -> ceil() -> float2nr()
+    bit = ana.numstr -> substitute('^0\+', '', '') -> len()
 
     now_disp = true
 
@@ -547,17 +547,17 @@ export def BaseChange(
 
   if base == 16
     hex = ana.numstr
-    dec = Hex2Dec(ana.numstr)
-    bin = Hex2Bin(ana.numstr)
+    dec = ana.numstr -> Hex2Dec()
+    bin = ana.numstr -> Hex2Bin()
 
   elseif base == 10
-    hex = Dec2Hex(ana.numstr)
+    hex = ana.numstr -> Dec2Hex()
     dec = ana.numstr
-    bin = Hex2Bin(hex)
+    bin = hex        -> Hex2Bin()
 
   elseif base == 2
-    hex = Bin2Hex(ana.numstr)
-    dec = Hex2Dec(hex)
+    hex = ana.numstr -> Bin2Hex()
+    dec = hex        -> Hex2Dec()
     bin = ana.numstr
 
   else
