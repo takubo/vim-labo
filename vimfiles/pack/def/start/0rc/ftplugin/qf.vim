@@ -188,62 +188,14 @@ endif
 
 #---------------------------------------------------------------------------------------------
 # Edit
-# TODO 複数リストを、2次元リストで対応
 
-nnoremap <silent> <buffer> dd <ScriptCmd>DelEntry()<CR>
-nnoremap <silent> <buffer>  x <ScriptCmd>DelEntry()<CR>
+nnoremap <buffer> dd <Plug>(QuickfixEdit-Delelte)
+nnoremap <buffer>  x <Plug>(QuickfixEdit-Delelte)
 
-vnoremap <silent> <buffer>  d :call <SID>DelEntry()<CR>
-vnoremap <silent> <buffer>  x :call <SID>DelEntry()<CR>
+vnoremap <buffer>  d <Plug>(QuickfixEdit-Delelte-Visual)
+vnoremap <buffer>  x <Plug>(QuickfixEdit-Delelte-Visual)
 
-nnoremap <silent> <buffer>  u <ScriptCmd>UndoEntry()<CR>
-
-
-function DelEntry() range
-  const winnr = winnr()
-  const GetList = b:QuickFix ? function('getqflist') : function('getloclist', [winnr])
-  const SetList = b:QuickFix ? function('setqflist') : function('setloclist', [winnr])
-
-  call <SID>DelEntry_body(a:firstline, a:lastline, GetList, SetList)
-endfunction
-
-def DelEntry_body(firstline: number, lastline: number, GetList: func, SetList: func)
-  var qf = GetList()
-  var history = get(w:, 'qf_history', [])
-  history -> add(copy(qf))
-  w:qf_history = history
-  qf -> remove(firstline - 1, lastline - 1)
-  const title = GetList({'title': 0}).title
-  # TODO noau がないと、FTloadが走る。
-  #      function <SNR>82_del_entry[6]..FileType Autocommands for "*"..function <SNR>12_LoadFTPlugin[18]..script C:\Users\UserName\vimfiles\ftplugin\qf.vim の処理中にエラーが検出されました:
-  #      行  121:
-  # E127: 関数 <SNR>82_del_entry を再定義できません: 使用中です
-  noautocmd SetList(qf, 'r')
-  SetList([], 'r', {'title': title})
-  execute ':' .. firstline
-enddef
-
-def UndoEntry()
-  const winnr = winnr()
-  const GetList = b:QuickFix ? function('getqflist') : function('getloclist', [winnr])
-  const SetList = b:QuickFix ? function('setqflist') : function('setloclist', [winnr])
-
-  UndoEntry_body(GetList, SetList)
-enddef
-
-def UndoEntry_body(GetList: func, SetList: func)
-  var history = get(w:, 'qf_history', [])
-  if !empty(history)
-    const title = GetList({'title': 0}).title
-
-    const curpos = getpos('.')
-    # TODO noau がないと、FTloadが走る。
-    noautocmd remove(history, -1) -> SetList('r')
-    setpos('.', curpos)
-
-    SetList([], 'r', {'title': title})
-  endif
-enddef
+nnoremap <buffer>  u <Plug>(QuickfixEdit-Undo)
 
 
 
