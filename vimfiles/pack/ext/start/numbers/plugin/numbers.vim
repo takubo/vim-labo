@@ -43,6 +43,13 @@ com! -bar -nargs=? HD nr.BaseChange(10, <q-args>, 16)
 com! -bar -nargs=? XD nr.BaseChange(10, <q-args>, 16)
 
 
+#--------------------------------------------
+# Add Comma
+
+com! -bar -nargs=? NumbersAddCommma  nr.BaseChange(10, expand("<cword>"), 0, ',', 3)
+com! -bar -nargs=? NumbersAddCommma4 nr.BaseChange(10, expand("<cword>"), 0, ',', 4)
+
+
 #---------------------------------------------------------------------------------------------
 # Mapping
 
