@@ -96,6 +96,10 @@ def AnalizeNumberString(src_str: string): dict<any>
     str = substitute(str, '[ulUL]\+$', '', '')
   endif
 
+  if true  # 桁区切りのアンダースコア
+    str = substitute(str, '_', '', 'g')
+  endif
+
   if     str =~? '^0x\x\+$'  # 16進数
     base   = 16
     numstr = strpart(str, 2)
@@ -276,7 +280,7 @@ export def NumberDisplay(str: string): bool
   if base == 16
     const dec = Hex2Dec(ana.numstr)
     const bin = Hex2Bin_Disp(ana.numstr)
-    const byt = len(ana.numstr) / 2
+    const byt = float2nr(ceil(len(ana.numstr) / 2.0))
     const bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
 
     echo ' [Dec]' dec '    [Bin]' bin '' (winwidth(0) > 100 ? '    ' : '\n') '[Byt]' byt '    [Bit]' bit '    [Dig]' dig
@@ -417,7 +421,7 @@ export def NumberDisplayPopup(str: string = expand("<cword>"), time: number = 40
     dec = Hex2Dec(ana.numstr) -> DecimalComma()
     # dec = dec .. ' ' .. (dec->DecimalComma())
     bin = Hex2Bin_Disp(ana.numstr)
-    byt = len(ana.numstr) / 2
+    byt = float2nr(ceil(len(ana.numstr) / 2.0))
     bit = len(substitute(bin, '^[ o]\+\| ', '', 'g'))
 
     now_disp = true
