@@ -120,7 +120,7 @@ setlocal stl=%!QuickfixStl()
 #--------------------------------------------
 # View
 
-def Qf_Unified_CR()
+def g:Qf_Unified_CR()
   if v:prevcount != 0
     # jumplistに残すために、Gを使用。
     histadd('cmd', v:prevcount .. '')
@@ -131,8 +131,8 @@ def Qf_Unified_CR()
   CursorJumped
 enddef
 
-nnoremap <buffer>      <CR> <Esc>:call <SID>Qf_Unified_CR()<CR>
-nnoremap <buffer> <C-W><CR> <Esc>:call <SID>Qf_Unified_CR()<CR>
+nnoremap <buffer>      <CR> <Esc>:call g:Qf_Unified_CR()<CR>
+nnoremap <buffer> <C-W><CR> <Esc>:call g:Qf_Unified_CR()<CR>
 
 
 #--------------------------------------------
