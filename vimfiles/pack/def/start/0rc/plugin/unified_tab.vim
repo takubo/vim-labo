@@ -23,7 +23,7 @@ nnoremap <silent>        gT <Cmd>clast<CR>
 
 
 #---------------------------------------------------------------------------------------------
-# Unified CR
+# Unified Tab
 
 def Unified_Tab(dir_and_num: number)
   if &diff
@@ -64,7 +64,7 @@ def QfJump(dir_and_num: number)
       # echo dir_and_num >= 0 ?  'Last error list.' : '1st error list.'
     endtry
 
-    QfNumAdd
+    QfNumPopupAdd
     # echo 'QuickFix Jump'
   else
     # 例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
@@ -72,10 +72,10 @@ def QfJump(dir_and_num: number)
       execute(':' .. abs(dir_and_num) .. (dir_and_num >= 0 ?  'lnext' : 'lprev'))
       CursorJumped
     catch /:E553/
-      # echo dir_num >= 0 ?  'Last location list.' : '1st location list.'
+      # echo dir_and_num >= 0 ?  'Last location list.' : '1st location list.'
     endtry
 
-    LlNumAdd
+    LlNumPopupAdd
     # echo 'LocationList Jump'
   endif
 enddef
@@ -95,11 +95,25 @@ def GetLocationlistWinid(): number
 enddef
 
 
-const QfNum = () => execute('clist') -> split('\n') -> len()
-const LlNum = () => execute('llist') -> split('\n') -> len()
+# Quickfixのエントリ数を返す
+def QfNum(): number
+  return execute('clist') -> split('\n') -> len()
+enddef
 
-const QfLeaveNum = () => execute('clist +' .. 999999999) -> split('\n') -> len() - 1
-const LlLeaveNum = () => execute('llist +' .. 999999999) -> split('\n') -> len() - 1
+# Locationlistのエントリ数を返す
+def LlNum(): number
+  return execute('llist') -> split('\n') -> len()
+enddef
+
+# Quickfixの"残り"エントリ数(カレントエントリから最後のエントリまでの数)を返す
+def QfLeaveNum(): number
+  return execute('clist +' .. 999999999) -> split('\n') -> len() - 1
+enddef
+
+# Locationlistの"残り"エントリ数(カレントエントリから最後のエントリまでの数)を返す
+def LlLeaveNum(): number
+  return execute('llist +' .. 999999999) -> split('\n') -> len() - 1
+enddef
 
 
 #----------------------------------------------------------------------------------------
@@ -107,85 +121,16 @@ const LlLeaveNum = () => execute('llist +' .. 999999999) -> split('\n') -> len()
 
 import autoload "popup_info.vim" as pui
 
-def QfNumString(title: string, whole: number, leave: number): string
-  return title .. ' [ ' .. (whole - leave) .. ' / ' .. whole .. ' ]'
+def QfNumFormatString(header: string, whole: number, leave: number): string
+  return header .. ' [ ' .. (whole - leave) .. ' / ' .. whole .. ' ]'
 enddef
 
-def QfNumPopup(title: string, whole: number, leave: number)
-  pui.PopUpInfoA(QfNumString(title, whole, leave), 2500, 8, 24)
+def QfNumPopupAdd(header: string, whole: number, leave: number)
+  QfNumFormatString(header, whole, leave) -> pui.PopUpInfoA(2500, 8, 24)
 enddef
 
-com! QfNum echo QfNumString('Qfix', QfNum(), QfLeaveNum())
-com! LlNum echo QfNumString('LocL', LlNum(), LlLeaveNum())
+com! QfNumEcho echo QfNumFormatString('Qfix', QfNum(), QfLeaveNum())
+com! LlNumEcho echo QfNumFormatString('LocL', LlNum(), LlLeaveNum())
 
-# com! QfNumAdd QfNumPopup('Q ', QfNum(), QfLeaveNum())
-# com! LlNumAdd QfNumPopup('R ', LlNum(), LlLeaveNum())
-com! QfNumAdd QfNumPopup('QFix ',    QfNum(), QfLeaveNum())
-com! LlNumAdd QfNumPopup('LocList ', LlNum(), LlLeaveNum())
-
-
-
-
-
-## def QfNumString(): string
-##   const whole = execute('clist') -> split('\n') -> len()
-##   const leave = execute('clist +' .. whole) -> split('\n') -> len() - 1
-##   return '[' .. (whole - leave) .. '/' .. whole .. ']'
-## enddef
-##
-## def QfNumString(): string
-##   const whole = QfNum()
-##   const leave = QfLeaveNum()
-##   return '[' .. (whole - leave) .. '/' .. whole .. ']'
-## enddef
-##
-## def QfNumString(): string
-##   const whole = QfNum()
-##   const leave = QfLeaveNum()
-##   return '[' .. (whole - leave) .. '/' .. whole .. ']'
-## enddef
-##
-## def LlNumString(): string
-##   const whole = LlNum()
-##   const leave = LlLeaveNum()
-##   return '[' .. (whole - leave) .. '/' .. whole .. ']'
-## enddef
-
-#const QfNum = () => execute('clist') -> split('\n') -> len()
-#const LlNum = () => execute('llist') -> split('\n') -> len()
-#
-#const QfLeaveNum = () => execute('clist +' .. 999999999) -> split('\n') -> len() - 1
-#const LlLeaveNum = () => execute('llist +' .. 999999999) -> split('\n') -> len() - 1
-#
-#def QfNumString(title: string, whole: number, leave: number): string
-#  return title .. ' [ ' .. (whole - leave) .. ' / ' .. whole .. ' ]'
-#enddef
-#
-#com! EchoQfNum echo QfNumString('', QfNum(), QfLeaveNum())
-#com! EchoLlNum echo QfNumString('', LlNum(), LlLeaveNum())
-#
-#com! QfNumAdd pui.PopUpInfoA(QfNumString('Qfix', QfNum(), QfLeaveNum()), 2500, 8)
-#com! LlNumAdd pui.PopUpInfoA(QfNumString('LocL', LlNum(), LlLeaveNum()), 2500, 8)
-
-
-#def QfJump(dir_num: number)
-#  if !HaveLocationlist()
-#    # 例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-#    try
-#      execute(abs(dir_num) ..( dir_num >= 0 ?  'cnext' : 'cprev'))
-#      CursorJumped
-#    catch /:E553/
-#      # echo dir_num >= 0 ?  'Last error list.' : '1st error list.'
-#    endtry
-#    QfNumAdd
-#  else
-#    # 例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-#    try
-#      execute(abs(dir_num) .. (dir_num >= 0 ?  'lnext' : 'lprev'))
-#      CursorJumped
-#    catch /:E553/
-#      # echo dir_num >= 0 ?  'Last location list.' : '1st location list.'
-#    endtry
-#    LlNumAdd
-#  endif
-#enddef
+com! QfNumPopupAdd QfNumPopupAdd('QFix ',    QfNum(), QfLeaveNum())
+com! LlNumPopupAdd QfNumPopupAdd('LocList ', LlNum(), LlLeaveNum())
