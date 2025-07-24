@@ -8,17 +8,6 @@ scriptencoding utf-8
 #---------------------------------------------------------------------------------------------
 
 
-#---------------------------------------------------------------------------------------------
-# Mapping
-
-nnoremap <silent> <Plug>(QuickfixEdit-Delelte)        <ScriptCmd>DelEntry()<CR>
-nnoremap <silent> <Plug>(QuickfixEdit-Delelte)        <ScriptCmd>DelEntry()<CR>
-
-vnoremap <silent> <Plug>(QuickfixEdit-Delelte-Visual) :call <SID>DelEntry()<CR>
-vnoremap <silent> <Plug>(QuickfixEdit-Delelte-Visual) :call <SID>DelEntry()<CR>
-
-nnoremap <silent> <Plug>(QuickfixEdit-Undo)           <ScriptCmd>UndoEntry()<CR>
-
 
 #---------------------------------------------------------------------------------------------
 # Variables
@@ -26,60 +15,82 @@ nnoremap <silent> <Plug>(QuickfixEdit-Undo)           <ScriptCmd>UndoEntry()<CR>
 var History = {}
 
 
+
 #---------------------------------------------------------------------------------------------
 # Functions
 
-function DelEntry() range
-  const winnr = winnr()
-  const GetList = b:QuickFix ? function('getqflist') : function('getloclist', [winnr])
-  const SetList = b:QuickFix ? function('setqflist') : function('setloclist', [winnr])
 
-  call <SID>DelEntry_body(a:firstline, a:lastline, GetList, SetList)
+#--------------------------------------------
+# Delete
+
+function DeleteEntry() range
+  const winnr = winnr()
+  const GetListFunc = b:QuickFix ? function('getqflist') : function('getloclist', [winnr])
+  const SetListFunc = b:QuickFix ? function('setqflist') : function('setloclist', [winnr])
+
+  call <SID>DeleteEntry_body(a:firstline, a:lastline, GetListFunc, SetListFunc)
 endfunction
 
-def DelEntry_body(firstline: number, lastline: number, GetList: func, SetList: func)
-  const id = GetList({'id': 0}).id
+def DeleteEntry_body(firstline: number, lastline: number, GetListFunc: func, SetListFunc: func)
+  const id = GetListFunc({'id': 0}).id
   var history = get(History, id, [])
 
-  var qf = GetList()
+  var qf = GetListFunc()
 
   history -> add(copy(qf))
   History[id] = history
 
   qf -> remove(firstline - 1, lastline - 1)
 
-  const title = GetList({'title': 0}).title
+  const title = GetListFunc({'title': 0}).title
 
   # TODO noau がないと、FTloadが走る。
   #      function <SNR>82_del_entry[6]..FileType Autocommands for "*"..function <SNR>12_LoadFTPlugin[18]..script C:\Users\UserName\vimfiles\ftplugin\qf.vim の処理中にエラーが検出されました:
   #      行  121:
   # E127: 関数 <SNR>82_del_entry を再定義できません: 使用中です
-  noautocmd SetList(qf, 'r')
-  SetList([], 'r', {'title': title})
+  noautocmd SetListFunc(qf, 'r')
+  SetListFunc([], 'r', {'title': title})
 
   execute ':' .. firstline
 enddef
 
-def UndoEntry()
-  const winnr = winnr()
-  const GetList = b:QuickFix ? function('getqflist') : function('getloclist', [winnr])
-  const SetList = b:QuickFix ? function('setqflist') : function('setloclist', [winnr])
 
-  UndoEntry_body(GetList, SetList)
+#--------------------------------------------
+# Undo
+
+def Undo()
+  const winnr = winnr()
+  const GetListFunc = b:QuickFix ? function('getqflist') : function('getloclist', [winnr])
+  const SetListFunc = b:QuickFix ? function('setqflist') : function('setloclist', [winnr])
+
+  Undo_body(GetListFunc, SetListFunc)
 enddef
 
-def UndoEntry_body(GetList: func, SetList: func)
-  const id = GetList({'id': 0}).id
+def Undo_body(GetListFunc: func, SetListFunc: func)
+  const id = GetListFunc({'id': 0}).id
   var history = get(History, id, [])
 
   if !empty(history)
-    const title = GetList({'title': 0}).title
+    const title = GetListFunc({'title': 0}).title
     const curpos = getpos('.')
 
     # TODO noau がないと、FTloadが走る。
-    noautocmd remove(history, -1) -> SetList('r')
-    SetList([], 'r', {'title': title})
+    noautocmd remove(history, -1) -> SetListFunc('r')
+    SetListFunc([], 'r', {'title': title})
 
     setpos('.', curpos)
   endif
 enddef
+
+
+
+#---------------------------------------------------------------------------------------------
+# Mapping
+
+nnoremap <silent> <Plug>(QuickfixEdit-Delelte)        <ScriptCmd>DeleteEntry()<CR>
+nnoremap <silent> <Plug>(QuickfixEdit-Delelte)        <ScriptCmd>DeleteEntry()<CR>
+
+vnoremap <silent> <Plug>(QuickfixEdit-Delelte-Visual) :call <SID>DeleteEntry()<CR>
+vnoremap <silent> <Plug>(QuickfixEdit-Delelte-Visual) :call <SID>DeleteEntry()<CR>
+
+nnoremap <silent> <Plug>(QuickfixEdit-Undo)           <ScriptCmd>Undo()<CR>
