@@ -3,6 +3,7 @@ vim9script
 scriptencoding utf-8
 
 
+
 #---------------------------------------------------------------------------------------------
 # Initialize
 
@@ -27,6 +28,7 @@ scriptencoding utf-8
   set diffopt+=algorithm:histogram
 
 
+
 #---------------------------------------------------------------------------------------------
 # Diff On/Off/Update
 
@@ -44,6 +46,7 @@ nnoremap <silent> dq <Cmd>PushPosAll<CR><Cmd>windo diffoff<CR><Cmd>PopPosAll<CR>
 
 # diff (all window and buffer) Quit
 nnoremap <silent> dQ <Cmd>PushPosAll<CR><Cmd>bufdo diffoff<CR><Cmd>windo diffoff<CR><Cmd>PopPosAll<CR><Cmd>echo 'bufdo diffoff <Bar> windo diffoff'<CR>
+
 
 
 #---------------------------------------------------------------------------------------------
@@ -110,13 +113,16 @@ enddef
 nnoremap d<Space> <Cmd>call <SID>DiffSpecial()<CR>
 
 
+
 #---------------------------------------------------------------------------------------------
 # Git Diff
 #
 #   ・Windowが1つだけならそのタブで、そうでなければ新しいタブでGdiffsplitを実行。
 #   ・元のWindowを左に配置し、Focusを元のWindowへ戻す。
 #   ・Gdiffsplit実行中は、コマンドラインにGdiffsplitが見えるようにする。
+
 nnoremap <silent> d<CR> <Cmd>exe (winnr('$') > 1 ? 'tab split' : '')<CR><Cmd>Gdiffsplit<CR><Cmd>wincmd r<CR><Cmd>wincmd p<CR><Cmd>echo 'Gdiffsplit'<CR>
+
 
 
 #---------------------------------------------------------------------------------------------
@@ -124,6 +130,7 @@ nnoremap <silent> d<CR> <Cmd>exe (winnr('$') > 1 ? 'tab split' : '')<CR><Cmd>Gdi
 
 vmap <Leader>1 <Plug>(BlockDiff-GetBlock1)
 vmap <Leader>2 <Plug>(BlockDiff-GetBlock2andExe)
+
 
 
 #---------------------------------------------------------------------------------------------
@@ -134,6 +141,7 @@ nnoremap <expr> dl match(&diffopt, '\<icase\>' ) < 0 ? ':<C-U>set diffopt+=icase
 
 # diff whi(Y)tespace (iwhite: 空白の数の違いを無視する。)
 nnoremap <expr> dy match(&diffopt, '\<iwhite\>') < 0 ? ':<C-U>set diffopt+=iwhite<CR>' : ':<C-U>set diffopt-=iwhite<CR>'
+
 
 
 #---------------------------------------------------------------------------------------------
@@ -163,32 +171,24 @@ nnoremap d- <Cmd>exe 'DiffContextDec' v:count1<CR>
 nnoremap d= <Cmd>DiffContextReset<CR>
 
 
+
 #---------------------------------------------------------------------------------------------
 # Move to Hunk
 
 def DiffHunkJump(dir_and_num: number)
-  if dir_and_num > 0
-    # Next Hunk
-    exe 'normal!'     dir_and_num  .. ']c'
-  else
-    # Previouse Hunk
-    exe 'normal!' abs(dir_and_num) .. '[c'
-  endif
+  exe 'normal!' abs(dir_and_num) .. (dir_and_num >= 0 ? ']c' : '[c')
   normal! zz
   CursorJumped
 enddef
 
 # Next Hunk
-nnoremap <silent> <Plug>(Diff-Hunk-Next) ]czz<Cmd>CursorJumped<CR>
-nnoremap <silent> <Plug>(Diff-Hunk-Next) ]c<Cmd>CursorJumped<CR>
-nnoremap <silent> <Plug>(Diff-Hunk-Next) <Cmd>DiffHunkJump(+v:count1)<CR>
+nnoremap <silent> <Plug>(Diff-Hunk-Next) <ScriptCmd>DiffHunkJump(+v:count1)<CR>
 
 # Previouse Hunk
-nnoremap <silent> <Plug>(Diff-Hunk-Prev) [czz<Cmd>CursorJumped<CR>
-nnoremap <silent> <Plug>(Diff-Hunk-Prev) [c<Cmd>CursorJumped<CR>
-nnoremap <silent> <Plug>(Diff-Hunk-Prev) <Cmd>DiffHunkJump(-v:count1)<CR>
+nnoremap <silent> <Plug>(Diff-Hunk-Prev) <ScriptCmd>DiffHunkJump(-v:count1)<CR>
 
 # => unified_tab.vim
+
 
 
 #---------------------------------------------------------------------------------------------

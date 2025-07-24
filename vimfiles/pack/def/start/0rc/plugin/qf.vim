@@ -7,6 +7,32 @@ scriptencoding utf-8
 # QuickFix
 #---------------------------------------------------------------------------------------------
 
+# make
+# lmake
+# grep
+# lgrep
+# grepadd
+# lgrepadd
+# vimgrep
+# lvimgrep
+# vimgrepadd
+# lvimgrepadd
+# cscope
+# cfile
+# cgetfile
+# caddfile
+# lfile
+# lgetfile
+# laddfile
+# helpgrep
+# lhelpgrep
+# cexpr
+# cgetexpr
+# caddexpr
+# cbuffer
+# cgetbuffer
+# caddbuffer
+
 
 
 #---------------------------------------------------------------------------------------------
@@ -46,8 +72,8 @@ augroup end
 # QuickFix Jump
 
 # TODO cafter cbefore
-def g:QfJump(dir_and_num: number)
-  !HaveLocationlist() ? CcJump(dir_and_num: number) : LlJump(dir_and_num: number)
+def QfJump(dir_and_num: number)
+  HaveLocationlist() ? LlJump(dir_and_num) : CcJump(dir_and_num)
 enddef
 
 def CcJump(dir_and_num: number)
@@ -78,7 +104,6 @@ def LlJump(dir_and_num: number)
 
   CursorJumped
   LlNumPopupAdd
-  endif
 enddef
 
 
@@ -143,8 +168,8 @@ com! LlNumPopupAdd QfNumPopupAdd('LocList ', LlNum(), LlLeaveNum())
 #---------------------------------------------------------------------------------------------
 # Quickfix & Locationlist
 
-nnoremap <silent> <Plug>(QuickFix-QfNext)   <ScriptCmd>QfJump(+v:count1)<CR>
-nnoremap <silent> <Plug>(QuickFix-QfPrev)   <ScriptCmd>QfJump(-v:count1)<CR>
+nnoremap <silent> <Plug>(QuickFix-QfNext) <ScriptCmd>QfJump(+v:count1)<CR>
+nnoremap <silent> <Plug>(QuickFix-QfPrev) <ScriptCmd>QfJump(-v:count1)<CR>
 
 nnoremap <silent> <Plug>(QuickFix-CcNext) <ScriptCmd>CcJump(+v:count1)<CR>
 nnoremap <silent> <Plug>(QuickFix-CcPrev) <ScriptCmd>CcJump(-v:count1)<CR>
@@ -153,6 +178,7 @@ nnoremap <silent> <Plug>(QuickFix-LlNext) <ScriptCmd>LlJump(+v:count1)<CR>
 nnoremap <silent> <Plug>(QuickFix-LlPrev) <ScriptCmd>LlJump(-v:count1)<CR>
 
 # => unified_tab.vim
+
 
 
 # #---------------------------------------------------------------------------------------------
