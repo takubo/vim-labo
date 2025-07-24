@@ -9,6 +9,9 @@ scriptencoding utf-8
 
 
 
+#---------------------------------------------------------------------------------------------
+# Auto Window Open
+
 augroup QuickFix_AutoWinOpen
   au!
   # grepする際に'|cwindow'を付けなくても、Quickfixに結果を表示する
@@ -18,18 +21,62 @@ augroup end
 
 
 
-#augroup QuickFix_AutoChDir
+#---------------------------------------------------------------------------------------------
+# Auto Change Directory
+
+
+#--------------------------------------------
+# Save
+
 augroup QuickFix_AutoChDir_SaveCwd
   au!
 
   # QFコマンド実行時のcwdをcontextへ保存。
-  au QuickfixCmdPost [^l]* setqflist([], 'r', {'context': getcwd()})
+  au QuickfixCmdPost [^l]* setqflist(          [], 'r', {'context': getcwd()})
   au QuickfixCmdPost    l* setloclist(winnr(), [], 'r', {'context': getcwd()})
 augroup end
 
 
+#--------------------------------------------
+# Restore
+
+augroup QuickFix_AutoChDir_RestoreCwd
+  au!
+  # => ftplugin/qf.vim
+augroup end
+
+
+
+finish
 
 # => unified_tab.vim
+
+
+
+# #---------------------------------------------------------------------------------------------
+# # Quickfix cd Project-Root
+#
+# import autoload 'get_project_root.vim' as gpr
+#
+# # Quickfixウィンドウを、指定のディレクトリをカレントディレクトリとして開き直す。
+# def QfChdir(dir: string)
+#   cclose
+#
+#   const save_autochdir = &autochdir
+#   set noautochdir
+#
+#   const cur_dir = getcwd()
+#
+#   exe 'noautocmd cd ' dir
+#   copen
+#
+#   exe 'noautocmd cd' cur_dir
+#
+#   &autochdir = save_autochdir
+# enddef
+#
+# # Quickfixウィンドウを、プロジェクトルートをカレントディレクトリとして開き直す。
+# # com! QfChdirPrjRoot call QfChdir(gpr.GetPrjRoot())
 
 
 
@@ -51,35 +98,3 @@ augroup end
 # #例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
 # nnoremap <silent> <Plug>(QuickFix-LlNext) <Cmd>try <Bar> lnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
 # nnoremap <silent> <Plug>(QuickFix-LlPrev) <Cmd>try <Bar> lprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-#
-# #nmap <silent> <Del> <Plug>(QuickFix-QfNext)
-# #nmap <silent> <Ins> <Plug>(QuickFix-QfPrev)
-# #nmap <silent> <A-n> <Plug>(QuickFix-LlNext)
-# #nmap <silent> <A-m> <Plug>(QuickFix-LlPrev)
-
-
-
-# #----------------------------------------------------------------------------------
-# # Quickfix cd Project-Root
-#
-# import autoload '../impauto/GetPrjRoot.vim' as gpr
-# import autoload 'get_project_root.vim' as gpr
-#
-# # Quickfixウィンドウを、指定のディレクトリをカレントディレクトリとして開き直す。
-# def QfChdir(dir: string)
-#   cclose
-#
-#   const save_autochdir = &autochdir
-#   set noautochdir
-#
-#   const org_dir = getcwd()
-#   exe 'noautocmd cd ' dir
-#
-#   copen
-#   exe 'noautocmd cd' org_dir
-#
-#   &autochdir = save_autochdir
-# enddef
-#
-# # Quickfixウィンドウを、プロジェクトルートをカレントディレクトリとして開き直す。
-# com! QfChdirPrjRoot call QfChdir(gpr.GetPrjRoot())
