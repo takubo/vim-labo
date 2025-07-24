@@ -40,11 +40,12 @@ enddef
 def DiffHunkJump(dir_and_num: number)
   if dir_and_num > 0
     # Next Hunk
-    exe 'normal!' dir_and_num .. ']c'
+    exe 'normal!'     dir_and_num  .. ']c'
   else
     # Previouse Hunk
     exe 'normal!' abs(dir_and_num) .. '[c'
   endif
+  normal! zz
 
   CursorJumped
 enddef

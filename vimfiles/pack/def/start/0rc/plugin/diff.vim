@@ -18,13 +18,13 @@ scriptencoding utf-8
 # set diffopt-=iwhiteeol
 # set diffopt-=horizontal
 # set diffopt+=vertical
- set diffopt-=closeoff
+  set diffopt-=closeoff
 # set diffopt-=hiddenoff
 # set diffopt+=foldcolumn:{n}
 # set diffopt-=followwrap
 # set diffopt+=internal
- set diffopt+=indent-heuristic
- set diffopt+=algorithm:histogram
+  set diffopt+=indent-heuristic
+  set diffopt+=algorithm:histogram
 
 
 #---------------------------------------------------------------------------------------------
@@ -34,19 +34,16 @@ scriptencoding utf-8
 nmap du d<Space>
 
 # diff Cancel
-nnoremap dc    :<C-u>diffoff<CR>
-nnoremap d<BS> :<C-u>diffoff<CR>
+nnoremap dc <Cmd>diffoff<CR>
+
+# diff toggle
+nnoremap <expr> dx &diff ? '<Cmd>diffoff<CR>' : '<Cmd>diffthis<CR>'
 
 # diff (all window) Quit
 nnoremap <silent> dq <Cmd>PushPosAll<CR><Cmd>windo diffoff<CR><Cmd>PopPosAll<CR><Cmd>echo 'windo diffoff'<CR>
 
 # diff (all window and buffer) Quit
 nnoremap <silent> dQ <Cmd>PushPosAll<CR><Cmd>bufdo diffoff<CR><Cmd>windo diffoff<CR><Cmd>PopPosAll<CR><Cmd>echo 'bufdo diffoff <Bar> windo diffoff'<CR>
-
-# diff toggle
-nnoremap <expr> dx &diff ?
-      \ '<Cmd>diffoff<CR>' :
-      \ winnr('$') == 2 ? '<Cmd>PushPosAll <Bar> exe "windo diffthis" <Bar> PopPosAll<CR>' : '<Cmd>diffthis<CR>'
 
 
 #---------------------------------------------------------------------------------------------
@@ -119,24 +116,24 @@ nnoremap d<Space> <Cmd>call <SID>DiffSpecial()<CR>
 #   ・Windowが1つだけならそのタブで、そうでなければ新しいタブでGdiffsplitを実行。
 #   ・元のWindowを左に配置し、Focusを元のWindowへ戻す。
 #   ・Gdiffsplit実行中は、コマンドラインにGdiffsplitが見えるようにする。
-nnoremap <silent> d<CR> <Cmd>exe ( winnr('$') > 1 ? 'tab split' : '' )<Bar>Gdiffsplit<Bar>wincmd r<Bar>wincmd p<Bar>echo 'Gdiffsplit'<CR>
+nnoremap <silent> d<CR> <Cmd>exe (winnr('$') > 1 ? 'tab split' : '')<CR><Cmd>Gdiffsplit<CR><Cmd>wincmd r<CR><Cmd>wincmd p<CR><Cmd>echo 'Gdiffsplit'<CR>
 
 
 #---------------------------------------------------------------------------------------------
 # Block Diff
 
-vmap <leader>1 <Plug>(BlockDiff-GetBlock1)
-vmap <leader>2 <Plug>(BlockDiff-GetBlock2andExe)
+vmap <Leader>1 <Plug>(BlockDiff-GetBlock1)
+vmap <Leader>2 <Plug>(BlockDiff-GetBlock2andExe)
 
 
 #---------------------------------------------------------------------------------------------
 # Diff Option Change
 
 # diff I(l)gnorecase
-nnoremap <expr> dl match(&diffopt, '\<icase\>' ) < 0 ? ':<C-u>set diffopt+=icase<CR>'  : ':<C-u>set diffopt-=icase<CR>'
+nnoremap <expr> dl match(&diffopt, '\<icase\>' ) < 0 ? ':<C-U>set diffopt+=icase<CR>'  : ':<C-U>set diffopt-=icase<CR>'
 
 # diff whi(Y)tespace (iwhite: 空白の数の違いを無視する。)
-nnoremap <expr> dy match(&diffopt, '\<iwhite\>') < 0 ? ':<C-u>set diffopt+=iwhite<CR>' : ':<C-u>set diffopt-=iwhite<CR>'
+nnoremap <expr> dy match(&diffopt, '\<iwhite\>') < 0 ? ':<C-U>set diffopt+=iwhite<CR>' : ':<C-U>set diffopt-=iwhite<CR>'
 
 
 #---------------------------------------------------------------------------------------------
@@ -169,27 +166,36 @@ nnoremap d= <Cmd>DiffContextReset<CR>
 #---------------------------------------------------------------------------------------------
 # Move to Hunk
 
+def DiffHunkJump(dir_and_num: number)
+  if dir_and_num > 0
+    # Next Hunk
+    exe 'normal!'     dir_and_num  .. ']c'
+  else
+    # Previouse Hunk
+    exe 'normal!' abs(dir_and_num) .. '[c'
+  endif
+  normal! zz
+  CursorJumped
+enddef
+
+# Next Hunk
+nnoremap <silent> <Plug>(Diff-Hunk-Next) ]czz<Cmd>CursorJumped<CR>
+nnoremap <silent> <Plug>(Diff-Hunk-Next) ]c<Cmd>CursorJumped<CR>
+nnoremap <silent> <Plug>(Diff-Hunk-Next) <Cmd>DiffHunkJump(+v:count1)<CR>
+
+# Previouse Hunk
+nnoremap <silent> <Plug>(Diff-Hunk-Prev) [czz<Cmd>CursorJumped<CR>
+nnoremap <silent> <Plug>(Diff-Hunk-Prev) [c<Cmd>CursorJumped<CR>
+nnoremap <silent> <Plug>(Diff-Hunk-Prev) <Cmd>DiffHunkJump(-v:count1)<CR>
+
 # => unified_tab.vim
-
-# Next Hunk
-#nnoremap <silent> <Plug>(Diff-Hunk-Next) ]c^zz<Cmd>CursorJumped<CR>
-#nnoremap <silent> <Plug>(Diff-Hunk-Next) ]c^<Cmd>CursorJumped<CR>
-
-# Previouse Hunk
-#nnoremap <silent> <Plug>(Diff-Hunk-Prev) [c^zz<Cmd>CursorJumped<CR>
-#nnoremap <silent> <Plug>(Diff-Hunk-Prev) [c^<Cmd>CursorJumped<CR>
-
-# Next Hunk
-#nmap <silent> <Tab>   <Plug>(Diff-Hunk-Next)
-# Previouse Hunk
-#nmap <silent> <S-Tab> <Plug>(Diff-Hunk-Prev)
 
 
 #---------------------------------------------------------------------------------------------
 # Sequential Patch Apply
 #   diff accept (obtain and next, obtain and previouse) (dotは、repeatの'.')
 
-# TODO var g:DiffAcceptComfirmTime = 500  # [ms]
+g:DiffPatchComfirmTime = 500  # [ms]
 
-nnoremap d. do<Cmd>exe 'sleep' g:DiffAcceptComfirmTime .. 'm'<CR>]c^zz
-nnoremap d, do<Cmd>exe 'sleep' g:DiffAcceptComfirmTime .. 'm'<CR>[c^zz
+nnoremap d. do<Cmd>exe 'sleep' g:DiffPatchComfirmTime .. 'm'<CR>]c^zz
+nnoremap d, do<Cmd>exe 'sleep' g:DiffPatchComfirmTime .. 'm'<CR>[c^zz

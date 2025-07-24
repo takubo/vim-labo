@@ -10,18 +10,6 @@ scriptencoding utf-8
 
 
 #---------------------------------------------------------------------------------------------
-# Auto Window Open
-
-augroup QuickFix_AutoWinOpen
-  au!
-  # grepする際に'|cwindow'を付けなくても、Quickfixに結果を表示する
-  au QuickfixCmdPost [^l]* exe 'botright cwindow ' .. (&lines / 4)
-  au QuickfixCmdPost    l* exe 'lwindow ' .. (winheight(0) / 4)
-augroup end
-
-
-
-#---------------------------------------------------------------------------------------------
 # Auto Change Directory
 
 #--------------------------------------------
@@ -43,32 +31,53 @@ augroup end
 
 
 #---------------------------------------------------------------------------------------------
+# Auto Window Open
+
+augroup QuickFix_AutoWinOpen
+  au!
+  # grepする際に'|cwindow'を付けなくても、Quickfixに結果を表示する
+  au QuickfixCmdPost [^l]* exe 'botright cwindow' (&lines       / 4)
+  au QuickfixCmdPost    l* exe 'lwindow'          (winheight(0) / 4)
+augroup end
+
+
+
+#---------------------------------------------------------------------------------------------
 # QuickFix Jump
 
 # TODO cafter cbefore
-def g:QfJump(dir_and_num: number, force_locationlist: bool = false)
-  if !HaveLocationlist() && !force_locationlist
-    # 例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-    try
-      execute(':' .. abs(dir_and_num) .. (dir_and_num >= 0 ?  'cnext' : 'cprev'))
-      CursorJumped
-    catch /:E553/
-      # echo dir_and_num >= 0 ?  'Last error list.' : '1st error list.'
-    endtry
+def g:QfJump(dir_and_num: number)
+  !HaveLocationlist() ? CcJump(dir_and_num: number) : LlJump(dir_and_num: number)
+enddef
 
-    QfNumPopupAdd
-    # echo 'QuickFix Jump'
-  else
-    # 例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-    try
-      execute(':' .. abs(dir_and_num) .. (dir_and_num >= 0 ?  'lnext' : 'lprev'))
-      CursorJumped
-    catch /:E553/
-      # echo dir_and_num >= 0 ?  'Last location list.' : '1st location list.'
-    endtry
+def CcJump(dir_and_num: number)
+  # 例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+  try
+    exe ':' .. abs(dir_and_num) .. (dir_and_num >= 0 ?  'cnext' : 'cprev')
+  catch /:E553/
+    exe 'cc' (dir_and_num >= 0 ?  QfNum() : 1)
+    echohl ErrorMsg
+    echo dir_and_num >= 0 ?  'Last error list.' : '1st error list.'
+    echohl None
+  endtry
 
-    LlNumPopupAdd
-    # echo 'LocationList Jump'
+  CursorJumped
+  QfNumPopupAdd
+enddef
+
+def LlJump(dir_and_num: number)
+  # 例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
+  try
+    exe ':' .. abs(dir_and_num) .. (dir_and_num >= 0 ?  'lnext' : 'lprev')
+  catch /:E553/
+    exe 'll' (dir_and_num >= 0 ?  LlNum() : 1)
+    echohl ErrorMsg
+    echo dir_and_num >= 0 ?  'Last location list.' : '1st location list.'
+    echohl None
+  endtry
+
+  CursorJumped
+  LlNumPopupAdd
   endif
 enddef
 
@@ -132,27 +141,18 @@ com! LlNumPopupAdd QfNumPopupAdd('LocList ', LlNum(), LlLeaveNum())
 
 
 #---------------------------------------------------------------------------------------------
-finish
+# Quickfix & Locationlist
+
+nnoremap <silent> <Plug>(QuickFix-QfNext)   <ScriptCmd>QfJump(+v:count1)<CR>
+nnoremap <silent> <Plug>(QuickFix-QfPrev)   <ScriptCmd>QfJump(-v:count1)<CR>
+
+nnoremap <silent> <Plug>(QuickFix-CcNext) <ScriptCmd>CcJump(+v:count1)<CR>
+nnoremap <silent> <Plug>(QuickFix-CcPrev) <ScriptCmd>CcJump(-v:count1)<CR>
+
+nnoremap <silent> <Plug>(QuickFix-LlNext) <ScriptCmd>LlJump(+v:count1)<CR>
+nnoremap <silent> <Plug>(QuickFix-LlPrev) <ScriptCmd>LlJump(-v:count1)<CR>
 
 # => unified_tab.vim
-
-
-
-#---------------------------------------------------------------------------------------------
-# # Quickfix & Locationlist
-#
-# #例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-# nnoremap <silent> <Plug>(QuickFix-Next) <Cmd>try <Bar> exe (HaveLocationlist ? ':lnext' : 'cnext') <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-# nnoremap <silent> <Plug>(QuickFix-Prev) <Cmd>try <Bar> exe (HaveLocationlist ? ':lprev' : 'cprev') <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-#
-# #例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-# nnoremap <silent> <Plug>(QuickFix-QfNext) <Cmd>try <Bar> cnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-# nnoremap <silent> <Plug>(QuickFix-QfPrev) <Cmd>try <Bar> cprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-#
-# #例外をキャッチしないと、最初と最後の要素の次に移動しようとして例外で落ちる。
-# nnoremap <silent> <Plug>(QuickFix-LlNext) <Cmd>try <Bar> lnext <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-# nnoremap <silent> <Plug>(QuickFix-LlPrev) <Cmd>try <Bar> lprev <Bar> catch <Bar> endtry<CR>:CursorJumped<CR>
-
 
 
 # #---------------------------------------------------------------------------------------------
