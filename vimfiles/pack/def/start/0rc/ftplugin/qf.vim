@@ -46,26 +46,17 @@ def g:QuickfixStl(): string
   const title = prop.title
                 -> substitute('^:git grep --line-number --no-color -I', ':git grep ', '')
                 -> substitute(' -- :!..svn/ :!tags$', '', '')
-  stl ..= ' %t '
+  # Selected QfList (Stack)
+  const stack_max = GetListFunc({'nr': '$'}).nr
+  stl ..= ' %t'
+  stl ..= ' 《%2(' .. (stack_max - prop.nr + 1) .. '%)/' .. stack_max .. '》'
   stl ..= '%#StlGoldChar#'
-  stl ..= ' [ ' .. title .. ' ] '
-
-
-  # Separator
-  stl ..= '%#StlGoldChar#%='
-
-
-  # Selected QfList
-  const stack_max = GetListFunc(         {'nr': '$'}).nr
-  #stl ..= '%#StlGoldChar#'
-  #stl ..= '%#StlGoldLeaf#'
-  stl ..= '%##'
-  stl ..= '《list:%2(' .. (stack_max - prop.nr + 1) .. '%)/' .. stack_max .. '》'
+  stl ..= ' ' .. title .. ' '
 
 
   # QfList Number of Change
+  stl ..= '%##'
   stl ..= ' changed:' .. prop.changedtick .. ' '
-
 
   # QfList Is Change
   #stl ..= ' changed:' .. (prop.changedtick != 2 ? '+' : '*') .. ' '
@@ -127,24 +118,27 @@ def g:Qf_Unified_CR()
     exe 'normal!' v:prevcount .. 'G'
   else
     exe "normal! \<CR>"
+    CursorJumped
   endif
-  CursorJumped
 enddef
 
 nnoremap <buffer>      <CR> <Esc>:call g:Qf_Unified_CR()<CR>
 nnoremap <buffer> <C-W><CR> <Esc>:call g:Qf_Unified_CR()<CR>
 
+#nnoremap <buffer>      <CR> <Cmd>if<Bar>v:count != 0 ? g:GotoLine(v:count)<Bar>else<Bar>execute(["normal! <Lt>CR>", 'CursorJumped'])<Bar>endif<CR>
+#nnoremap <buffer> <C-W><CR> <Cmd>if<Bar>v:count != 0 ? g:GotoLine(v:count)<Bar>else<Bar>execute(["normal! <Lt>CR>", 'CursorJumped'])<Bar>endif<CR>
+
+#nnoremap <buffer>      <CR> <Cmd>v:count != 0 ? g:GotoLine(v:count) : execute(["normal! <Lt>CR>", 'CursorJumped'])<CR>
+#nnoremap <buffer> <C-W><CR> <Cmd>v:count != 0 ? g:GotoLine(v:count) : execute(["normal! <Lt>CR>", 'CursorJumped'])<CR>
+
 
 #--------------------------------------------
-# Consecutive View
+# Consecutive View (Preview)
 
-#nnoremap <buffer> p <CR>zz<C-W>p
-#nnoremap <buffer> p <CR>zz<cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
-#nnoremap <buffer> P <CR>zz<C-W>pj
-#nnoremap <buffer> o <CR>zz<C-W>pj
-#nnoremap <buffer> O <CR>zz<C-W>pk
-#nnoremap <buffer> o <CR>zz<cmd>noautocmd wincmd p<CR>j
-
+# noautocmdを付けないと、飛び先のcursorlineが(WinLabelで)Offされるので、どの行へジャンプしたのかがわからなくなる。
+# noautocmdの影響で、Quickfixウィンドウのcursorlineが(WinEnterで)付かないので、別途付けている。
+# noautocmdを付けなくていいなら、↓でよい、
+# nnoremap <buffer> p <CR>zz<C-W>p
 
 nnoremap <buffer> r             <CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
 
@@ -153,7 +147,7 @@ nnoremap <buffer> r             <CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd 
 if b:QuickFix
   nnoremap <buffer> p <Cmd>cnext<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
   nnoremap <buffer> P <Cmd>cprev<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
-else  # LocationList
+else
   nnoremap <buffer> p <Cmd>lnext<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
   nnoremap <buffer> P <Cmd>lprev<CR>zz<Cmd>CFIPopupNMV<CR><Cmd>noautocmd wincmd p<CR><Cmd>set cursorline<CR>
 endif
@@ -174,20 +168,19 @@ endif
 # History Stack
 
 if b:QuickFix
-  nnoremap <buffer> >> <Cmd>exe 'cnewer' v:count1<CR>
-  nnoremap <buffer> << <Cmd>exe 'colder' v:count1<CR>
-  nnoremap <buffer> == <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
-  nnoremap <buffer> s  <Cmd>exe 'cnewer' getqflist({'nr': '$'}).nr - getqflist({'nr': 0}).nr<CR>
-  nnoremap <buffer> m  <Cmd>chistory<CR>:<C-U>chistory<Space>
-  nnoremap <buffer> R  <Cmd>chistory<CR>:<C-U>chistory<Space>
+  nnoremap <buffer> >> <Cmd>silent exe 'cnewer' v:count1<CR>
+  nnoremap <buffer> << <Cmd>silent exe 'colder' v:count1<CR>
+  nnoremap <buffer> == <Cmd>silent exe 'chistory' getqflist({'nr': '$'}).nr<CR>
+  nnoremap <buffer> S  <Cmd>chistory<CR>:<C-U>chistory<Space>
 else
-  nnoremap <buffer> >> <Cmd>exe 'lnewer' v:count1<CR>
-  nnoremap <buffer> << <Cmd>exe 'lolder' v:count1<CR>
-  nnoremap <buffer> == <Cmd>exe 'lnewer' getloclist(winnr(), {'nr': '$'}).nr - getloclist(winnr(), {'nr': 0}).nr<CR>
-  nnoremap <buffer> s  <Cmd>exe 'lnewer' getloclist(winnr(), {'nr': '$'}).nr - getloclist(winnr(), {'nr': 0}).nr<CR>
-  nnoremap <buffer> m  <Cmd>lhistory<CR>:<C-U>lhistory<Space>
-  nnoremap <buffer> R  <Cmd>lhistory<CR>:<C-U>lhistory<Space>
+  nnoremap <buffer> >> <Cmd>silent exe 'lnewer' v:count1<CR>
+  nnoremap <buffer> << <Cmd>silent exe 'lolder' v:count1<CR>
+  nnoremap <buffer> == <Cmd>silent exe 'lhistory' getloclist(winnr(), {'nr': '$'}).nr<CR>
+  nnoremap <buffer> S  <Cmd>lhistory<CR>:<C-U>lhistory<Space>
 endif
+nmap <buffer> <C-A> >>
+nmap <buffer> <C-X> <<
+nmap <buffer> <C-S> ==
 
 
 #--------------------------------------------
