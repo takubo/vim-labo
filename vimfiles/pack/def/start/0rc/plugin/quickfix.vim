@@ -83,7 +83,8 @@ def CcJump(dir_and_num: number)
   catch /:E553/
     exe 'cc' (dir_and_num >= 0 ?  QfNum() : 1)
     echohl ErrorMsg
-    echo dir_and_num >= 0 ?  'Last error list.' : '1st error list.'
+   #echo dir_and_num >= 0 ?  'Last error list.' : '1st error list.'
+    echo v:exception
     echohl None
   endtry
 
@@ -98,7 +99,8 @@ def LlJump(dir_and_num: number)
   catch /:E553/
     exe 'll' (dir_and_num >= 0 ?  LlNum() : 1)
     echohl ErrorMsg
-    echo dir_and_num >= 0 ?  'Last location list.' : '1st location list.'
+   #echo dir_and_num >= 0 ?  'Last location list.' : '1st location list.'
+    echo v:exception
     echohl None
   endtry
 
