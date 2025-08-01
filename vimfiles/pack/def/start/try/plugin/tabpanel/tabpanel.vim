@@ -11,11 +11,13 @@ var TabpanelContentsSwitch = {
   'BatteryBar':     false,
   'BatteryGraph':   false,
   'Footer':         true,
+  'FooterBattery':  false,
   'FooterDiff':     true,
   'FooterStr':      true,
-  'Functions':      true,
+  'Functions':      false,
   'Header':         true,
   'HeaderDateTime': true,
+  'Registers':      true,
 }
 
 
@@ -43,13 +45,17 @@ enddef
 def After(): string
   const contents_switch = TabpanelContentsSwitch
 
+  var str = ''
+
   const fs = g:FuncsString()
 
   if fs != '' && contents_switch.Functions
-    return "\n\n" .. Border() .. fs .. "\n" .. Border() .. "\n"
+    str ..= "\n\n" .. Border() .. fs .. "\n" .. Border() .. "\n"
   else
-    return "\n\n"
+    str ..= "\n\n"
   endif
+
+  return str
 enddef
 
 
@@ -58,6 +64,12 @@ def Footer(): string
 
   var str = ''
 
+  if contents_switch.Registers
+    str ..= Border()
+    str ..= Registers() .. "\n"
+    str ..= Border() .. "\n"
+  endif
+
   if contents_switch.BatteryBar
     str ..= g:BatteryBar() -> join("\n") .. "\n"
   elseif contents_switch.BatteryGraph
@@ -65,6 +77,8 @@ def Footer(): string
   endif
 
   if !contents_switch.Footer
+  elseif contents_switch.FooterBattery
+    str ..= g:BatteryBar() -> join("\n")
   elseif contents_switch.FooterDiff
     str ..= '%#StlGoldLeaf#%=%#TblDate# [ ' .. DiffOptStr() .. ' ] %#StlGoldLeaf#%='
    #str ..= '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ] %='
@@ -170,7 +184,7 @@ def WinLabel(winnr: number, winid: number, tabnr: number): string
     indent ..= (false && curwin ? '%#TabPanelMySel#' : '' )
                .. (false ? ('  ') : ('   '))
     indent ..= (curwin ? '%#TabPanelMySel#' : '' )
-               .. (true ? (' ') : (''))
+               .. (false ? (' ') : (''))
   else
     indent ..= (1 ? ('  ') : ('   '))
 
@@ -203,7 +217,7 @@ def WinLabel(winnr: number, winid: number, tabnr: number): string
   info ..= (info != '' && info[-1] != ' ' ? ' ' : '')
 
   const bufname_show = bufname != '' ? bufname :
-                       wininfo.loclist == 0 && wininfo.quickfix == 0 ? '[無名]' :  # [No Name]
+                       wininfo.loclist == 0 && wininfo.quickfix == 0 ? ('[無名] ' .. BufSummary(wininfo.bufnr) .. '%<') :  # [No Name]
                        ''
 
   return indent
@@ -212,6 +226,11 @@ def WinLabel(winnr: number, winid: number, tabnr: number): string
       .. info_hl    .. info
       .. bufname_hl .. bufname_show
       .. '%<'
+enddef
+
+def BufSummary(bufnr: number): string
+  # TODO 先頭3行決め打ち
+  return getbufline(bufnr, 1, 30) -> join(' ') -> substitute('^\s\+', '', '') -> substitute('\s\+', ' ', 'g') -> substitute('%', '%%', 'g') -> strpart(0, 100) # tabpanelの1行が長すぎると、左端が切れるバグ対応のため、strpart()で雑に切り詰めている。
 enddef
 
 
@@ -233,6 +252,51 @@ def DiffOptStr(): string
   return ' ' .. case .. ' ' .. white .. ' '
   # return '%#StlFill# [  ' .. case .. ' ' .. white .. '%#StlFill#  ] '
 enddef
+
+
+def Registers_0(): string
+  var str = ''
+
+  str ..= "%#TabPanel#Registers:\n"
+
+  str ..= '-0123456789.:' -> split('\zs') -> map(
+                                                  (_, v) => execute('registers ' .. v)
+                                                  # registersコマンドのヘッダ行を削除
+                                                  -> substitute('^.*\n', '', '')
+                                                  # TODO 改行を可視化
+                                                  -> substitute('\n', '\\n', 'g')
+                                                  # 末尾に、省略記号を付加
+                                                  -> substitute('$', '%<', '')
+                                                  # 先頭に、Highlight命令を付加
+                                                  -> substitute('^\s*', '%#TabPanel#', '')
+                                                  # レジスタ名前のダブルクォーテーションを削除
+                                                  -> substitute('\s\+"', ' ', '')
+                                                ) -> join("\n")
+
+  return str
+enddef
+
+def Registers(): string
+  var str = ''
+
+  str ..= "%#TabPanel#Registers:"
+
+  str ..= execute('registers - 0 1 2 3 4 5 6 7 8 9 . :') -> substitute("\n" .. '  \(\a\)  "', "%<\n\\1 ", 'g') #-> substitute('^\|n', '\n%#TabPanel#', 'g')
+
+  return str
+enddef
+
+# const N = 3333
+# var startTime = reltime()
+# startTime = reltime()
+# range(N) -> foreach((_, _) => Registers())
+# g:Registers_t = startTime->reltime()->reltimestr()
+# 
+# startTime = reltime()
+# range(N) -> foreach((_, _) => Registers_0())
+# g:Registers_0_t = startTime->reltime()->reltimestr()
+# 
+# com! RegistersEcho echo g:Registers_t g:Registers_0_t
 
 
 
@@ -279,6 +343,7 @@ def SetTimer(on: bool)
   if on && req_timer_cont
     if timer_info(g:RedrawTabpanelTimerId) == []
       g:RedrawTabpanelTimerId = timer_start(RedrawTabpanelInterval, (dummy) => {
+        # TODO if mode() !~# '^[cr]'
         if mode() != 'c'
           execute('redrawtabpanel')
         endif
