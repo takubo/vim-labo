@@ -39,7 +39,7 @@ Hl()
 # Dummy (for Demo)
 
 # 他から自由に干渉できるよう、グローバルスコープとしておく。
-g:BatDemoRem = 100
+g:BatDemoRem = 100.0
 
 def BatteryReduce(dummy: number)
   var rem = g:BatDemoRem
@@ -48,7 +48,7 @@ def BatteryReduce(dummy: number)
     rem = 100
   else
     # 0..N の範囲の乱数を生成して引く
-    rem -= (rand() / pow(2, 32) * 8) -> float2nr()
+    rem -= (rand() / pow(2, 32) * 8)
     if rem < 0
       rem = 0
     endif
@@ -73,7 +73,7 @@ def SetTimer(on: bool)
 enddef
 
 def BatteryRemaining(): number
-  return g:BatDemoRem
+  return g:BatDemoRem -> float2nr()
 enddef
 
 SetTimer(true)

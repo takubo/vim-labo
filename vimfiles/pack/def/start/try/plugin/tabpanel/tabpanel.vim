@@ -8,7 +8,7 @@ scriptencoding utf-8
 # TabPanel Contents Switch
 
 var TabpanelContentsSwitch = {
-  'AkaBattery':     false,
+  'AkaBattery':     true,
   'BatteryBar':     false,
   'BatteryGraph':   false,
   'Footer':         true,
@@ -519,67 +519,22 @@ def SetTabPanelColumn(arg: string)
   SetTabPanelColumnNum(new_column)
 enddef
 
-def SetTabPanelColumnRepeat(arg: string)
-  SetTabPanelColumn(arg)
-
-  while true
-    const c = getchar(-1) -> nr2char()
-    if c !~# '[+-><]'
-      return
-    endif
-
-    const a = c == '>' ? '+' : c == '<' ? '-' : c
-
-    SetTabPanelColumn(a)
-  endwhile
-enddef
-
-com! -nargs=1 SetTabPanelColumn call <SID>SetTabPanelColumn(<f-args>)
-com! ShowTabPanelColumn call <SID>SetTabPanelColumn('0')
-
-#nnoremap <Leader><lt> <ScriptCmd>SetTabPanelColumnRepeat('-')<CR>
-#nnoremap <Leader>>    <ScriptCmd>SetTabPanelColumnRepeat('+')<CR>
-#nnoremap <Leader>-    <ScriptCmd>SetTabPanelColumnRepeat('-')<CR>
-#nnoremap <Leader>+    <ScriptCmd>SetTabPanelColumnRepeat('+')<CR>
-
-# nnoremap <Leader><lt> <ScriptCmd>SetTabPanelColumn('-2')<CR>
-# nnoremap <Leader>>    <ScriptCmd>SetTabPanelColumn('+2')<CR>
-# nnoremap <Leader>-    <ScriptCmd>SetTabPanelColumn('-2')<CR>
-# nnoremap <Leader>+    <ScriptCmd>SetTabPanelColumn('+2')<CR>
+com! -nargs=1 SetTabPanelColumn  call <SID>SetTabPanelColumn(<f-args>)
+com!          ShowTabPanelColumn call <SID>SetTabPanelColumn('0')
 
 # TabPanelColum
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>+',    ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>-',    ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>>',    ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space><lt>', ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-#call submode#map(       'TabPanelCol', 'n', 's', '+',           ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-#call submode#map(       'TabPanelCol', 'n', 's', '-',           ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-#call submode#map(       'TabPanelCol', 'n', 's', '>',           ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-#call submode#map(       'TabPanelCol', 'n', 's', '<lt>',        ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>+',    '<ScriptCmd>call SetTabPanelColumn("+")<CR>')
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>-',    '<ScriptCmd>call SetTabPanelColumn("-")<CR>')
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>>',    '<ScriptCmd>call SetTabPanelColumn("+")<CR>')
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space><lt>', '<ScriptCmd>call SetTabPanelColumn("-")<CR>')
-#call submode#map(       'TabPanelCol', 'n', 's', '+',           '<ScriptCmd>call SetTabPanelColumn("+")<CR>')
-#call submode#map(       'TabPanelCol', 'n', 's', '-',           '<ScriptCmd>call SetTabPanelColumn("-")<CR>')
-#call submode#map(       'TabPanelCol', 'n', 's', '>',           '<ScriptCmd>call SetTabPanelColumn("+")<CR>')
-#call submode#map(       'TabPanelCol', 'n', 's', '<lt>',        '<ScriptCmd>call SetTabPanelColumn("-")<CR>')
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>+',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>-',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>>',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
-#call submode#enter_with('TabPanelCol', 'n', 's', '<Space><lt>', ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
-#call submode#map(       'TabPanelCol', 'n', 's', '+',           ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
-#call submode#map(       'TabPanelCol', 'n', 's', '-',           ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
-#call submode#map(       'TabPanelCol', 'n', 's', '>',           ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
-#call submode#map(       'TabPanelCol', 'n', 's', '<lt>',        ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
-call submode#enter_with('TabPanelCol', 'n', 's', '<Space>+',    ':<C-U>exe "SetTabPanelColumn +" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-call submode#enter_with('TabPanelCol', 'n', 's', '<Space>-',    ':<C-U>exe "SetTabPanelColumn -" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-call submode#enter_with('TabPanelCol', 'n', 's', '<Space>>',    ':<C-U>exe "SetTabPanelColumn +" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-call submode#enter_with('TabPanelCol', 'n', 's', '<Space><lt>', ':<C-U>exe "SetTabPanelColumn -" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-call submode#map(       'TabPanelCol', 'n', 's', '+',           ':<C-U>exe "SetTabPanelColumn +" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-call submode#map(       'TabPanelCol', 'n', 's', '-',           ':<C-U>exe "SetTabPanelColumn -" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-call submode#map(       'TabPanelCol', 'n', 's', '>',           ':<C-U>exe "SetTabPanelColumn +" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-call submode#map(       'TabPanelCol', 'n', 's', '<lt>',        ':<C-U>exe "SetTabPanelColumn -" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+call submode#enter_with('TabPnlColum', 'n', 's', '<Leader>+',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+call submode#enter_with('TabPnlColum', 'n', 's', '<Leader>-',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+call submode#enter_with('TabPnlColum', 'n', 's', '<Leader>)',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+call submode#enter_with('TabPnlColum', 'n', 's', '<Leader>(',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+call submode#enter_with('TabPnlColum', 'n', 's', '<Leader>>',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+call submode#enter_with('TabPnlColum', 'n', 's', '<Leader><lt>', ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+call submode#map(       'TabPnlColum', 'n', 's', '+',            ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+call submode#map(       'TabPnlColum', 'n', 's', '-',            ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+call submode#map(       'TabPnlColum', 'n', 's', ')',            ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+call submode#map(       'TabPnlColum', 'n', 's', '(',            ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+call submode#map(       'TabPnlColum', 'n', 's', '>',            ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+call submode#map(       'TabPnlColum', 'n', 's', '<lt>',         ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
 
 
 
