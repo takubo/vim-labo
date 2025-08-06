@@ -8,10 +8,11 @@ scriptencoding utf-8
 # TabPanel Contents Switch
 
 var TabpanelContentsSwitch = {
+  'AkaBattery':     false,
   'BatteryBar':     false,
   'BatteryGraph':   false,
   'Footer':         true,
-  'FooterBattery':  false,
+  'FooterBattery':  true,
   'FooterDiff':     true,
   'FooterStr':      true,
   'Functions':      false,
@@ -25,6 +26,10 @@ var TabpanelContentsSwitch = {
 #----------------------------------------------------------------------------------------
 # Make TabPanelStr
 
+
+#--------------------------------------------
+# Header
+
 def Header(): string
   const contents_switch = TabpanelContentsSwitch
 
@@ -33,7 +38,11 @@ def Header(): string
   endif
 
   if contents_switch.Header && contents_switch.HeaderDateTime
-    return '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '%=' .. strftime('%H:%M  ') .. "\n\n"
+    return '%#TblDate# ' .. strftime('%m/%d(%a)') .. ' %#StlGoldLeaf#%=%#TblDate# ' .. strftime('%H:%M') .. ' %#StlGoldLeaf#%=%#TblDate#' .. DiffOptStr_Short() .. "%#StlGoldLeaf#\n\n"
+   #return '%#TblDate# ' .. strftime('%m/%d(%a) %H:%M') .. ' %#StlGoldLeaf#%=%#TblDate#' .. DiffOptStr_Short() .. "%#StlGoldLeaf#\n\n"
+   #return '%#TblDate# ' .. strftime('%H:%M') .. ' %#StlGoldLeaf#%=%#TblDate#' .. DiffOptStr() .. "%#StlGoldLeaf#\n\n"
+   #return '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. ' %#StlGoldLeaf#%=%#TblDate# ' .. strftime('%H:%M ') .. "\n\n"
+   #return '%#TblDate# ' .. strftime('%Y/%m/%d (%a)') .. '%=' .. strftime('%H:%M  ') .. "\n\n"
   elseif contents_switch.Header
     return "%#TblDate#\n"
   endif
@@ -41,6 +50,9 @@ def Header(): string
   return ''
 enddef
 
+
+#--------------------------------------------
+# After
 
 def After(): string
   const contents_switch = TabpanelContentsSwitch
@@ -58,6 +70,9 @@ def After(): string
   return str
 enddef
 
+
+#--------------------------------------------
+# Footer
 
 def Footer(): string
   const contents_switch = TabpanelContentsSwitch
@@ -77,8 +92,10 @@ def Footer(): string
   endif
 
   if !contents_switch.Footer
+  elseif contents_switch.AkaBattery
+    str ..= g:BatteryBar_red() -> join("\n")
   elseif contents_switch.FooterBattery
-    str ..= g:BatteryBar() -> join("\n")
+    str ..= g:BatteryBar_raw() -> join("\n")
   elseif contents_switch.FooterDiff
     str ..= '%#StlGoldLeaf#%=%#TblDate# [ ' .. DiffOptStr() .. ' ] %#StlGoldLeaf#%='
    #str ..= '%#TblDate#%= [ ' .. DiffOptStr() .. '%#TblDate# ] %='
@@ -96,12 +113,18 @@ def Footer(): string
 enddef
 
 
+#--------------------------------------------
+# Border
+
 def Border(c: string = '─', hl: string = '%#TabPanel#'): string
   const tc = TabPanelColumn()
   const cw = c -> strdisplaywidth()
   return hl .. repeat(c, tc / cw) .. "\n"
 enddef
 
+
+#--------------------------------------------
+# TabPanel
 
 var AccumNumLine: number
 
@@ -145,6 +168,9 @@ def g:TabPanel(): string
 enddef
 
 
+#--------------------------------------------
+# Tab Label
+
 def TabLabel(tabnr: number): string
   # Tab Number
   const tabnrstr = (true && tabnr == tabpagenr() ?
@@ -154,19 +180,22 @@ def TabLabel(tabnr: number): string
                    .. printf("[%d]", tabnr) .. "%#TabPanelFill#\n"
 
   # ウィンドウのリスト
-  const winlabels = gettabinfo(tabnr)[0].windows -> map((i, winid) => WinLabel(i + 1, winid, tabnr))
+  const winlabels = gettabinfo(tabnr)[0].windows -> map((i, winid) => WindowLabel(i + 1, winid, tabnr))
   const winstr = join(winlabels, "\n")  .. "\n"
 
   return tabnrstr .. winstr
 enddef
 
 
+#--------------------------------------------
+# Window Label
+
 # TODO
 #   タブもhighlightするか
 #   マークか、highlightか
 #   インデント数
 #   ウィンドウ番号の左のhighlightの数
-def WinLabel(winnr: number, winid: number, tabnr: number): string
+def WindowLabel(winnr: number, winid: number, tabnr: number): string
   const wininfo = getwininfo(winid)[0]
   const wintype = win_gettype(winid)
   const buftype = getbufvar(wininfo.bufnr, '&buftype')
@@ -217,8 +246,10 @@ def WinLabel(winnr: number, winid: number, tabnr: number): string
   info ..= (info != '' && info[-1] != ' ' ? ' ' : '')
 
   const bufname_show = bufname != '' ? bufname :
-                       wininfo.loclist == 0 && wininfo.quickfix == 0 ? ('[無名] ' .. BufSummary(wininfo.bufnr) .. '%<') :  # [No Name]
-                       ''
+                       wininfo.loclist == 0 && wininfo.quickfix == 0 ?
+                         (info_hl .. '[無名] ' .. bufname_hl .. BufSummary(wininfo.bufnr) .. '%<') :  # [No Name]
+                         #wininfo.loclist == 0 && wininfo.quickfix == 0 ? ('[無名] ' .. BufSummary(wininfo.bufnr) .. '%<') :  # [No Name]
+                         ''
 
   return indent
       .. curwin_sign
@@ -230,9 +261,22 @@ enddef
 
 def BufSummary(bufnr: number): string
   # TODO 先頭3行決め打ち
-  return getbufline(bufnr, 1, 30) -> join(' ') -> substitute('^\s\+', '', '') -> substitute('\s\+', ' ', 'g') -> substitute('%', '%%', 'g') -> strpart(0, 100) # tabpanelの1行が長すぎると、左端が切れるバグ対応のため、strpart()で雑に切り詰めている。
+  return getbufline(bufnr, 1, 30)
+          -> join(' ')
+          -> substitute('^\s\+', '', '')
+          -> substitute('\s\+', ' ', 'g')
+          -> substitute('%', '%%', 'g')
+          -> strpart(0, 100) # tabpanelの1行が長すぎると左端が切れるバグ対応のため、strpart()で雑に切り詰めている。
 enddef
 
+
+
+#----------------------------------------------------------------------------------------
+# Contents
+
+
+#--------------------------------------------
+# DiffOpt
 
 # TODO tabline.vimと重複
 def DiffOptStr(): string
@@ -253,50 +297,42 @@ def DiffOptStr(): string
   # return '%#StlFill# [  ' .. case .. ' ' .. white .. '%#StlFill#  ] '
 enddef
 
+def DiffOptStr_Short(): string
+  const diffopt = split(&diffopt, ',')
 
-def Registers_0(): string
-  var str = ''
+  const case = (index(diffopt, 'icase') == -1 ?  '%#TblDiffRedOn#' : '%#TblDiffRedOff#') ..  'Cs'
 
-  str ..= "%#TabPanel#Registers:\n"
+  const white =
+    ( ['iblank', 'iwhite', 'iwhiteall', 'iwhiteeol']
+        -> map((_, val) => index(diffopt, val))
+        -> reduce((acc, val) => acc && (val == -1), true)
+      ?  '%#TblDiffRedOn#' : '%#TblDiffRedOff#'
+    ) ..  'Wt'
 
-  str ..= '-0123456789.:' -> split('\zs') -> map(
-                                                  (_, v) => execute('registers ' .. v)
-                                                  # registersコマンドのヘッダ行を削除
-                                                  -> substitute('^.*\n', '', '')
-                                                  # TODO 改行を可視化
-                                                  -> substitute('\n', '\\n', 'g')
-                                                  # 末尾に、省略記号を付加
-                                                  -> substitute('$', '%<', '')
-                                                  # 先頭に、Highlight命令を付加
-                                                  -> substitute('^\s*', '%#TabPanel#', '')
-                                                  # レジスタ名前のダブルクォーテーションを削除
-                                                  -> substitute('\s\+"', ' ', '')
-                                                ) -> join("\n")
+  # 'Blank'
 
-  return str
+  return ' ' .. case .. ' ' .. white .. ' '
+  # return '%#StlFill# [  ' .. case .. ' ' .. white .. '%#StlFill#  ] '
 enddef
+
+
+#--------------------------------------------
+# Register
 
 def Registers(): string
   var str = ''
 
   str ..= "%#TabPanel#Registers:"
 
-  str ..= execute('registers - 0 1 2 3 4 5 6 7 8 9 . :') -> substitute("\n" .. '  \(\a\)  "', "%<\n\\1 ", 'g') #-> substitute('^\|n', '\n%#TabPanel#', 'g')
+  str ..= execute('registers * - 0 1 2 3 4 5 6 7 8 9 . :')
+          -> substitute('%', '%%', 'g')
+         #-> substitute("\n" .. '  \(\a\)  "', "%<\n\\1 ", 'g')
+          -> substitute("\n" .. '  \(\a\)  "\(.\)   ', "%<\n\\1 \\2  ", 'g')
+          -> substitute("\n", "\n%#TabPanel#", 'g')
+          -> substitute("^[^\n]*\n[^\n]\\+\n", "\n", '')
 
   return str
 enddef
-
-# const N = 3333
-# var startTime = reltime()
-# startTime = reltime()
-# range(N) -> foreach((_, _) => Registers())
-# g:Registers_t = startTime->reltime()->reltimestr()
-# 
-# startTime = reltime()
-# range(N) -> foreach((_, _) => Registers_0())
-# g:Registers_0_t = startTime->reltime()->reltimestr()
-# 
-# com! RegistersEcho echo g:Registers_t g:Registers_0_t
 
 
 
@@ -357,7 +393,16 @@ enddef
 
 
 #----------------------------------------------------------------------------------------
-# Switch TabPanel Status & Contents
+# Switch TabPanel Contents
+
+def SetYankAucmd(on: bool)
+  augroup TabPanelStr
+    au!
+    if on
+      au TextYankPost * redrawtabpanel
+    endif
+  augroup end
+enddef
 
 def SwitchTabpanel(...args: list<string>)
   if args == []
@@ -372,6 +417,7 @@ def SwitchTabpanel(...args: list<string>)
 
   redrawtabpanel
 
+  SetYankAucmd(TabpanelContentsSwitch.Registers)
   SetTimer(true)
 enddef
 
@@ -380,8 +426,8 @@ def CompletionTbpContents(ArgLead: string, CmdLine: string, CusorPos: number): l
 enddef
 
 com! -nargs=* -complete=customlist,CompletionTbpContents Tpnl {
-  SwitchTabpanel(<f-args>)
-}
+                                                                SwitchTabpanel(<f-args>)
+                                                              }
 
 
 
@@ -437,6 +483,8 @@ nnoremap <Leader>] <ScriptCmd>SetTabPanelAlign('right')<CR>
 #--------------------------------------------
 # Change TabPanel Column
 
+import autoload "popup_info.vim" as pui
+
 def SetTabPanelColumnNum(column: number)
   const tabpanelopt = &tabpanelopt
 
@@ -445,6 +493,8 @@ def SetTabPanelColumnNum(column: number)
   else
     &tabpanelopt ..= ',columns:' .. column
   endif
+
+  pui.PopUpInfoC($'TabPanel Column: {column}') | redraw
 enddef
 
 def SetTabPanelColumn(arg: string)
@@ -469,22 +519,6 @@ def SetTabPanelColumn(arg: string)
   SetTabPanelColumnNum(new_column)
 enddef
 
-com! -nargs=1 SetTabPanelColumn call <SID>SetTabPanelColumn(<f-args>)
-
-# nnoremap <Leader><lt> <ScriptCmd>SetTabPanelColumn('-2')<CR>
-# nnoremap <Leader>>    <ScriptCmd>SetTabPanelColumn('+2')<CR>
-# nnoremap <Leader>-    <ScriptCmd>SetTabPanelColumn('-2')<CR>
-# nnoremap <Leader>+    <ScriptCmd>SetTabPanelColumn('+2')<CR>
-
-#call submode#enter_with('TabPanelColumn', 'n', 's', "\<Space>+",    ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-#call submode#enter_with('TabPanelColumn', 'n', 's', "\<Space>-",    ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-#call submode#enter_with('TabPanelColumn', 'n', 's', "\<Space>>",    ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-#call submode#enter_with('TabPanelColumn', 'n', 's', "\<Space><lt>", ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-#call submode#map(       'TabPanelColumn', 'n', 's', "+",            ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-#call submode#map(       'TabPanelColumn', 'n', 's', "-",            ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-#call submode#map(       'TabPanelColumn', 'n', 's', ">",            ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
-#call submode#map(       'TabPanelColumn', 'n', 's', "\<lt>",        ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
-
 def SetTabPanelColumnRepeat(arg: string)
   SetTabPanelColumn(arg)
 
@@ -500,15 +534,58 @@ def SetTabPanelColumnRepeat(arg: string)
   endwhile
 enddef
 
-nnoremap <Leader><lt> <ScriptCmd>SetTabPanelColumnRepeat('-')<CR>
-nnoremap <Leader>>    <ScriptCmd>SetTabPanelColumnRepeat('+')<CR>
-nnoremap <Leader>-    <ScriptCmd>SetTabPanelColumnRepeat('-')<CR>
-nnoremap <Leader>+    <ScriptCmd>SetTabPanelColumnRepeat('+')<CR>
+com! -nargs=1 SetTabPanelColumn call <SID>SetTabPanelColumn(<f-args>)
+com! ShowTabPanelColumn call <SID>SetTabPanelColumn('0')
+
+#nnoremap <Leader><lt> <ScriptCmd>SetTabPanelColumnRepeat('-')<CR>
+#nnoremap <Leader>>    <ScriptCmd>SetTabPanelColumnRepeat('+')<CR>
+#nnoremap <Leader>-    <ScriptCmd>SetTabPanelColumnRepeat('-')<CR>
+#nnoremap <Leader>+    <ScriptCmd>SetTabPanelColumnRepeat('+')<CR>
+
+# nnoremap <Leader><lt> <ScriptCmd>SetTabPanelColumn('-2')<CR>
+# nnoremap <Leader>>    <ScriptCmd>SetTabPanelColumn('+2')<CR>
+# nnoremap <Leader>-    <ScriptCmd>SetTabPanelColumn('-2')<CR>
+# nnoremap <Leader>+    <ScriptCmd>SetTabPanelColumn('+2')<CR>
+
+# TabPanelColum
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>+',    ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>-',    ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>>',    ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space><lt>', ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+#call submode#map(       'TabPanelCol', 'n', 's', '+',           ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+#call submode#map(       'TabPanelCol', 'n', 's', '-',           ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+#call submode#map(       'TabPanelCol', 'n', 's', '>',           ':<C-U>SetTabPanelColumn +1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+#call submode#map(       'TabPanelCol', 'n', 's', '<lt>',        ':<C-U>SetTabPanelColumn -1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>+',    '<ScriptCmd>call SetTabPanelColumn("+")<CR>')
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>-',    '<ScriptCmd>call SetTabPanelColumn("-")<CR>')
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>>',    '<ScriptCmd>call SetTabPanelColumn("+")<CR>')
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space><lt>', '<ScriptCmd>call SetTabPanelColumn("-")<CR>')
+#call submode#map(       'TabPanelCol', 'n', 's', '+',           '<ScriptCmd>call SetTabPanelColumn("+")<CR>')
+#call submode#map(       'TabPanelCol', 'n', 's', '-',           '<ScriptCmd>call SetTabPanelColumn("-")<CR>')
+#call submode#map(       'TabPanelCol', 'n', 's', '>',           '<ScriptCmd>call SetTabPanelColumn("+")<CR>')
+#call submode#map(       'TabPanelCol', 'n', 's', '<lt>',        '<ScriptCmd>call SetTabPanelColumn("-")<CR>')
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>+',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>-',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space>>',    ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+#call submode#enter_with('TabPanelCol', 'n', 's', '<Space><lt>', ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+#call submode#map(       'TabPanelCol', 'n', 's', '+',           ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+#call submode#map(       'TabPanelCol', 'n', 's', '-',           ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+#call submode#map(       'TabPanelCol', 'n', 's', '>',           ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("+" .. v:count1)<CR>')
+#call submode#map(       'TabPanelCol', 'n', 's', '<lt>',        ':<C-U>call ' .. expand('<SID>') .. 'SetTabPanelColumn("-" .. v:count1)<CR>')
+call submode#enter_with('TabPanelCol', 'n', 's', '<Space>+',    ':<C-U>exe "SetTabPanelColumn +" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+call submode#enter_with('TabPanelCol', 'n', 's', '<Space>-',    ':<C-U>exe "SetTabPanelColumn -" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+call submode#enter_with('TabPanelCol', 'n', 's', '<Space>>',    ':<C-U>exe "SetTabPanelColumn +" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+call submode#enter_with('TabPanelCol', 'n', 's', '<Space><lt>', ':<C-U>exe "SetTabPanelColumn -" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+call submode#map(       'TabPanelCol', 'n', 's', '+',           ':<C-U>exe "SetTabPanelColumn +" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+call submode#map(       'TabPanelCol', 'n', 's', '-',           ':<C-U>exe "SetTabPanelColumn -" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
+call submode#map(       'TabPanelCol', 'n', 's', '>',           ':<C-U>exe "SetTabPanelColumn +" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('+2')<CR>")
+call submode#map(       'TabPanelCol', 'n', 's', '<lt>',        ':<C-U>exe "SetTabPanelColumn -" .. v:count1<CR>')  #"<ScriptCmd>SetTabPanelColumn('-2')<CR>")
 
 
 
 #----------------------------------------------------------------------------------------
 # Initialize
+
 
 #--------------------------------------------
 # Options
@@ -518,10 +595,18 @@ set tabpanel=%!g:TabPanel_cur_only_over_test()
 set tabpanel=%!g:TabPanel()
 
 set tabpanelopt=align:right,columns:26
-set tabpanelopt=align:right,columns:36
 set tabpanelopt=align:right,columns:28
+set tabpanelopt=align:right,columns:36
+set tabpanelopt=align:right,columns:32
 
 set showtabpanel=2
+
+
+#--------------------------------------------
+# Auto Command
+
+SetYankAucmd(TabpanelContentsSwitch.Registers)
+
 
 #--------------------------------------------
 # Timer

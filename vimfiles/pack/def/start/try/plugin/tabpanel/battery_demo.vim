@@ -18,6 +18,13 @@ def Hl()
 
   hi BatteryLvlNon	guifg=#666666	guibg=#666666	gui=NONE	cterm=NONE
   hi BatteryLvlBrd	guifg=#000000	guibg=#000000	gui=NONE	cterm=NONE
+
+  # Red
+  hi! link BatteryLvlFtlRed StlGoldLeaf
+  hi! link BatteryLvlLowRed StlGoldLeaf
+  hi! link BatteryLvlMidRed StlGoldLeaf
+  hi! link BatteryLvlNrmRed StlGoldLeaf
+  hi! link BatteryLvlNonRed QuickFixLine
 enddef
 
 augroup BatteryGraph
@@ -197,4 +204,62 @@ export def g:BatteryBar(): list<string>
   # .. "\n" .. '@@@@@@@@@@@@@@@@@@@@@@@@'
 
   return bat_draw
+enddef
+
+export def g:BatteryBar_raw(): list<string>
+  const remain_percent = BatteryRemaining()
+  const remaining = remain_percent / GraphCellPerCent
+  const consumed  = GraphCellNum - remaining
+
+  const bat_hl =
+    remain_percent <= 12 ? '%#BatteryLvlFtl#' :
+    remain_percent <= 30 ? '%#BatteryLvlLow#' :
+    remain_percent <= 45 ? '%#BatteryLvlMid#' : '%#BatteryLvlNrm#'
+
+  const remaining_str = bat_hl .. repeat('!', remaining)
+  const consumed_str  = '%#BatteryLvlNon#' .. repeat('!', consumed)
+
+  # echo remaining_str consumed_str
+
+  const bat_str = remaining_str .. consumed_str .. '%#BatteryLvlBrd#'
+
+  if true
+    return [ $'%=%#TabLine#[ %3({remain_percent}%)%% ]%=',
+             '',
+             '%#TblDate#%=' .. bat_str .. '%#TblDate#%=',
+           ]
+  else
+    return [
+             '%#TblDate#%=' .. bat_str .. ' ' .. $'%#TabLine#%3({remain_percent}%)%% %#TblDate#%='
+           ]
+  endif
+enddef
+
+export def g:BatteryBar_red(): list<string>
+  const remain_percent = BatteryRemaining()
+  const remaining = remain_percent / GraphCellPerCent
+  const consumed  = GraphCellNum - remaining
+
+  const bat_hl =
+    remain_percent <= 12 ? '%#BatteryLvlFtlRed#' :
+    remain_percent <= 30 ? '%#BatteryLvlLowRed#' :
+    remain_percent <= 45 ? '%#BatteryLvlMidRed#' : '%#BatteryLvlNrmRed#'
+
+  const remaining_str = bat_hl .. repeat('!', remaining)
+  const consumed_str  = '%#BatteryLvlNonRed#' .. repeat('!', consumed)
+
+  # echo remaining_str consumed_str
+
+  const bat_str = remaining_str .. consumed_str .. '%#BatteryLvlBrd#'
+
+  if false
+    return [ $'%=%#TabLine#[ %3({remain_percent}%)%% ]%=',
+             '',
+             '%#TblDate#%=' .. bat_str .. '%#TblDate#%=',
+           ]
+  else
+    return [
+             '%#TblDate#%=' .. bat_str .. ' ' .. $'%#TabLine#%3({remain_percent}%)%% %#TblDate#%='
+           ]
+  endif
 enddef
