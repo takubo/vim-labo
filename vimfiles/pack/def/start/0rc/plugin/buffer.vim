@@ -23,8 +23,12 @@ nnoremap g<A-p> <Cmd>bprev<CR>
 # バッファ削除
 
 # バッファ削除 (指定)
-nnoremap <Leader>z :<C-U>CloseBuffer<Space>
-nnoremap <Leader>Z :<C-U>CloseBuffer!<Space>
+nnoremap <Leader>z :<C-U>bdelete<Space>
+nnoremap <Leader>Z :<C-U>bdelete!<Space>
+
+# バッファ削除 (指定) (ウィンドウは残す)
+nnoremap        gz :<C-U>CloseBuffer<Space>
+nnoremap        gZ :<C-U>CloseBuffer!<Space>
 
 # バッファ削除 (選択)
 nnoremap <Leader><C-K> :<C-U>ls <CR>:CloseBuffer<Space>

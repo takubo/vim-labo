@@ -45,7 +45,7 @@ inoremap <expr> <Esc> pumvisible() ? '<C-E>' : '<Esc>'
 
 # jj
 augroup JKComplete
-  au InsertEnter,CompleteDone * inoremap jj <Esc><Cmd>update<CR>
+  au InsertEnter,CompleteDone * inoremap <expr> jj bufname() != '' ? '<Esc><Cmd>update<CR>' : '<Esc>'
 augroup end
 
 # <CR> 短縮入力を展開 & Hook発動 & 行ごとにUndo & 改行
