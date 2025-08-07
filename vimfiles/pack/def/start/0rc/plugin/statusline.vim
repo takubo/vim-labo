@@ -271,10 +271,10 @@ def g:Statusline(): string
   const fenc = B('&fenc')
   const ff   = B('&ff')
   stl ..= printf(" %-5s  %-5s  %4s ",
-    filetype == '' ? '@' : filetype,
-    fenc == '' ? &enc : fenc,
-    ff
-  )
+                  filetype == '' ? '@' : filetype,
+                  fenc == '' ? &enc : fenc,
+                  ff
+                )
   #------------------------------------------------- }}}
 
 

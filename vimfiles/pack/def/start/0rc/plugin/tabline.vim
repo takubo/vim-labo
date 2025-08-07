@@ -28,7 +28,7 @@ def! g:TabLine(): string
   const contents_switch = TablineContentsSwitch
 
   #const gold = g:IsGold()
-  const gold = !exists('g:RimpaGold') || g:RimpaGold
+  const gold = exists('g:RimpaGold') && g:RimpaGold
 
 
   # ------------------------------------------------------------------------
@@ -338,7 +338,11 @@ def SetTimer(on: bool)
 
   if on && req_timer_cont
     if timer_info(g:RedrawTablineTimerId) == []
-      g:RedrawTablineTimerId = timer_start(RedrawTablineInterval, (dummy) => execute('redrawtabline'), {'repeat': -1})
+      g:RedrawTablineTimerId = timer_start(RedrawTablineInterval, (dummy) => {
+        if mode() !~# '^[cr]'
+          execute('redrawtabline')
+        endif
+      }, {'repeat': -1})
     endif
   else
     timer_stop(g:RedrawTablineTimerId)

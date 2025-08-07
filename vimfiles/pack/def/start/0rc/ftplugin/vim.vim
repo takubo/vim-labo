@@ -30,7 +30,7 @@ def VimSaveAndExe(force: bool = false)
       pui.PopUpInfo('Source!!', 2500)
     else
       # PopUpInfo None!!
-      pui.PopUpInfo('Source!!', 2500)
+      pui.PopUpInfo('None!!', 2500)
     endif
 
     #PopUpInfo Execute!!

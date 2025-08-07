@@ -9,7 +9,7 @@ scriptencoding utf-8
 
 
 #---------------------------------------------------------------------------------------------
-# Edit File
+# Edit RC File
 
 
 import autoload 'util_func.vim' as uf
@@ -100,3 +100,36 @@ com! OptionsExe {
       }
 
 com! Options silent keeppatterns OptionsExe
+
+
+
+#---------------------------------------------------------------------------------------------
+# Commands
+
+
+#--------------------------------------------
+# Help Builtin-Function-List
+
+com! FL help function-list<CR>
+
+
+#--------------------------------------------
+# Help Regex Syntax
+
+com! Regex   help regexp
+com! Pattern help pattern
+com! Regex   help magic
+com! Regex   help pattern-overview
+com! Pattern help pattern-overview
+
+
+#--------------------------------------------
+# Highlights
+
+# com! HHL echo hlget()->map((k, v) => v.name)
+
+def HL()
+  hlget() -> map((_, v) => v.name) -> map((_, v) => matchadd(v, '\<' .. v .. '\>', 90))
+enddef
+
+com! HL HL()

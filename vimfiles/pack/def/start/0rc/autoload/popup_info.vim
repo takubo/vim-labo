@@ -86,6 +86,9 @@ export def PopUpInfoM_NMV(cont: list<string>, time: number = 2500, line_off: num
   PopUpInfo_Internal(cont, time, line_off, col_off, 'topleft', [0, 0, 0])
 enddef
 
+export def PopUpInfoClose()
+  PopUpInfo_Close()
+enddef
 
 #----------------------------------------------------------------------------------------
 # Inner Data

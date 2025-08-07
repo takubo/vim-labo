@@ -82,8 +82,6 @@ endif
 # 無名バッファなら、pwd。そうでなければ、保存。
 nnoremap <expr> <silent> <Leader>w bufname() == '' ? '<Cmd>pwd<CR>' : '<Cmd>update<CR>'
 
-#nmap <silent> <Leader>e <Leader>w
-
 
 #---------------------------------------------------------------------------------------------
 # Line Number

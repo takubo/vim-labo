@@ -42,14 +42,18 @@ def g:QuickfixStl(): string
   var stl = ''
 
 
-  # Title
-  const title = prop.title
-                -> substitute('^:git grep --line-number --no-color -I', ':git grep ', '')
-                -> substitute(' -- :!..svn/ :!tags$', '', '')
   # Selected QfList (Stack)
   const stack_max = GetListFunc({'nr': '$'}).nr
   stl ..= ' %t'
-  stl ..= ' 《%2(' .. (stack_max - prop.nr + 1) .. '%)/' .. stack_max .. '》'
+  stl ..= " %#StlGoldLeaf#"
+  stl ..= '《%2(' .. (stack_max - prop.nr + 1) .. '%)/' .. stack_max .. '》'
+
+
+  # Title
+  const title = prop.title
+                -> substitute('^:', '', '')
+                -> substitute('^git grep --line-number --no-color -I ', 'git grep ', '')
+                -> substitute(' -- :!..svn/ :!tags$', '', '')
   stl ..= '%#StlGoldChar#'
   stl ..= ' ' .. title .. ' '
 
@@ -122,14 +126,11 @@ def g:Qf_Unified_CR()
   endif
 enddef
 
+# カーソル行の要素へジャンプ
 nnoremap <buffer>      <CR> <Esc>:call g:Qf_Unified_CR()<CR>
-nnoremap <buffer> <C-W><CR> <Esc>:call g:Qf_Unified_CR()<CR>
 
-#nnoremap <buffer>      <CR> <Cmd>if<Bar>v:count != 0 ? g:GotoLine(v:count)<Bar>else<Bar>execute(["normal! <Lt>CR>", 'CursorJumped'])<Bar>endif<CR>
-#nnoremap <buffer> <C-W><CR> <Cmd>if<Bar>v:count != 0 ? g:GotoLine(v:count)<Bar>else<Bar>execute(["normal! <Lt>CR>", 'CursorJumped'])<Bar>endif<CR>
-
-#nnoremap <buffer>      <CR> <Cmd>v:count != 0 ? g:GotoLine(v:count) : execute(["normal! <Lt>CR>", 'CursorJumped'])<CR>
-#nnoremap <buffer> <C-W><CR> <Cmd>v:count != 0 ? g:GotoLine(v:count) : execute(["normal! <Lt>CR>", 'CursorJumped'])<CR>
+# ウィンドウを分割してジャンプ
+# nnoremap <buffer> <C-W><CR>
 
 
 #--------------------------------------------
@@ -168,14 +169,22 @@ endif
 # History Stack
 
 if b:QuickFix
+  # 次のリストへ
   nnoremap <buffer> >> <Cmd>silent exe 'cnewer' v:count1<CR>
+  # 前のリストへ
   nnoremap <buffer> << <Cmd>silent exe 'colder' v:count1<CR>
+  # 最新のリストへ
   nnoremap <buffer> == <Cmd>silent exe 'chistory' getqflist({'nr': '$'}).nr<CR>
+  # リスト一覧から選択
   nnoremap <buffer> S  <Cmd>chistory<CR>:<C-U>chistory<Space>
 else
+  # 次のリストへ
   nnoremap <buffer> >> <Cmd>silent exe 'lnewer' v:count1<CR>
+  # 前のリストへ
   nnoremap <buffer> << <Cmd>silent exe 'lolder' v:count1<CR>
+  # 最新のリストへ
   nnoremap <buffer> == <Cmd>silent exe 'lhistory' getloclist(winnr(), {'nr': '$'}).nr<CR>
+  # リスト一覧から選択
   nnoremap <buffer> S  <Cmd>lhistory<CR>:<C-U>lhistory<Space>
 endif
 nmap <buffer> <C-A> >>
@@ -186,12 +195,15 @@ nmap <buffer> <C-S> ==
 #--------------------------------------------
 # Edit
 
+# エントリ削除
 nnoremap <buffer> dd <Plug>(QuickfixEdit-Delelte)
 nnoremap <buffer>  x <Plug>(QuickfixEdit-Delelte)
 
+# エントリ削除(Visualモード)
 vnoremap <buffer>  d <Plug>(QuickfixEdit-Delelte-Visual)
 vnoremap <buffer>  x <Plug>(QuickfixEdit-Delelte-Visual)
 
+# アンドゥ
 nnoremap <buffer>  u <Plug>(QuickfixEdit-Undo)
 
 
