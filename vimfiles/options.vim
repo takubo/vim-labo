@@ -188,7 +188,7 @@ set splitbelow  # TODO
 set splitkeep=topline # TODO
 set splitkeep=screen  # TODO
 set splitkeep=cursor  # TODO
-set nosplitright  # TODO
+set splitright  # TODO
 #set scrollbind
 #set scrollopt=ver,jump
 #set cursorbind
@@ -352,7 +352,7 @@ set shiftwidth=2  # TODO 8
 #set varsofttabstop
 set smarttab
 set softtabstop=-1  # 'マイナスなら 'shiftwidth' の値が使われる。
-set noshiftround
+set shiftround  # TODO set noshiftround
 set expandtab  # TODO
 set autoindent
 #set smartindent
