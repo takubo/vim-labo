@@ -49,17 +49,13 @@ onoremap i% iw%
 set formatoptions-=ro
 
 
-com! EraceWhiteLine :g/^\s\+$/d
-com! EraceTrailingWhite :%s/\s\+$//
-com! EraceEmptyLine :g/^$/d
-com! EraceNullLine EraceEmptyLine
+com!       EraceWhiteLine     :g/^\s\+$/d
+com!       EraceTrailingWhite :%s/\s\+$//
+com!       EraceEmptyLine     :g/^$/d
+com! -bang EraceSearchLine    exe ':g<bang>/' .. @/ .. '/d'
+#com!       EraceNotSearchLine exe ':g!/' .. @/ .. '/d'
+#com!       EraceNullLine      EraceEmptyLine
 
-com! EraceSearchLine exe ':g/' .. @/ .. '/d'
-com! EraceNotSearchLine exe ':g!/' .. @/ .. '/d'
-
-
-nnoremap <expr> <Leader>w bufname('') == '' ? '<Cmd>pwd<CR>' : '<Cmd>update<CR>'
-nnoremap <expr> <Leader>w bufname('') == '' ? '' : '<Cmd>update<CR>'
 
 #nnoremap gcc S
 #nnoremap gcc 0C
@@ -147,6 +143,8 @@ def CommnadOutput(cmd: string): string
 enddef
 
 
+#---------------------------------------------------------------------------------------------
+
 nnoremap <Leader>p <Cmd>registers - 0 1 2 3 4 5 6 7 8 9<CR>:put<Space>
 
 def ShowRegisters()
@@ -157,14 +155,32 @@ def ShowRegisters()
 enddef
 nnoremap <Leader>p <ScriptCmd>ShowRegisters()<CR>:put<Space>
 
+def SelectPaste_0()
+  const r = '-0123456789'
+  const s = CommnadOutput('registers ' .. r) -> split('\n')
+  pui.PopUpInfoM(s, -1)
+  redraw
+  const k = uf.GetKey()
+  if stridx(r, k) != -1
+    exe 'put' k
+  endif
+  pui.PopUpInfoClose()
+enddef
 
-#---------------------------------------------------------------------------------------------
+def SelectPaste(c: string)
+  const r = '-0123456789'
+  const s = CommnadOutput('registers ' .. r) -> split('\n')
+  pui.PopUpInfoM(s, -1)
+  redraw
+  const k = uf.GetKey()
+  if stridx(r, k) != -1
+    exe 'normal! ' .. v:count1 .. '"' .. k .. c
+  endif
+  pui.PopUpInfoClose()
+enddef
 
-com! Regex help regexp
-com! Pattern help pattern
-com! Regex help magic
-com! Regex help pattern-overview
-com! Pattern help pattern-overview
+nnoremap <Leader>p <ScriptCmd>SelectPaste('p')<CR>
+nnoremap <Leader>P <ScriptCmd>SelectPaste('P')<CR>
 
 
 #---------------------------------------------------------------------------------------------
@@ -183,10 +199,10 @@ com! -nargs=0 -bang NumCommma3 g$.$s/\(\d\)\%(\%(\d\d\d\)\+\>\)\@=/\1,/g
 #---------------------------------------------------------------------------------------------
 augroup highlightIdeographicSpace
   autocmd!
-  autocmd Colorscheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
+  autocmd Colorscheme * highlight IdeographicSpace term=underline guibg=#6622cc
   autocmd VimEnter,WinEnter * match IdeographicSpace /　/
 augroup END
-highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
+highlight IdeographicSpace term=underline guibg=#6622cc
 
 com! -bang -nargs=0 HankakuSpace :%s/　/  /g
 
@@ -205,14 +221,6 @@ def Window_Resize_SetOptimalWidth()
 
   exe max_len + off .. ' wincmd |'
 enddef
-
-
-
-#---------------------------------------------------------------------------------------------
-
-nnoremap <expr> <silent> <Leader>w bufname() == '' ? '<Cmd>pwd<CR>' : '<Cmd>update<CR>'
-
-#nnoremap <expr> <silent> <Leader>w '<Cmd>' .. (bufname() == '' ? 'pwd' : 'update') .. '<CR>'
 
 
 
@@ -239,6 +247,9 @@ nnoremap <expr> <silent> <Leader>w bufname() == '' ? '<Cmd>pwd<CR>' : '<Cmd>upda
 #----------------------------------------------------------------------------------------
 com! Winnr echo '  ' winnr('$')
 
+com! WinId echo winnr() -> win_getid()
+
+
 
 
 #----------------------------------------------------------------------------------------
@@ -251,22 +262,6 @@ endfunction
 
 #----------------------------------------------------------------------------------------
 #hi StatusLineNC		guifg=#7f1f1a	guibg=#d0c589	gui=none	" guibgは色を錯覚するので#d0c589から補正
-
-
-
-#---------------------------------------------------------------------------------------------
-# from ema.vim
-
-nnoremap <silent> <C-]> g;
-nnoremap <silent> <C-\> g,
-
-
-#---------------------------------------------------------------------------------------------
-
-# nnoremap H <C-w>h
-# nnoremap J <C-w>j
-# nnoremap K <C-w>k
-# nnoremap L <C-w>l
 
 
 
@@ -287,25 +282,6 @@ def RRR()
 enddef
 #call RRR()
 com! RRR call RRR()
-
-
-
-#---------------------------------------------------------------------------------------------
-
-com! HL echo hlget()->map((k, v) => v.name)
-
-def HL()
-  #var hl = hlget()
-  #const hn = hl -> mapnew((_, v) => v -> filter((k, _) => (k == 'name' || k == 'guifg' || k == 'guibg' || k == 'gui')))
-
-  const hl = hlget()
-  #const hn = hl -> mapnew((k, v) => v.name)
-  const hn = hl -> mapnew((_, v) => v.name) -> map((_, v) => matchadd(v, '\<' .. v .. '\>', 90))
-
-  # echo hn
-enddef
-
-com! HL HL()
 
 
 
@@ -515,15 +491,22 @@ com! -nargs=1 -complete=runtime Configure echo <q-args>
 
 augroup ExpandTab
   au!
-  au InsertEnter * setl noexpandtab
-  au InsertLeave * setl   expandtab
+  #au InsertEnter * setl noexpandtab
+  #au InsertLeave * setl   expandtab
 augroup end
 
 inoremap <Plug>(C-t) <C-t>
 inoremap <Plug>(C-d) <C-d>
 
-inoremap <C-t> <Cmd>setl expandtab<CR><Plug>(C-t)<Cmd>setl noexpandtab<CR>
-inoremap <C-d> <Cmd>setl expandtab<CR><Plug>(C-d)<Cmd>setl noexpandtab<CR>
+inoremap <C-T> <Cmd>setl expandtab<CR><Plug>(C-t)<Cmd>setl noexpandtab<CR>
+inoremap <C-D> <Cmd>setl expandtab<CR><Plug>(C-d)<Cmd>setl noexpandtab<CR>
+
+inoremap <C-S> <Cmd>setl expandtab!<CR><Cmd>set expandtab?<CR>
+inoremap <C-L> <Cmd>set expandtab?<CR>
+
+inoremap <S-Tab> <C-V><Tab>
+inoremap <C-]> <C-V><Tab>
+inoremap <C-@> <C-V><Tab>
 
 set softtabstop=0
 
@@ -554,16 +537,56 @@ nnoremap <silent> - <ScriptCmd>Isk('-')<CR>
 
 #---------------------------------------------------------------------------------------------
 
+# const N = 3333
+# var startTime = reltime()
+# startTime = reltime()
+# range(N) -> foreach((_, _) => Registers())
+# g:Registers_t = startTime->reltime()->reltimestr()
+# 
+# startTime = reltime()
+# range(N) -> foreach((_, _) => Registers_0())
+# g:Registers_0_t = startTime->reltime()->reltimestr()
+# 
+# com! RegistersEcho echo g:Registers_t g:Registers_0_t
+
+
+
+#---------------------------------------------------------------------------------------------
+
+nnoremap <expr> G v:count == 0 ? 'G' : ':tabnext ' .. v:count .. '<CR>'  #(v:count .. 'gt')
+nnoremap <expr> G v:count == 0 ? 'G' : 'gt'
+nnoremap U <Cmd>tabnext #<CR>
+
 
 #---------------------------------------------------------------------------------------------
 
 
-#---------------------------------------------------------------------------------------------
-
 
 #---------------------------------------------------------------------------------------------
 
 
+
 #---------------------------------------------------------------------------------------------
+
+
+
+#---------------------------------------------------------------------------------------------
+
+
+
+#---------------------------------------------------------------------------------------------
+
+
+
+#---------------------------------------------------------------------------------------------
+
+
+
+#---------------------------------------------------------------------------------------------
+
+
+
+#---------------------------------------------------------------------------------------------
+
 
 

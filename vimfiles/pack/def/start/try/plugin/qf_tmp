@@ -1,0 +1,305 @@
+vim9script
+
+
+#------------------------------------------------------------------------------------------
+def QfBufNum_0()
+  # HaveLocationlist TODO
+  const GetListFunc = getloclist(winnr(), {'winid': 0}).winid == 0 ?
+                      function('getqflist') :
+                      function('getloclist', [g:statusline_winid])
+
+  var lists = GetListFunc() -> map((i, v) => ({'idx': i + 1, 'bufnr':  v.bufnr}))
+
+  if lists == []
+    return
+  endif
+
+  const cur_idx = GetListFunc({'idx': 0}).idx
+  const cur_lidx = cur_idx - 1
+  const cur_buf = lists[cur_lidx].bufnr
+
+  if cur_buf == 0
+    return
+  endif
+
+  const lists_same_buf = lists -> filter((_, v) => v.bufnr == cur_buf)
+  const in_buf_num = lists_same_buf -> len()
+  const in_buf_lidx = lists_same_buf -> indexof((_, v) => v.idx == cur_idx)
+  const in_buf_idx = lists_same_buf[in_buf_lidx].idx
+
+  echo in_buf_num in_buf_idx
+enddef
+
+def QfInBufNum(): number
+  # HaveLocationlist TODO
+  const GetListFunc = getloclist(winnr(), {'winid': 0}).winid == 0 ?
+                      function('getqflist') :
+                      function('getloclist', [g:statusline_winid])
+
+  var lists = GetListFunc() -> map((i, v) => ({'idx': i + 1, 'bufnr':  v.bufnr}))
+
+  if lists == []
+    return 0
+  endif
+
+  const cur_idx = GetListFunc({'idx': 0}).idx
+  const cur_lidx = cur_idx - 1
+  const cur_buf = lists[cur_lidx].bufnr
+
+  if cur_buf == 0
+    return 0
+  endif
+
+  const lists_same_buf = lists -> filter((_, v) => v.bufnr == cur_buf)
+  const in_buf_num = lists_same_buf -> len()
+
+  return in_buf_num
+enddef
+
+def QfInBufCurIdx(): number
+  # HaveLocationlist TODO
+  const GetListFunc = getloclist(winnr(), {'winid': 0}).winid == 0 ?
+                      function('getqflist') :
+                      function('getloclist', [g:statusline_winid])
+
+  var lists = GetListFunc() -> map((i, v) => ({'idx': i + 1, 'bufnr':  v.bufnr}))
+
+  if lists == []
+    return 0
+  endif
+
+  const cur_idx = GetListFunc({'idx': 0}).idx
+  const cur_lidx = cur_idx - 1
+  const cur_buf = lists[cur_lidx].bufnr
+
+  if cur_buf == 0
+    return 0
+  endif
+
+  const lists_same_buf = lists -> filter((_, v) => v.bufnr == cur_buf)
+  const in_buf_lidx = lists_same_buf -> indexof((_, v) => v.idx == cur_idx)
+  const in_buf_idx = in_buf_lidx + 1
+
+  return in_buf_idx
+enddef
+
+def QfBufNum(): number
+  # HaveLocationlist TODO
+  const GetListFunc = getloclist(winnr(), {'winid': 0}).winid == 0 ?
+                      function('getqflist') :
+                      function('getloclist', [g:statusline_winid])
+
+  return GetListFunc() -> map((_, v) => v.bufnr) -> uniq() -> len()
+enddef
+
+def QfStat()
+  # HaveLocationlist TODO
+  const GetListFunc = getloclist(winnr(), {'winid': 0}).winid == 0 ?
+                      function('getqflist') :
+                      function('getloclist', [g:statusline_winid])
+
+  var d = []
+  #const l = GetListFunc() -> reduce((a, v) => add(a, {'bufnr': v.bufnr, '), [])
+enddef
+
+echo QfInBufCurIdx() '/' QfInBufNum() QfBufNum()
+finish
+#------------------------------------------------------------------------------------------
+
+
+
+const SAME = 1
+const NEXT = 2
+const PREV = 4
+const SAME_NEXT = SAME + NEXT
+const SAME_PREV = SAME + PREV
+
+# enr entry number
+# lidx list index
+def g:Jump_0(dir_and_num: number)
+  # HaveLocationlist TODO
+  const GetListFunc = getloclist(winnr(), {'winid': 0}).winid == 0 ?
+                      function('getqflist') :
+                      function('getloclist', [g:statusline_winid])
+
+ #const lists = GetListFunc()
+ #const list_bufnrs = lists -> map((_, v) => v.bufnr)
+  var lists = GetListFunc() -> map((i, v) => ({'lidx': i, 'bufnr':  v.bufnr}))
+
+  if lists == []
+    return
+  endif
+
+  if false
+    reverse(lists)
+  endif
+
+  const cur_entry = GetListFunc({'idx': 0})
+  const cur_entry_idx = cur_entry.idx - 1
+
+  const cur_buf = lists[cur_entry_idx].bufnr
+ #const cur_buf = list_bufnrs[cur_entry_idx].bufnr
+
+  if cur_buf == 0
+    return
+  endif
+
+  const next_buf = 9999
+  const prev_buf = 9999
+
+  const lists_same_buf = lists -> filter((_, v) => v.bufnr == cur_buf)
+
+  echo cur_buf cur_entry_idx lists_same_buf
+
+  exe 'cc' dir_and_num + cur_entry.idx
+
+  exe 'cc' lists_same_buf[0].lidx + 1
+  exe 'cc' lists_same_buf[-1].lidx + 1
+enddef
+
+def g:Jump(dir_and_num: number)
+  # HaveLocationlist TODO
+  const GetListFunc = getloclist(winnr(), {'winid': 0}).winid == 0 ?
+                      function('getqflist') :
+                      function('getloclist', [g:statusline_winid])
+
+  var lists = GetListFunc() -> map((i, v) => ({'idx': i + 1, 'bufnr':  v.bufnr}))
+
+  if lists == []
+    return
+  endif
+
+  if false || false || false
+    reverse(lists)
+  endif
+
+  const cur_idx = GetListFunc({'idx': 0}).idx
+  const cur_lidx = cur_idx - 1
+  const cur_buf = lists[cur_lidx].bufnr
+
+  if cur_buf == 0
+    return
+  endif
+
+  if true
+    # 現在のバッファ内での移動
+    const tgt_lidx = cur_lidx + abs(dir_and_num)
+    if lists[tgt_lidx].bufnr == lists[cur_lidx].bufnr
+      exe 'cc' lists[tgt_lidx].idx
+    else
+    endif
+    return
+  endif
+
+  const bufs = lists -> map((_, v) => v.bufnr) -> uniq()
+  echo bufs
+
+  const next_buf = 9999
+  const prev_buf = 9999
+
+  const lists_same_buf = lists -> filter((_, v) => v.bufnr == cur_buf)
+
+  echo cur_buf cur_entry_idx lists_same_buf
+
+
+  exe 'cc' lists_same_buf[0].lidx + 1
+  exe 'cc' lists_same_buf[-1].lidx + 1
+enddef
+
+g:Jump(+1)
+
+
+finish
+
+
+#------------------------------------------------------------------------------------------
+getqflist() -> map((_, v) =>  {
+  v.bufnr = 144
+  v.bufname = 'no'
+  return v
+}) -> setqflist()
+#------------------------------------------------------------------------------------------
+
+
+# カレントバッファの最後のエントリへジャンプ/次のバッファの最後のエントリへジャンプ
+nnoremap <buffer> ][
+# カレントバッファの最初のエントリへジャンプ/前のバッファの最初のエントリへジャンプ
+nnoremap <buffer> [[
+# 次のバッファの最初のエントリへジャンプ
+nnoremap <buffer> ]]
+# 前のバッファの最後のエントリへジャンプ
+nnoremap <buffer> []
+
+# カレントバッファの最後のエントリへジャンプ
+nnoremap <buffer> }
+# カレントバッファの最初のエントリへジャンプ
+nnoremap <buffer> {
+
+# 次のバッファの最初のエントリへジャンプ
+nnoremap <buffer> >>
+# 前のバッファの最初のエントリへジャンプ
+nnoremap <buffer> <<
+
+# 最初のエントリへジャンプ
+nnoremap <buffer> <> <Cmd> cfirst<CR>
+# 最後のエントリへジャンプ
+nnoremap <buffer> >< <Cmd> clast<CR>
+
+# カレントバッファ内の次のエントリへジャンプ
+nnoremap <buffer> } <Cmd>cc<CR><Cmd>cafter<CR><Cmd>wincmd p<CR>
+# カレントバッファ内の前のエントリへジャンプ
+nnoremap <buffer> { <Cmd>cc<CR><Cmd>cbefore<CR><Cmd>wincmd p<CR>
+
+
+
+
+
+- ftp
+qf
+- plugin
+satatusline
+autochdir
+quickfix
+- autoload
+jump
+util
+
+
+
+#	<<	
+#	>>	
+#	==	
+#
+#	a	
+#	A	
+#	i	
+#	I	
+#	o	
+#	O	
+#	p	
+#	P	
+#	c	
+#	C	
+#	s	
+#	S	
+#	r	
+#	R	
+#
+#	C-A	
+#	C-X	
+#	C-S	
+#	C-V	
+#
+#	d	エントリ削除
+#	x	エントリ削除
+#	u	アンドゥ
+#	C-R	リドゥ
+#
+#	[[	
+#	]]	
+#	[]	
+#	][	
+#	{	
+#	}	
+#
+#	<CR>	ジャンプ
