@@ -8,11 +8,11 @@ cd ./pack
 
 
 cat <<- 'EOF' | sed '/^\s*#/d; /^$/d' | cat > submodules
-	# ext/start    tabubo/Battery
-	# ext/start    tabubo/CursorJumped
-	# ext/start    tabubo/EdgeMove BlockMove
-	# ext/start    tabubo/numbers
-	# ext/start    tabubo/Axes
+	# ext/start  tabubo/Battery
+	# ext/start  tabubo/CursorJumped
+	# ext/start  tabubo/EdgeMove BlockMove
+	# ext/start  tabubo/numbers
+	# ext/start  tabubo/Axes
 
 	reg/start    vim-jp/vimdoc-ja
 	reg/start    takubo/vim-submode
@@ -32,6 +32,7 @@ cat <<- 'EOF' | sed '/^\s*#/d; /^$/d' | cat > submodules
 	# try/opt    snippets
 	# try/opt    Surround
 	# try/opt    Tagbar
+	try/opt      mattn/vimtweak
 EOF
 
 
