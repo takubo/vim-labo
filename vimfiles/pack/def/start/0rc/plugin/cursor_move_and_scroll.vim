@@ -51,35 +51,6 @@ augroup end
 
 set smoothscroll
 
-def Scroll_0(dir: number)
-  const k = dir >= 0 ? "2\<C-E>2gj" : "2\<C-Y>2gk"
- #const k = dir >= 0 ? "\<C-E>gj" : "\<C-Y>gk"
-
-  const n0 = winheight(0) / 3
-
-  var n = n0
-
-  set nocursorcolumn
-
-  while true
-    var c = getchar(0) -> nr2char()
-    if dir >= 0 && c == 'k' || dir < 0 && c == 'j'
-      set cursorcolumn
-      return
-    endif
-    if dir >= 0 && c == 'j' || dir < 0 && c == 'k'
-      n += n0
-    endif
-
-    if n > 0
-      execute 'normal!' k
-      redraw
-      sleep 1m
-      n -= 1
-    endif
-  endwhile
-enddef
-
 def Scroll(dir: number)
   const n0 = winheight(0) / 2 #3
 
@@ -143,43 +114,16 @@ submode#map(       'HorizScroll', 'nv', '',  'j', '<c-e>')
 submode#map(       'HorizScroll', 'nv', '',  'k', '<c-y>')
 submode#map(       'HorizScroll', 'nv', '',  'l', 'zl'   )
 
+submode#map(       'HorizScroll', 'nv', '',  'H', 'h')
 submode#map(       'HorizScroll', 'nv', '',  'J', 'j')
 submode#map(       'HorizScroll', 'nv', '',  'K', 'k')
+submode#map(       'HorizScroll', 'nv', '',  'L', 'l')
 
 # sidescrolloffが1以上のとき、タブ文字(または多バイト文字)上にカーソルがあると、
 # 水平スクロールできないバグがあるので、カーソルを動かせるようにしておく。
 set sidescrolloff=0
 submode#map(       'HorizScroll', 'nv', '',  'w', 'w')
 submode#map(       'HorizScroll', 'nv', '',  'b', 'b')
-
-
-
-#----------------------------------------------------------------------------------------
-# Scrolloff
-#----------------------------------------------------------------------------------------
-
-set scrolloff=5  # TODO
-
-# Best Scrolloff
-
-augroup BestScrollOff
-  au!
-  au WinResized * EvtBestScrolloff()
-augroup end
-
-def EvtBestScrolloff()
-  foreach(v:event.windows, (_, win_id) => win_execute(win_id, 'SetBestScrolloff()'))
-enddef
-
-def SetBestScrolloff()
-  const winheight = winheight(0)
-  # Quickfixでは、なぜかWinNewが発火しないので、exists()で変数の存在を確認せねばならない。
-  &l:scrolloff = (!TypewriterScroll && (!exists('w:TypewriterScroll') || !w:TypewriterScroll)) ?
-                   ( winheight < 10 ? 0 :
-                     winheight < 20 ? 2 :
-                     5 ) :
-                   9999
-enddef
 
 
 #----------------------------------------------------------------------------------------
@@ -218,6 +162,31 @@ nnoremap g<Space> <ScriptCmd>ToggleTypewriterScroll(false)<CR>
 
 
 #----------------------------------------------------------------------------------------
+# Scrolloff
+#----------------------------------------------------------------------------------------
+
+set scrolloff=5  # TODO
+
+# Best Scrolloff
+
+augroup BestScrollOff
+  au!
+  au WinResized * foreach(v:event.windows, (_, win_id) => win_execute(win_id, 'SetBestScrolloff()'))
+augroup end
+
+def SetBestScrolloff()
+  const winheight = winheight(0)
+  # Quickfixでは、なぜかWinNewが発火しないので、exists()で変数の存在を確認せねばならない。
+  &l:scrolloff = (!TypewriterScroll && (!exists('w:TypewriterScroll') || !w:TypewriterScroll)) ?
+                 ( winheight < 10 ? 0 :
+                   winheight < 20 ? 2 :
+                   5
+                 ) :
+                 9999
+enddef
+
+
+#----------------------------------------------------------------------------------------
 # Virtual Edit
 #----------------------------------------------------------------------------------------
 nnoremap <expr> <Leader>$ '<Cmd>set virtualedit' .. (&virtualedit =~# 'onemore' ? '-=' : '+=') .. 'onemore<CR><Cmd>set virtualedit<CR>'
@@ -226,12 +195,6 @@ nnoremap <expr> <Leader>$ '<Cmd>set virtualedit' .. (&virtualedit =~# 'onemore' 
 #----------------------------------------------------------------------------------------
 # TODO
 #----------------------------------------------------------------------------------------
-
-#set noshowcmd
-
-#noremap j  gj
-#noremap k  gk
-
 
 #? #noremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\(\S\|\s$\)', 'bcn') ? '0' : '^'
 #? #noremap <expr> <silent> U v:prevcount ? (v:prevcount . '<Bar>') : search('^\s\+\%#\(\S\|\s$\)', 'bcn') ? '0' : '^'
@@ -253,14 +216,6 @@ nnoremap <expr> <Leader>$ '<Cmd>set virtualedit' .. (&virtualedit =~# 'onemore' 
 
 
 # FIXME set ve=all {{{
-#submode#on_entering('HorizScroll', 'set ve=all')
-#submode#on_leaving( 'HorizScroll', 'set ve=')
-
-# submode#map(       'HorizScroll', 'nv', 'r',  'l', '<Plug>(More-Right)'   )
-# # 行右端で、なお右に進もうとしたら、virtualeditにallを追加して、何事もなかったかのように右へ移動する。
-# noremap <expr> <Plug>(More-Right) (!!search('\%#$', 'bcn') ? '<Cmd>set virtualedit+=all<CR>' : '') .. 'l'
-# noremap <expr> <Plug>(More-Right) (!!search('\%#$', 'bcn') ? '<Cmd>set virtualedit+=all<CR>' : '') .. 'zl'
-# noremap <expr> <Plug>(More-Right) (!!search('\%#.\?$', 'bcn') ? '<Cmd>set virtualedit+=all<CR>' : '') .. 'zl'
 # # search()の最後の .\? は、onemore の有効向こう次第で、カーソルの右の文字の有無が変わるから。
 # noremap <expr> <Plug>(More-Right) (!!search('\%#.\?$', 'bcn') && ScreenCol() == 1 ? '<Cmd>set virtualedit+=all<CR>' : '') .. 'zl'
 #
@@ -269,37 +224,18 @@ nnoremap <expr> <Leader>$ '<Cmd>set virtualedit' .. (&virtualedit =~# 'onemore' 
 # }}}
 
 
-# com! -bar -bang CursorLine   {
-#                   if '<bang>' == '!'
-#                     setg cursorline!
-#                   else
-#                     setl cursorline!
-#                   endif
-#                 }
-# com! -bar -bang CursorColumn {
-#                   if '<bang>' == '!'
-#                     setg cursorcolumn!
-#                   else
-#                     setl cursorcolumn!
-#                   endif
-#                 }
-
-
 # #----------------------------------------------------------------------------------------
 # # Vertical Scroll (ComfortableMotion)
 #----------------------------------------------------------------------------------------
-# # FIXME
 #
-# if 0
-#   g:comfortable_motion_friction = 253.0
-#   g:comfortable_motion_air_drag = 45.0
-#   g:comfortable_motion_impulse_multiplier = 38.0
+# g:comfortable_motion_friction = 253.0
+# g:comfortable_motion_air_drag = 45.0
+# g:comfortable_motion_impulse_multiplier = 38.0
 #
-#   nnoremap <silent> <Plug>(ComfortableMotion-Flick-Down) <Cmd>comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * min([64, winheight(0)])     )<CR>
-#   nnoremap <silent> <Plug>(ComfortableMotion-Flick-Up)   <Cmd>comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * min([64, winheight(0)]) * -1)<CR>
+# nnoremap <silent> <Plug>(ComfortableMotion-Flick-Down) <Cmd>comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * min([64, winheight(0)])     )<CR>
+# nnoremap <silent> <Plug>(ComfortableMotion-Flick-Up)   <Cmd>comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * min([64, winheight(0)]) * -1)<CR>
 #
-#   #nmap     gj <Plug>(ComfortableMotion-Flick-Down)
-#   #nmap     gk <Plug>(ComfortableMotion-Flick-Up)
-#   #vnoremap gj <C-d>
-#   #vnoremap gk <C-u>
-# endif
+# #nmap     gj <Plug>(ComfortableMotion-Flick-Down)
+# #nmap     gk <Plug>(ComfortableMotion-Flick-Up)
+# #vnoremap gj <C-d>
+# #vnoremap gk <C-u>
