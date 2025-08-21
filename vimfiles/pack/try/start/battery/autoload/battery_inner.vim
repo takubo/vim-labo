@@ -62,7 +62,7 @@ finish
 
 
 
-def time_format(sec: number): dict<number>
+def TimeFormat(sec: number): dict<number>
   const hour    = rem_sec / 3600
   const minutes = rem_sec % 3600 / 60
   const second  = rem_sec % 60 )
