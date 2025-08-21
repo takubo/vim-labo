@@ -112,6 +112,25 @@ enddef
 com! GetCursorCharCode echo printf('0x%x', GetCursorCharCode())
 
 
+# 秒を、時/分/秒の辞書に変換する。
+export def TimeSecondDivide(sec: number): dict<number>
+  return {
+           hour:    (sec / 3600),
+           minutes: (sec % 3600 / 60),
+           second:  (sec % 60),
+         }
+enddef
+
+
+# 秒を、HH:MM:SSの文字列に変換する。
+export def TimeFormat_Sec2Str(sec: number): string
+  const hour    = sec / 3600
+  const minutes = sec % 3600 / 60
+  const second  = sec % 60
+  return printf('%d:%02d:%02d', hour, minutes, second)
+enddef
+
+
 finish
 
 
