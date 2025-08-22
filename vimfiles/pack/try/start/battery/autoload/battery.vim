@@ -69,7 +69,7 @@ import autoload 'util_func.vim' as uf
 
 def Update(dummy: number)
   if false
-    # TODO battery_dummy.vim
+    # TODO UpdateSim()
   else
     sys.Update(batteryInfo)
   endif
@@ -166,11 +166,12 @@ endif
 
 def Init(dummy: number)
   const init_status = sys.Init()
-  echo init_status
+  # oecho init_status
+
   if init_status == 0
     sys.Update(batteryInfo)  # 初回更新
     timer_start(15000, Update, {'repeat': -1})
   endif
 enddef
 
-timer_start(3000, Init)
+timer_start(3000, Init)  # 遅延初期化のタイマー
