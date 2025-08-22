@@ -45,19 +45,16 @@ const ACStatusChar = [
 #----------------------------------------------------------------------------------------
 # API
 
-export def BatteryInfo(): dict<any>
-  return batteryInfo
+export def g:GetBatteryInfo(): dict<any>
+  return BatteryInfo
 enddef
 
-export def BatteryInfoStr(): string
-  return batteryInfoStr
+export def g:GetBatteryInfoStr(): string
+  return BatteryInfoStr
 enddef
 
-export def BatteryPercent(): number
-  return batteryPercent
-# TODO 削除
- #return max([batteryInfo.RemainingPercent, 0])
- #return batteryInfo.RemainingPercent
+export def g:GetBatteryPercent(): number
+  return BatteryInfo.RemainingPercent
 enddef
 
 
@@ -71,16 +68,16 @@ def Update(dummy: number)
   if false
     # TODO battery_dummy.vim
   else
-    sys.Update(batteryInfo)
+    SystemUpdateFunc(BatteryInfo)
   endif
 
   # 残り時間の文字列表現 (HH:MM:SS)
-  batteryInfo.RemainingTimeFormatedStr = batteryInfo.RemainingTimeSecond >= 0 ?
-                                         uf.TimeFormat_Sec2Str(batteryInfo.RemainingTimeSecond) :
+  BatteryInfo.RemainingTimeFormatedStr = BatteryInfo.RemainingTimeSecond >= 0 ?
+                                         uf.TimeFormat_Sec2Str(BatteryInfo.RemainingTimeSecond) :
                                          '--:--:--'
 
-  batteryInfo.ACStatusEmoji = ACStatusEmoji[batteryInfo.ACStatus.ordinal]  # 電源への接続状態の絵文字表現
-  batteryInfo.ACStatusChar  = ACStatusChar[batteryInfo.ACStatus.ordinal]   # 電源への接続状態のASCII文字表現
+  BatteryInfo.ACStatusEmoji = ACStatusEmoji[BatteryInfo.ACStatus.ordinal]  # 電源への接続状態の絵文字表現
+  BatteryInfo.ACStatusChar  = ACStatusChar[BatteryInfo.ACStatus.ordinal]   # 電源への接続状態のASCII文字表現
 
  #'FullTimeFormatedStr':       '--:--:--',        # 満充電時の使用可能時間の文字列表現 (HH:MM:SS)
  #'NeedTimeFormatedStr':       '--:--:--',        # 満充電までの時間の文字列表現 (HH:MM:SS)
@@ -88,18 +85,14 @@ def Update(dummy: number)
  #'ChargingStatusEmoji':       Unknown,
  #'RemainingPercentStr':       printf('%3d%%', RemainingPercent),
 
-  # Example:
-  #                  '❔ ---% [--:--:--]'
+  # BatteryInfoStr = '❔ ---% [--:--:--]'
   #                  '🔋  35% [ 2:04:43]'
   #                  '🔌 100% [10:04:43]'
-  batteryInfoStr = batteryInfo.ACStatusEmoji
-                   .. (batteryInfo.RemainingTimeSecond >= 0 ?
-                       printf(' %3d%%', batteryInfo.RemainingPercent) :
-                       ' ---%'
-                      )
-                   .. printf(' [%8s]', batteryInfo.RemainingTimeFormatedStr)
-
-  batteryPercent = max([batteryInfo.RemainingPercent, 0])
+  BatteryInfoStr = printf('%s %3d% [%8s]',
+                           BatteryInfo.ACStatusEmoji,
+                           BatteryInfo.RemainingPercent,
+                           BatteryInfo.RemainingTimeFormatedStr
+                         )
 
   # Callback
   doautocmd User BatteryInfoUpdate
@@ -121,13 +114,13 @@ augroup end
 #--------------------------------------------
 # Variables
 
-var batteryInfo = {
-  'RemainingPercent':          -1,                # 残りパーセント
-  'RemainingTimeSecond':       -1,                # 残り秒数
+var BatteryInfo = {
+  'RemainingPercent':          0,                 # 残りパーセント
+  'RemainingTimeSecond':       0,                 # 残り秒数
   'RemainingTimeFormatedStr':  '--:--:--',        # 残り時間の文字列表現 (HH:MM:SS)
- #'FullTimeSecond':            -1,                # 満充電時の使用可能秒数
+ #'FullTimeSecond':            0,                 # 満充電時の使用可能秒数
  #'FullTimeFormatedStr':       '--:--:--',        # 満充電時の使用可能時間の文字列表現 (HH:MM:SS)
- #'NeedTimeSecond':            -1,                # 満充電までの秒数
+ #'NeedTimeSecond':            0,                 # 満充電までの秒数
  #'NeedTimeFormatedStr':       '--:--:--',        # 満充電までの時間の文字列表現 (HH:MM:SS)
   'ACStatus':                  ACStatus.Unknown,  # 電源への接続状態 (不明 / 非接続 / 接続&非充電 / 充電中 )
   'ACStatusEmoji':             '❔',              # 電源への接続状態の絵文字表現
@@ -140,24 +133,23 @@ var batteryInfo = {
  #'RemainingPercentStr':       printf('%3d%%', RemainingPercent),
 }
 
-var batteryInfoStr = '❓ ---% [--:--:--]'
-#                    '❔ ---% [--:--:--]'
+var BatteryInfoStr = '❔ ---% [--:--:--]'
 #                    '? ---% [--:--:--]'
-
-var batteryPercent = 0
 
 
 #--------------------------------------------
 # システム選択
 
+var UnsupportedSystem = false
+
 if exists('g:BatteryNet') && g:BatteryNet
-  import autoload 'sys_net/battery_sys_net.vim' as sys
+  import autoload 'net/battery_sys_net.vim' as sys
 elseif has('osxdarwin')
-  import autoload 'sys_osx/battery_sys_osx.vim' as sys
+  import autoload 'osx/battery_sys_osx.vim' as sys
 elseif has('win32')
-  import autoload 'sys_dos/battery_sys_dos.vim' as sys
+  import autoload 'dos/battery_sys_dos.vim' as sys
 else
-  import autoload 'sys_unsupported/battery_sys_unsupported.vim' as sys
+  UnsupportedSystem = true
 endif
 
 
@@ -165,10 +157,11 @@ endif
 # 遅延初期化
 
 def Init(dummy: number)
-  if sys.Init() == 0
-    sys.Update(batteryInfo)  # 初回更新
-    timer_start(15000, Update, {'repeat': -1})
-  endif
+  if UnsupportedSystem
+  sys.Init()
+  SystemUpdateFunc
+  SystemUpdateFunc(dummy)
+  timer_start(15000, Update, {'repeat': -1})
 enddef
 
 timer_start(3000, Init)
