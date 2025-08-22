@@ -9,3 +9,12 @@ export def Init(): number
   # Update()を呼ばれなくする。
   return -1
 enddef
+
+
+# 常に初期化失敗扱いなのだから、Update()は呼ばれるはずはない。
+#
+# export def Update(battery_info: dict<any>)
+#   battery_info.RemainingPercent    = -1
+#   battery_info.RemainingTimeSecond = -1
+#   battery_info.ACStatus            = ACStatus.Unknown
+# enddef

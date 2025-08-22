@@ -3,10 +3,9 @@ vim9script
 scriptencoding utf-8
 
 
-
 import autoload 'battery.vim' as bat
 
 
-com! BatteryInfo    echo <SID>bat.BatteryInfo()
-com! BatteryInfoStr echo <SID>bat.BatteryInfoStr()
-com! BatteryPercent echo <SID>bat.BatteryPercent()
+com! -nargs=0 -bar BatteryInfo    echo <SID>bat.BatteryInfo()
+com! -nargs=0 -bar BatteryInfoStr echo <SID>bat.BatteryInfoStr()
+com! -nargs=0 -bar BatteryPercent echo <SID>bat.BatteryPercent()

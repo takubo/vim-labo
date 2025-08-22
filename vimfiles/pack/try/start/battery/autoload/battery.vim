@@ -165,7 +165,9 @@ endif
 # 遅延初期化
 
 def Init(dummy: number)
-  if sys.Init() == 0
+  const init_status = sys.Init()
+  echo init_status
+  if init_status == 0
     sys.Update(batteryInfo)  # 初回更新
     timer_start(15000, Update, {'repeat': -1})
   endif
