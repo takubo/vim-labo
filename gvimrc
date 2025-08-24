@@ -1,0 +1,398 @@
+" vimrc
+
+
+set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+
+
+" Transparency {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+if has('gui')
+  let g:my_transparency = 229
+  let g:my_transparency = 227
+  let g:my_transparency = 235
+  let g:my_transparency = float2nr((255 - g:my_transparency) * 100 / 255)
+  augroup MyVimrc_GUI
+    au!
+    "au GUIEnter * simalt ~x
+    "au GUIEnter * ScreenMode 4
+    "au GUIEnter * ScreenMode 5
+    exe 'au GUIEnter * set transparency=' . g:my_transparency
+  augroup end
+  nnoremap <silent> <S-PageUp>   :<C-u>ScreenMode 5<CR>
+  nnoremap <silent> <S-PageDown> :<C-u>ScreenMode 4<CR>
+  nnoremap <silent> <A-PageUp>   :<C-u>ScreenMode 5<CR>:Thinkpad<CR>
+  nnoremap <silent> <A-PageDown> :<C-u>ScreenMode 4<CR>:Thinkpad<CR>
+
+
+  nnoremap <silent><expr> <PageUp>   ':<C-u>se transparency=' .    ( &transparency + 1      ) . '<Bar> Transparency <CR>'
+  nnoremap <silent><expr> <PageDown> ':<C-u>se transparency=' . max([&transparency - 1,   1]) . '<Bar> Transparency <CR>'   | " transparencyは、0以下を設定すると255になってしまう。
+
+  nnoremap <silent>       <C-PageUp>   :exe 'se transparency=' . (&transparency == g:my_transparency ? 255 : g:my_transparency) <Bar> Transparency <CR>
+  nnoremap <silent>       <C-PageDown> :exe 'se transparency=' . (&transparency == g:my_transparency ?  50 : g:my_transparency) <Bar> Transparency <CR>
+
+  com! Transparency echo printf(' Transparency = %4.1f%%', &transparency * 100 / 255.0)
+
+  exe 'set transparency=' . g:my_transparency
+endif
+
+
+" Transparency }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+
+
+
+
+" Line
+" 	1080
+" 	90
+" 
+" 	768
+" 	64
+" 
+" Col
+" 	1920
+" 	320
+" 
+" 	1024
+" 	170.666667
+" 
+" set lines=64 columns0171
+com! XGA set lines=64 columns=171
+
+" Thinkpad
+com! Thinkpad set lines=75 columns=267 | winpos 150 110
+
+
+if has('mac')
+  augroup IME_Mac
+    autocmd!
+    autocmd InsertLeave * :call job_start(
+	  \ ['osascript', '-e', 'tell application "System Events" to key code {102}'],
+	  \ {'in_io': 'null', 'out_io': 'null', 'err_io': 'null'})
+    autocmd VimEnter * :call job_start(
+	  \ ['osascript', '-e', 'tell application "System Events" to key code {102}'],
+	  \ {'in_io': 'null', 'out_io': 'null', 'err_io': 'null'})
+    autocmd GuiEnter * set guioptions=
+  augroup END
+
+
+
+  function! Mac_ime_off()
+    call job_start(
+	  \ ['osascript', '-e', 'tell application "System Events" to key code {102}'],
+	  \ {'in_io': 'null', 'out_io': 'null', 'err_io': 'null'})
+  endfunction
+  call EscEsc_Add('call Mac_ime_off()')
+endif
+
+
+
+
+
+" 1228 
+
+
+set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+
+
+" GUI {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
+
+
+"----------------------------------------------------------------------------------------
+" Font Size
+
+if has('win32')
+  let g:FontName      = "MeiryoKe_Console"
+  "let g:FontHeight   = 9.5
+  "let g:FontWidth    = 4.5
+  "let g:FontWidth    = 4.45
+  let g:FontHeight    = 9.0
+  let g:FontWidth     = 4.2
+  let g:FontHeight    = 9.0
+  let g:FontWidth     = 4.5
+  let g:FontHeight    = 8.5
+  let g:FontWidth     = 4.5
+  let g:MinFontHeight = 2.0
+  let g:MinFontWidth  = 1.0
+  let g:FontHVRatio   = 0.5   " 縦横比
+
+  " FullHD NotePC {{{
+  let g:FontHeight = 11.5
+  let g:FontWidth  = 6
+  " FullHD NotePC }}}
+
+  let g:FontName      = "BIZ_UDゴシック"
+  let g:FontHeight    = 10.5
+endif
+
+function! ResizeFont(r)
+  if a:r == 0
+    " デフォルトサイズに戻す
+    let g:CurFontHeight = g:FontHeight
+    let g:CurFontWidth  = g:FontWidth
+  else
+    "let g:CurFontWidth += a:r * (g:CurFontWidth / g:CurFontHeight)
+    let g:CurFontHeight += a:r
+    let g:CurFontWidth  += a:r * g:FontHVRatio
+
+    if g:CurFontHeight < g:MinFontHeight | let g:CurFontHeight = g:MinFontHeight | endif
+    if g:CurFontWidth  < g:MinFontWidth  | let g:CurFontWidth  = g:MinFontWidth  | endif
+    "let g:CurFontHeight = max([g:MinFontHeight, g:CurFontHeight])
+    "let g:CurFontWidth  = max([g:MinFontWidth,  g:CurFontWidth ])
+  endif
+
+  "exe "set guifont=" . g:FontName . ":h" . printf("%.2f", g:CurFontHeight) . ":w" . printf("%.2f", g:CurFontWidth)
+  exe "set guifont=" . g:FontName . ":h" . printf("%.2f", g:CurFontHeight)
+endfunction
+
+" mapping
+"nnoremap <Home>   :<C-u>call ResizeFont(+0.5)<CR>:EchoGuiFont<CR>
+"nnoremap <End>    :<C-u>call ResizeFont(-0.5)<CR>:EchoGuiFont<CR>
+"nnoremap <C-Home> :<C-u>call ResizeFont(0)<CR>:EchoGuiFont<CR>
+"nnoremap <C-End>  :<C-u>call ResizeFont(0)<CR>:EchoGuiFont<CR>
+"nnoremap <S-End>  :<C-u>call ResizeFont(-99999)<CR>:EchoGuiFont<CR>
+
+" mapping HHKB
+nnoremap <A-q> :<C-u>call ResizeFont(+0.5)<CR>:EchoGuiFont<CR>
+nnoremap <A-w> :<C-u>call ResizeFont(-0.5)<CR>:EchoGuiFont<CR>
+nnoremap <A-e> :<C-u>call ResizeFont(0)<CR>:EchoGuiFont<CR>
+nnoremap <A-r> :<C-u>call ResizeFont(-99999)<CR>:EchoGuiFont<CR>
+
+nnoremap <A-a> :<C-u>call ResizeFont(+0.5)<CR>:EchoGuiFont<CR>
+nnoremap <A-x> :<C-u>call ResizeFont(-0.5)<CR>:EchoGuiFont<CR>
+nnoremap <A-0> :<C-u>call ResizeFont(0)<CR>:EchoGuiFont<CR>
+nnoremap <A--> :<C-u>call ResizeFont(-99999)<CR>:EchoGuiFont<CR>
+
+com! EchoGuiFont echo '' &guifont
+
+" initialize
+if !exists('g:font_init_done')
+  let g:CurFontHeight = g:FontHeight
+  let g:CurFontWidth  = g:FontWidth
+
+  call ResizeFont(0)
+endif
+let g:font_init_done = v:true
+
+
+"----------------------------------------------------------------------------------------
+" Screen Size & Position
+
+if g:UseHHKB
+  nnoremap <silent> <A-h>   :exe 'winpos' getwinposx() - 7 ' ' getwinposy() - 0<CR>
+  nnoremap <silent> <A-j>   :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 7<CR>
+  nnoremap <silent> <A-k>   :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 7<CR>
+  nnoremap <silent> <A-l>   :exe 'winpos' getwinposx() + 7 ' ' getwinposy() + 0<CR>
+else
+  nnoremap <silent> <Left>    :exe 'winpos' getwinposx() - 7 ' ' getwinposy() - 0<CR>
+  nnoremap <silent> <Down>    :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 7<CR>
+  nnoremap <silent> <Up>      :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 7<CR>
+  nnoremap <silent> <Right>   :exe 'winpos' getwinposx() + 7 ' ' getwinposy() + 0<CR>
+endif
+
+nnoremap <silent> <S-Left>  :exe 'winpos' getwinposx() - 1 ' ' getwinposy() - 0<CR>
+nnoremap <silent> <S-Down>  :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 1<CR>
+nnoremap <silent> <S-Up>    :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 1<CR>
+nnoremap <silent> <S-Right> :exe 'winpos' getwinposx() + 1 ' ' getwinposy() + 0<CR>
+
+nnoremap <silent> <C-Left>  :let &columns -= 1<CR>
+nnoremap <silent> <C-Down>  :let &lines   += 1<CR>
+nnoremap <silent> <C-Up>    :let &lines   -= 1<CR>
+nnoremap <silent> <C-Right> :let &columns += 1<CR>
+
+nnoremap <silent> <A-Left>  :let &columns -= 1<CR>
+nnoremap <silent> <A-Down>  :let &lines   += 1<CR>
+nnoremap <silent> <A-Up>    :let &lines   -= 1<CR>
+nnoremap <silent> <A-Right> :let &columns += 1<CR>
+
+com! XGeometry echo 'Line:' &lines ' Column:' &columns ' X:' getwinposx() ' Y:' getwinposy()
+
+
+"----------------------------------------------------------------------------------------
+" Transparency
+
+let g:my_transparency = 229
+let g:my_transparency = 227
+let g:my_transparency = 235
+
+" nnoremap <silent><expr> <PageUp>   ':<C-u>se transparency=' .    ( &transparency + 1      ) . '<Bar> XTransparency <CR>'
+" nnoremap <silent><expr> <PageDown> ':<C-u>se transparency=' . max([&transparency - 1,   1]) . '<Bar> XTransparency <CR>'   | " transparencyは、0以下を設定すると255になってしまう。
+
+" nnoremap <silent>       <C-PageUp>   :exe 'se transparency=' . (&transparency == g:my_transparency ? 255 : g:my_transparency) <Bar> XTransparency <CR>
+" nnoremap <silent>       <C-PageDown> :exe 'se transparency=' . (&transparency == g:my_transparency ?  50 : g:my_transparency) <Bar> XTransparency <CR>
+
+if 1  " HHKB
+  nnoremap <silent><expr> <F11> ':<C-u>se transparency=' . max([&transparency - 1,   1]) . '<Bar> XTransparency <CR>'   | " transparencyは、0以下を設定すると255になってしまう。
+ "nnoremap <silent><expr> <A--> ':<C-u>se transparency=' . max([&transparency - 1,   1]) . '<Bar> XTransparency <CR>'   | " transparencyは、0以下を設定すると255になってしまう。
+  nnoremap <silent><expr> <F12> ':<C-u>se transparency=' .    ( &transparency + 1      ) . '<Bar> XTransparency <CR>'
+ "nnoremap <silent><expr> <A-=> ':<C-u>se transparency=' .    ( &transparency + 1      ) . '<Bar> XTransparency <CR>'
+
+  nnoremap <silent>       <S-F11> :<C-u>exe 'se transparency=' . (&transparency == g:my_transparency ?  50 : g:my_transparency) <Bar> XTransparency <CR>
+  nnoremap <silent>       <S-F12> :<C-u>exe 'se transparency=' . (&transparency == g:my_transparency ? 255 : g:my_transparency) <Bar> XTransparency <CR>
+endif
+
+"com! TransparencyEcho echo printf(' Transparency = %4.1f%%', &transparency * 100 / 255.0)
+com! XTransparency    echo printf(' Transparency = %4.1f%%', &transparency * 100 / 255.0)
+
+" exe 'set transparency=' . g:my_transparency
+
+
+"----------------------------------------------------------------------------------------
+" Screen (ScreenMode & Special)
+
+" line
+"	HD:  1080:90
+"	XGA:  768:64
+" col
+"	HD:  1920:320
+"	XGA: 1024:170.666667
+com! XGA set lines=64 columns=171
+" Thinkpad X1 Carbon Gen.1st (HD Size)
+com! Thinkpad set lines=75 columns=267 | winpos 150 110
+" FullHD Visible Window's Tastesbar
+com! Think    set lines=75 columns=270 | winpos 0 5
+com! Think    set lines=75 columns=275 | winpos 0 3
+"com! ThinkWUXGA    set lines=91 columns=304 | winpos 0 0 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1
+"com! WuxgaVert     set lines=136 columns=156 | winpos 0 0 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1
+"com! ThinkWUXGA    set lines=91 columns=304 | winpos 0 0 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1
+
+" 画面に収まらない場合、自動で縮むので、大きめの行列を指定すればよい。(WUGA縦横、FHDに対応。)
+com! ThinkWUXGA    set lines=136 columns=304 | winpos 0 0 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1 | exe 'winpos' getwinposx() - 1
+
+"com! MaxScreen     winpos 85 0 | set lines=136 columns=305
+"com! MaxScreen     set lines=136 columns=305 | winpos 85 0
+"com! MaxScreen     set lines=136 columns=305 | winpos 0 0
+com! MaxScreen     set lines=136 columns=305 | winpos 85 0  " タスクバー左
+com! MaxScreen     set lines=999 columns=999 | winpos 0  0  " タスクバー右
+
+if has('kaoriya')
+  " nnoremap <silent> <S-PageUp>   :<C-u>ScreenMode 5<CR>
+  " nnoremap <silent> <S-PageDown> :<C-u>ScreenMode 4<CR>
+  " nnoremap <silent> <A-PageUp>   :<C-u>ScreenMode 5<CR>:Thinkpad<CR>
+  " nnoremap <silent> <A-PageDown> :<C-u>ScreenMode 4<CR>:Thinkpad<CR>
+  " if 1  " HHKB
+  "  "nnoremap <silent> <F5> :<C-u>ScreenMode 5<CR>
+  "   nnoremap <silent> <F6> :<C-u>ScreenMode 4<CR>
+  "   nnoremap <silent> <F7> :<C-u>ScreenMode 5<CR>:Thinkpad<CR>
+  "   nnoremap <silent> <F8> :<C-u>ScreenMode 4<CR>:Thinkpad<CR>
+  " endif
+
+  "com! FullScreen ScreenMode 5
+  nnoremap <silent> <F5> :<C-u>FullScreen<CR>
+
+  "nnoremap <silent> <F6> :<C-u>ScreenMode 5<CR>:Think<CR>
+  "nnoremap <silent> <F4> :<C-u>Think<CR>
+
+  "nnoremap <silent> <F7> :<C-u>XGA<CR>
+  "nnoremap <silent> <F6> :<C-u>ThinkWUXGA<CR>
+  nnoremap <silent> <F6> :<C-u>MaxScreen<CR>
+
+  "nnoremap <silent> <F7> :<C-u>WuxgaVert<CR>
+
+  com! OriginalScreen ScreenMode 0
+  nnoremap <silent> <F7> :<C-u>OriginalScreen<CR>
+
+endif
+
+
+"----------------------------------------------------------------------------------------
+" Guioptions & Disable Menu
+
+if 0
+  let did_install_default_menus = 1
+  " TODO $VIMRUNTIME/menu.vimを削除する。
+else
+  " menu.vim の読み込みを抑止
+  " ReVimrc時のちらつき防止のため、+=で設定。
+  " https://hail2u.net/blog/software/dont-load-menu-in-gvim.html
+
+  "set guioptions+=M
+
+  if has('kaoriya')
+    set ambiwidth=auto
+    set guioptions=!CM
+  else
+    set guioptions=!M
+  endif
+endif
+
+
+"----------------------------------------------------------------------------------------
+" Autocmd
+
+augroup MyVimrc_GUI
+  au!
+
+  " Screen Size & Position
+  if has('kaoriya')
+   "au GUIEnter * ScreenMode 5
+    au GUIEnter * FullScreen
+  else
+    au GUIEnter * simalt ~x
+  endif
+
+  " Transparency
+  exe 'au GUIEnter * set transparency=' . g:my_transparency
+augroup end
+
+
+" GUI }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+
+
+set renderoptions=type:directx,scrlines:1
+
+
+
+" .gvimrc {{{
+" set guioptions=
+
+"? scriptencoding utf-8
+"? " vim:set ts=8 sts=2 sw=2 tw=0: (この行に関しては:help modelineを参照)
+"? 
+"? 
+"? " set visualbell t_vb=
+"? 
+"? " set guioptions=
+"? 
+"? " colorscheme Rimpa
+"? 
+"? " set transparency=235
+"? 
+"? " set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+"? " set guicursor=n-v-c:ver10-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+"? 
+"? " call ResizeFont(0)
+"? 
+"? 
+"? 
+" .gvimrc }}}
+
+
+
+
+
+
+
+" gvimrc
+
+
+set guioptions=
+
+colorscheme Rimpa
+
+set transparency=235
+
+
+
+
+set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+set guicursor=n-v-c:ver10-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+
+call ResizeFont(0)
+
+set visualbell t_vb=
+
+
+
+
