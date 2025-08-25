@@ -3,16 +3,18 @@ vim9script
 scriptencoding utf-8
 
 
+
+#----------------------------------------------------------------------------------------
+# 即時実行
+
+
 import autoload "popup_info.vim" as pui
 
 
 def VimSaveAndExe(force: bool = false)
   if bufname('') == ''
     pwd
-    return
-  endif
-
-  if !&readonly
+  elseif !&readonly
     update
   endif
 
@@ -21,29 +23,35 @@ def VimSaveAndExe(force: bool = false)
 
     if dir -> match('[/\\]colors$') >= 0
       exe 'colorscheme' expand('%:r')
-      # PopUpInfo ColorScheme!!
       pui.PopUpInfo('ColorScheme!!', 2500)
-    elseif dir -> match('[/\\]ftplugin$') == -1 || expand('%') == 'vim.vim'
-    # ftpluginなら、実行しない。
-      exe 'source' expand('%')
-      # PopUpInfo Source!!
+    elseif dir -> match('[/\\]ftplugin$') == -1
+      # ftpluginなら、実行しない。
+      source
       pui.PopUpInfo('Source!!', 2500)
+   #elseif dir -> match('[/\\]ftplugin$') >= 0 && expand('%') == 'vim.vim'
+   #  # vimの場合、sourceすると、「実行中の関数を再定義しようとしている。」というエラーになる。
+   #  setfiletype vim
+   #  pui.PopUpInfo('SetFietype Vim!!', 2500)
     else
-      # PopUpInfo None!!
       pui.PopUpInfo('None!!', 2500)
     endif
-
-    #PopUpInfo Execute!!
   endif
 enddef
 
-#nnoremap <buffer> <Leader>e <ScriptCmd>VimSaveAndExe()<CR><Cmd>echohl ModeMsg<Bar>echo 'source!'<Bar>echohl None<CR>
 
 nnoremap <buffer> <Leader>e <ScriptCmd>VimSaveAndExe(false)<CR>
 nnoremap <buffer> <Leader>E <ScriptCmd>VimSaveAndExe( true)<CR>
 
 
-#+++++ vtags ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+xnoremap <buffer> <Leader>e :vim9cmd source<CR>
+xnoremap <buffer> <Leader>E :source<CR>
+
+
+
+#----------------------------------------------------------------------------------------
+# タグファイル生成
+
+#+++++ vtags ++++++++++++++++++++++++++++++++++++++++++
 ##!/bin/sh
 #
 #cd ~/vimfiles/

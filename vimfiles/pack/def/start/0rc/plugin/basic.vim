@@ -23,6 +23,7 @@ nnoremap Y y$
 #nnoremap ; :
 #nnoremap ; <Cmd>hi CursorLineNr guibg=#d0c589 guifg=#222222 gui=NONE<CR><Cmd>redraw<CR>:
 nnoremap ; <Cmd>hi CursorLineNr guifg=#b8d3ef guibg=#4444ee gui=NONE<CR><Cmd>redraw<CR>:
+xnoremap ; <Cmd>hi CursorLineNr guifg=#b8d3ef guibg=#4444ee gui=NONE<CR><Cmd>redraw<CR>:
 
 # ; を連続で押してしまったとき用。
 cnoremap <expr> ; ((getcmdtype()  == ':') && (getcmdline() =~# '^:*$')) ? ':' : ';'
@@ -55,6 +56,8 @@ vnoremap ` m
 # コマンドラインモードへの出入りを行うことで、iminsert(or imcmdline?)の効果で、IMEがOFFされる。
 nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR><Cmd>normal! :<lt>Esc><CR>
 nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR>:<Esc>
+# :<Esc>だと、なぜか`:'が消えず残留する。
+nnoremap <Esc><Esc> <Cmd>doautocmd User EscEsc<CR><Cmd>noh<CR>:<BS>
 
 if 0
 
@@ -67,7 +70,10 @@ com! -nargs=0 -bar EscEsc {
 # EscEsc内のdoautocmdがエラーにならないよう、1つは自動コマンドを設定しておく。
 augroup EscEscDefault
   au!
-  # コマンドラインモードへの出入りを行うことで、iminsert(or imcmdline?)の効果で、IMEがOFFされる。
+  # コマンドラインに残留している内容を消す。
+  # また、コマンドラインモードへの出入りを行うことで、IMEがOFFされる。
+  #   ・Windoseでは、iminsert(or imcmdline?)の効果で、IMEがOFFされる？
+  #   ・macOSでは、CmdlineLeaveで、IMEをOFFするように設定している。
   au User EscEsc normal! :<Esc>
 augroup end
 
@@ -84,12 +90,8 @@ nnoremap <expr> <silent> <Leader>w bufname() == '' ? '<Cmd>pwd<CR>' : '<Cmd>upda
 
 
 #---------------------------------------------------------------------------------------------
-# Line Number
+# Switch Line Number
 #---------------------------------------------------------------------------------------------
-
-set number relativenumber
-
-nnoremap <Leader>0 <Cmd>set relativenumber!<CR>
 
 def SwitchLineNumber()
   if !&l:number && !&l:relativenumber
@@ -103,7 +105,7 @@ def SwitchLineNumber()
   endif
 enddef
 
-com! -bar SwitchLineNumber SwitchLineNumber()  # TODO
+nnoremap <Leader>0 <ScriptCmd>SwitchLineNumber()<CR>
 
 
 #---------------------------------------------------------------------------------------------

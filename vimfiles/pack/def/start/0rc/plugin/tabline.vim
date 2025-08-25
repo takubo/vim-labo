@@ -266,13 +266,18 @@ def MakeTabpageLabel(tabn: number, cur_tab: bool): string
 enddef
 
 
-# TODO
+#--------------------------------------------
+# Battery
+
+import autoload 'battery.vim' as bat
+
 def BatteryStr(): string
-  #return '🔋  85%% [10:04:43]'
-  return '🔌  85%% [10:04:43]'
-  #return '? ---% [--:--:--]'
+  return bat.BatteryInfoStr()
 enddef
 
+
+#--------------------------------------------
+# Diff Option
 
 def DiffOptStr(): string
   const diffopt = split(&diffopt, ',')

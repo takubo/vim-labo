@@ -106,12 +106,12 @@ augroup HorizScroll
 augroup end
 
 submode#enter_with('HorizScroll', 'nv', '', 'zh', 'zh'   )
-submode#enter_with('HorizScroll', 'nv', '', 'zj', '<c-e>')
-submode#enter_with('HorizScroll', 'nv', '', 'zk', '<c-y>')
+submode#enter_with('HorizScroll', 'nv', '', 'zj', '<C-E>')
+submode#enter_with('HorizScroll', 'nv', '', 'zk', '<C-Y>')
 submode#enter_with('HorizScroll', 'nv', '', 'zl', 'zl'   )
 submode#map(       'HorizScroll', 'nv', '',  'h', 'zh'   )
-submode#map(       'HorizScroll', 'nv', '',  'j', '<c-e>')
-submode#map(       'HorizScroll', 'nv', '',  'k', '<c-y>')
+submode#map(       'HorizScroll', 'nv', '',  'j', '<C-E>')
+submode#map(       'HorizScroll', 'nv', '',  'k', '<C-Y>')
 submode#map(       'HorizScroll', 'nv', '',  'l', 'zl'   )
 
 submode#map(       'HorizScroll', 'nv', '',  'H', 'h')
@@ -129,6 +129,9 @@ submode#map(       'HorizScroll', 'nv', '',  'b', 'b')
 #----------------------------------------------------------------------------------------
 # Typewriter Scroll
 #----------------------------------------------------------------------------------------
+
+#--------------------------------------------
+# Permanently
 
 import autoload "popup_info.vim" as pui
 
@@ -159,6 +162,22 @@ enddef
 
 nnoremap z<Space> <ScriptCmd>ToggleTypewriterScroll(true)<CR>
 nnoremap g<Space> <ScriptCmd>ToggleTypewriterScroll(false)<CR>
+
+#--------------------------------------------
+# Temporarily (Submode)
+
+#submode#enter_with('TypWrtrScroll', 'n', '', '<Leader>j',      'M')
+#submode#enter_with('TypWrtrScroll', 'n', '', '<Leader>k',      'M')
+submode#enter_with('TypWrtrScroll', 'n', '', '<Leader>j', 'M<C-E>M')
+submode#enter_with('TypWrtrScroll', 'n', '', '<Leader>k', 'M<C-Y>M')
+submode#map(       'TypWrtrScroll', 'n', '',         'j',  '<C-E>M')
+submode#map(       'TypWrtrScroll', 'n', '',         'k',  '<C-Y>M')
+submode#map(       'TypWrtrScroll', 'n', '', 'z<CR>',       'z<CR>')
+submode#map(       'TypWrtrScroll', 'n', '', 'zt',          'zt'   )
+submode#map(       'TypWrtrScroll', 'n', '', 'z.',          'z.'   )
+submode#map(       'TypWrtrScroll', 'n', '', 'zz',          'zz'   )
+submode#map(       'TypWrtrScroll', 'n', '', 'z-',          'z-'   )
+submode#map(       'TypWrtrScroll', 'n', '', 'zb',          'zb'   )
 
 
 #----------------------------------------------------------------------------------------

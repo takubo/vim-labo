@@ -52,7 +52,7 @@ augroup end
 inoremap <expr> <CR>  pumvisible() ? '<C-Y>' : '<C-]>' .. '<C-G>u' .. '<CR>'
 
 # gg
-inoremap <expr> <Plug>(JK-Complete-GG) (pumvisible() ? '<C-Y>' : '') .. '<Esc>' .. (bufname('') == '' ? '' : ":update\<CR>")
+inoremap <expr> <Plug>(JK-Complete-GG) (pumvisible() ? '<C-Y>' : '') .. '<Esc>' .. (bufname('') == '' ? '' : ':update<CR>')
 
 
 # -----------------------------------------
@@ -80,9 +80,9 @@ inoremap <expr> <A-j>  pumvisible() ? "\<C-N>" : StartComplete('')
 inoremap <expr> <A-k>  pumvisible() ? "\<C-P>" : StartComplete('')
 inoremap <expr> <Down> pumvisible() ? "\<C-N>" : StartComplete('')
 inoremap <expr> <Up>   pumvisible() ? "\<C-P>" : StartComplete('')
-inoremap <expr> ｊｊ pumvisible() ? '<C-N><C-N>' : '<Esc><Cmd>update<CR>'
-inoremap <expr>   ｊ pumvisible() ? '<C-N>'      : '<Esc><Cmd>update<CR>'
-inoremap <expr> っｊ pumvisible() ? '<C-N><C-N>' : '<Esc><Cmd>update<CR>'
+inoremap <expr> ｊｊ pumvisible() ? '<C-N><C-N>' : ('<Esc>' .. (bufname() != '' ? '<Cmd>update<CR>' : ''))
+inoremap <expr>   ｊ pumvisible() ? '<C-N>'      : ('<Esc>' .. (bufname() != '' ? '<Cmd>update<CR>' : ''))
+inoremap <expr> っｊ pumvisible() ? '<C-N><C-N>' : ('<Esc>' .. (bufname() != '' ? '<Cmd>update<CR>' : ''))
 
 # 日本語入力時の補完確定
 imap <C-G> <Plug>(JK-Complete-GG)

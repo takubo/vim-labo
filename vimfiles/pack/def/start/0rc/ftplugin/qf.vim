@@ -1,4 +1,4 @@
-vim9script
+vim9script noclear
 # vim: set ts=8 sts=2 sw=2 tw=0 et:
 scriptencoding utf-8
 
@@ -115,7 +115,7 @@ setlocal stl=%!QuickfixStl()
 #--------------------------------------------
 # View
 
-def g:Qf_Unified_CR()
+def Qf_Unified_CR()
   if v:prevcount != 0
     # jumplistに残すために、Gを使用。
     histadd('cmd', v:prevcount .. '')
@@ -127,7 +127,7 @@ def g:Qf_Unified_CR()
 enddef
 
 # カーソル行の要素へジャンプ
-nnoremap <buffer>      <CR> <Esc>:call g:Qf_Unified_CR()<CR>
+nnoremap <buffer>      <CR> <Esc>:call <SID>Qf_Unified_CR()<CR>
 
 # ウィンドウを分割してジャンプ
 # nnoremap <buffer> <C-W><CR>
