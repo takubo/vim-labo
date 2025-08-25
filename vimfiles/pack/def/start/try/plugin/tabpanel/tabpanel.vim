@@ -18,7 +18,7 @@ var TabpanelContentsSwitch = {
   'Functions':      false,
   'Header':         true,
   'HeaderDateTime': true,
-  'Registers':      true,
+  'Registers':      false,
 }
 
 
@@ -94,6 +94,7 @@ def Footer(): string
   if !contents_switch.Footer
   elseif contents_switch.AkaBattery
     str ..= g:BatteryBar_red() -> join("\n")
+   #str ..= g:BatteryBar_red_block() -> join("\n")
   elseif contents_switch.FooterBattery
     str ..= g:BatteryBar_raw() -> join("\n")
   elseif contents_switch.FooterDiff
@@ -211,9 +212,9 @@ def WindowLabel(winnr: number, winid: number, tabnr: number): string
 
   if hl_line
     indent ..= (false && curwin ? '%#TabPanelMySel#' : '' )
-               .. (false ? ('  ') : ('   '))
+               .. (true ? ('  ') : ('   '))
     indent ..= (curwin ? '%#TabPanelMySel#' : '' )
-               .. (false ? (' ') : (''))
+               .. (true ? (' ') : (''))
   else
     indent ..= (1 ? ('  ') : ('   '))
 
@@ -260,13 +261,14 @@ def WindowLabel(winnr: number, winid: number, tabnr: number): string
 enddef
 
 def BufSummary(bufnr: number): string
-  # TODO 先頭3行決め打ち
+  # TODO 先頭30行決め打ち
   return getbufline(bufnr, 1, 30)
           -> join(' ')
           -> substitute('^\s\+', '', '')
           -> substitute('\s\+', ' ', 'g')
           -> substitute('%', '%%', 'g')
           -> strpart(0, 100) # tabpanelの1行が長すぎると左端が切れるバグ対応のため、strpart()で雑に切り詰めている。
+         #-> strpart(0, TabPanelColumn() - 13) # tabpanelの1行が長すぎると左端が切れるバグ対応のため、strpart()で雑に切り詰めている。
 enddef
 
 
@@ -380,7 +382,8 @@ def SetTimer(on: bool)
     if timer_info(g:RedrawTabpanelTimerId) == []
       g:RedrawTabpanelTimerId = timer_start(RedrawTabpanelInterval, (dummy) => {
         # TODO if mode() !~# '^[cr]'
-        if mode() != 'c'
+        const mode = mode()
+        if mode != 'c' && mode != 'r'
           execute('redrawtabpanel')
         endif
       }, {'repeat': -1})

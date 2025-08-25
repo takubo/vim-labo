@@ -73,10 +73,20 @@ def SetTimer(on: bool)
 enddef
 
 def BatteryRemaining(): number
-  return g:BatDemoRem -> float2nr()
+  if g:TPnlBatSim
+    return g:BatDemoRem -> float2nr()
+  else
+    return bat.BatteryPercent()
+  endif
 enddef
 
 SetTimer(true)
+
+import autoload 'battery.vim' as bat
+
+g:TPnlBatSim = true
+
+com! -nargs=0 -bar BatSim g:TPnlBatSim = !g:TPnlBatSim
 
 
 #----------------------------------------------------------------------------------------
@@ -247,6 +257,35 @@ export def g:BatteryBar_red(): list<string>
 
   const remaining_str = bat_hl .. repeat('!', remaining)
   const consumed_str  = '%#BatteryLvlNonRed#' .. repeat('!', consumed)
+
+  # echo remaining_str consumed_str
+
+  const bat_str = remaining_str .. consumed_str .. '%#BatteryLvlBrd#'
+
+  if false
+    return [ $'%=%#TabLine#[ %3({remain_percent}%)%% ]%=',
+             '',
+             '%#TblDate#%=' .. bat_str .. '%#TblDate#%=',
+           ]
+  else
+    return [
+             '%#TblDate#%=' .. bat_str .. ' ' .. $'%#TabLine#%3({remain_percent}%)%% %#TblDate#%='
+           ]
+  endif
+enddef
+
+export def g:BatteryBar_red_block(): list<string>
+  const remain_percent = BatteryRemaining()
+  const remaining = remain_percent / GraphCellPerCent
+  const consumed  = GraphCellNum - remaining
+
+  const bat_hl =
+    remain_percent <= 12 ? '%#BatteryLvlFtlRed#' :
+    remain_percent <= 30 ? '%#BatteryLvlLowRed#' :
+    remain_percent <= 45 ? '%#BatteryLvlMidRed#' : '%#BatteryLvlNrmRed#'
+
+  const remaining_str = '%#TabLineDate#' .. repeat('█', remaining / 2)
+  const consumed_str  = '%#StlGoldLeaf#' .. repeat('▒', consumed / 2) .. '▁▄'
 
   # echo remaining_str consumed_str
 

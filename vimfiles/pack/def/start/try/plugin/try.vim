@@ -51,7 +51,8 @@ set formatoptions-=ro
 
 com!       EraceWhiteLine     :g/^\s\+$/d
 com!       EraceTrailingWhite :%s/\s\+$//
-com!       EraceEmptyLine     :g/^$/d
+#com!       EraceEmptyLine     :g/^$/d
+com!       EraceNullLine      :g/^$/d
 com! -bang EraceSearchLine    exe ':g<bang>/' .. @/ .. '/d'
 #com!       EraceNotSearchLine exe ':g!/' .. @/ .. '/d'
 #com!       EraceNullLine      EraceEmptyLine
@@ -560,11 +561,43 @@ nnoremap U <Cmd>tabnext #<CR>
 
 #---------------------------------------------------------------------------------------------
 
+nnoremap yr yiw
+nnoremap dr daw
+nnoremap cr ciw
+
 
 
 #---------------------------------------------------------------------------------------------
 
+def BufSummary(bufnr: number): string
+  # TODO 先頭50行決め打ち
+  return getbufline(bufnr, 1, 50)
+          -> join(' ')
+          -> substitute('^\s\+', '', '')
+          -> substitute('\s\+', ' ', 'g')
+          -> substitute('%', '%%', 'g')
+          -> strpart(0, 200) # tabpanelの1行が長すぎると左端が切れるバグ対応のため、strpart()で雑に切り詰めている。
+enddef
 
+def BufSummaryExe()
+  botright new
+  const end_bufnr = bufnr('$')
+
+  var l = 1
+  for b in range(1, end_bufnr + 1)
+    if buflisted(b)
+      const s = BufSummary(b)
+      setline(l, b .. "\t" .. s)
+      l += 1
+    endif
+  endfor
+  setl nowrap
+  normal! gg0
+enddef
+
+com! -bar BufSummary {
+    BufSummaryExe()
+  }
 
 #---------------------------------------------------------------------------------------------
 

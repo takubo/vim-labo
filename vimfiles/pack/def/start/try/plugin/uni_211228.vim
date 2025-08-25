@@ -6,21 +6,6 @@ scriptencoding utf-8
 finish
 
 
-" GUI {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-
-" nnoremap <silent> <F9>  :exe 'winpos' getwinposx() - 1 ' ' getwinposy() - 0<CR>
-" nnoremap <silent> <F10> :exe 'winpos' getwinposx() + 0 ' ' getwinposy() + 1<CR>
-" nnoremap <silent> <F11> :exe 'winpos' getwinposx() - 0 ' ' getwinposy() - 1<CR>
-" nnoremap <silent> <F12> :exe 'winpos' getwinposx() + 1 ' ' getwinposy() + 0<CR>
-" 
-" nnoremap <silent> <S-F9>  :let &columns -= 1<CR>
-" nnoremap <silent> <S-F10> :let &lines   += 1<CR>
-" nnoremap <silent> <S-F11> :let &lines   -= 1<CR>
-" nnoremap <silent> <S-F12> :let &columns += 1<CR>
-
-" GUI }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-
 " {{{
 
 hi HlWord	guifg=#4050cd	guibg=white
