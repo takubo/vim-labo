@@ -3,27 +3,21 @@ vim9script
 scriptencoding utf-8
 
 
-if has('osx')
+if !has('osx')
   finish
 endif
 
 
 augroup OSX_IME
     au!
-    au InsertLeave * job_start(
-                                ['osascript', '-e', 'tell application "System Events" to key code {102}'],
-                                {'in_io': 'null', 'out_io': 'null', 'err_io': 'null'}
-                              )
-    au CmdwinLeave * job_start(
-                                ['osascript', '-e', 'tell application "System Events" to key code {102}'],
-                                {'in_io': 'null', 'out_io': 'null', 'err_io': 'null'}
-                              )
+    au InsertLeave * OSX_IME_Off()
+    au CmdwinLeave * OSX_IME_Off()
 augroup END
 
 
 def OSX_IME_Off()
   job_start(
-        ['osascript', '-e', 'tell application "System Events" to key code {102}'],
-        {'in_io': 'null', 'out_io': 'null', 'err_io': 'null'}
+      ['osascript', '-e', 'tell application "System Events" to key code {102}'],
+      {'in_io': 'null', 'out_io': 'null', 'err_io': 'null'}
   )
 enddef
