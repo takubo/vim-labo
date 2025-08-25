@@ -133,6 +133,16 @@ endif
 
 
 if has('win32')
+  #var Alpha = 255
+  g:Alpha = 255
+
+  def SetTransparency(add: float)
+    const cur = g:Alpha * 100.0 / 255.0
+    const new = cur + add
+    echo cur add new
+    exe 'SetTransparency' new
+  enddef
+
   com! -nargs=? -bar -bang SetTransparency {
                                               var alpha: number
                                               if '<bang>' == '!'
@@ -144,8 +154,15 @@ if has('win32')
                                                 alpha = min([255, alpha])
                                               endif
                                               call libcallnr(g:vimtweak_dll_path, "SetAlpha", alpha)
+                                              g:Alpha = alpha
                                             }
 endif
+
+
+#nnoremap <A-Left>  <ScriptCmd>SetTransparency(-0.5)<CR>
+#nnoremap <A-Right> <ScriptCmd>SetTransparency(+0.5)<CR>
+nnoremap <A-Left>  <ScriptCmd>SetTransparency(-1.5)<CR>
+nnoremap <A-Right> <ScriptCmd>SetTransparency(+1.5)<CR>
 
 
 
