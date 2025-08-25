@@ -7,11 +7,6 @@ if !has('win32')
   finish
 endif
 
-if exists('g:loaded_battery_sys')
-  finish
-endif
-g:loaded_battery_sys = true
-
 
 export def Init(): number
   try

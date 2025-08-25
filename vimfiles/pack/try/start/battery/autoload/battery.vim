@@ -67,7 +67,7 @@ enddef
 
 import autoload 'util_func.vim' as uf
 
-def Update(dummy: number)
+def Update(_: number = 0)
   if false
     # TODO UpdateSim()
   else
@@ -89,13 +89,14 @@ def Update(dummy: number)
  #'RemainingPercentStr':       printf('%3d%%', RemainingPercent),
 
   # Example:
-  #                  '❔ ---% [--:--:--]'
+  #                  '❓ ---% [--:--:--]'
   #                  '🔋  35% [ 2:04:43]'
   #                  '🔌 100% [10:04:43]'
+  #                  '⚡  87% [ 8:04:43]'
   batteryInfoStr = batteryInfo.ACStatusEmoji
                    .. (batteryInfo.RemainingTimeSecond >= 0 ?
-                       printf(' %3d%%', batteryInfo.RemainingPercent) :
-                       ' ---%'
+                        printf(' %3d%%%%%', batteryInfo.RemainingPercent) :  # tablineなどで使えるように、%を重ねている。
+                        ' ---%%'
                       )
                    .. printf(' [%8s]', batteryInfo.RemainingTimeFormatedStr)
 
@@ -152,7 +153,7 @@ var batteryPercent = 0
 
 if exists('g:BatteryNet') && g:BatteryNet
   import autoload 'sys_net/battery_sys_net.vim' as sys
-elseif has('osxdarwin')
+elseif has('osx')
   import autoload 'sys_osx/battery_sys_osx.vim' as sys
 elseif has('win32')
   import autoload 'sys_dos/battery_sys_dos.vim' as sys
@@ -164,12 +165,12 @@ endif
 #--------------------------------------------
 # 遅延初期化
 
-def Init(dummy: number)
+def Init(_: number)
   const init_status = sys.Init()
   # oecho init_status
 
   if init_status == 0
-    sys.Update(batteryInfo)  # 初回更新
+    Update()  # 初回更新
     timer_start(15000, Update, {'repeat': -1})
   endif
 enddef
