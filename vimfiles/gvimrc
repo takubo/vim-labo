@@ -1,6 +1,17 @@
-" vim: set ts=8 sts=2 sw=2 tw=0 et:
+vim9script
+# vim: set ts=8 sts=2 sw=2 tw=0 et:
 scriptencoding utf-8
 
+
+
+if has('win32')
+  packadd vimtweak
+endif
+
+
+
+#---------------------------------------------------------------------------------------------
+# Font
 
 if has('win32')
   set guifont=BIZ_UDゴシック:h11:cSHIFTJIS:qDRAFT
@@ -8,23 +19,183 @@ endif
 
 
 
-finish
+#---------------------------------------------------------------------------------------------
+# Resize Font
+
+
+def ResizeFont(size: float)
+  const gf = &guifont
+  const hx = matchstr(gf, '\<h\zs\d\+\%(.\d*\)\>')
+  const hn = str2float(hx) + size
+  &guifont = substitute(gf, '\<h\zs\d\+\%(.\d*\)\>', hn, '')
+enddef
+
+def GetFontSize(): float
+  const gf = &guifont
+  const hx = matchstr(gf, '\<h\zs\d\+\%(.\d*\)\>')
+  return str2float(hx)
+enddef
+
+
+const DefaultFontSize = GetFontSize()
+
+
+com! -bar -nargs=? -bang ResizeFont {
+                                      const a = <bang>true ? str2float(<q-args>)
+                                                           : ((<q-args> == '' ? DefaultFontSize : str2float(<q-args>)) - GetFontSize())
+                                      call <SID>ResizeFont(a)
+                                      redraw
+                                      echo <SID>GetFontSize()
+                                    }
+
+nnoremap <A-Up>   <Cmd>ResizeFont +0.5<CR>
+nnoremap <A-Down> <Cmd>ResizeFont -0.5<CR>
+
+
+#---------------------------------------------------------------------------------------------
+# Window Position
+
+
+nnoremap <silent> <Left>    :exe 'winpos' getwinposx() - 5 getwinposy()    <CR>
+nnoremap <silent> <Down>    :exe 'winpos' getwinposx()     getwinposy() + 5<CR>
+nnoremap <silent> <Up>      :exe 'winpos' getwinposx()     getwinposy() - 5<CR>
+nnoremap <silent> <Right>   :exe 'winpos' getwinposx() + 5 getwinposy()    <CR>
+
+nnoremap <silent> <S-Left>  :exe 'winpos' getwinposx() - 1 getwinposy()    <CR>
+nnoremap <silent> <S-Down>  :exe 'winpos' getwinposx()     getwinposy() + 1<CR>
+nnoremap <silent> <S-Up>    :exe 'winpos' getwinposx()     getwinposy() - 1<CR>
+nnoremap <silent> <S-Right> :exe 'winpos' getwinposx() + 1 getwinposy()    <CR>
 
 
 
-set display+=lastline
+#---------------------------------------------------------------------------------------------
+# Window Size
 
-" set visualbell t_vb=
 
-" set guioptions=!cd
+nnoremap <silent> <C-Left>  <Cmd>let &columns -= 1<CR>
+nnoremap <silent> <C-Down>  <Cmd>let &lines   += 1<CR>
+nnoremap <silent> <C-Up>    <Cmd>let &lines   -= 1<CR>
+nnoremap <silent> <C-Right> <Cmd>let &columns += 1<CR>
 
-" colorscheme Rimpa
 
-set transparency=235
+if has('win32')
+  com! -bang -bar FullScreen {
+          const lines   = &lines
+          const columns = &columns
 
-set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
-set guicursor=n-v-c:ver10-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+          if '<bang>' == '!'
+            # 先にCacptionを消してから全画面表示にすると、タスクバーの上にもウィンドウが広がる。
+            # VimTweakDisableCaption
+            libcallnr(g:vimtweak_dll_path, "EnableCaption", 0)
+          else
+            # VimTweakEnableCaption
+            libcallnr(g:vimtweak_dll_path, "EnableCaption", 1)
+          endif
+          # VimTweakEnableMaximize
+          libcallnr(g:vimtweak_dll_path, "EnableMaximize", 1)
+          # VimTweakDisableCaption
+          libcallnr(g:vimtweak_dll_path, "EnableCaption", 0)
 
-call ResizeFont(0)
+          if lines == &lines && columns == &columns
+            if '<bang>' != '!'
+              # VimTweakEnableCaption
+              libcallnr(g:vimtweak_dll_path, "EnableCaption", 1)
+            endif
+            # VimTweakDisableMaximize
+            libcallnr(g:vimtweak_dll_path, "EnableMaximize", 0)
+          endif
+        }
+endif
 
-set visualbell t_vb=
+
+nnoremap <A-CR> <Cmd>FullScreen!<CR>
+
+
+
+#---------------------------------------------------------------------------------------------
+# Decoration
+
+
+if has('win32')
+  com! -bar TitleEnable  VimTweakEnableCaption
+  com! -bar TitleDisable VimTweakDisableCaption
+endif
+
+
+
+#---------------------------------------------------------------------------------------------
+# Transparency
+
+
+if has('win32')
+  com! -nargs=? -bar -bang SetTransparency {
+                                              var alpha: number
+                                              if '<bang>' == '!'
+                                                alpha = 255
+                                              else
+                                                const tmp: float = str2nr(<q-args>) / 100.0 * 255
+                                                alpha = float2nr(tmp)
+                                                alpha = max([  0, alpha])
+                                                alpha = min([255, alpha])
+                                              endif
+                                              call libcallnr(g:vimtweak_dll_path, "SetAlpha", alpha)
+                                            }
+endif
+
+
+
+#---------------------------------------------------------------------------------------------
+# GUI Cursor
+# TODO
+
+
+#set guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+#set guicursor=n-v-c:ver10-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,a:blinkon0
+
+set guicursor=n-v-c:ver20-blinkwait1000-blinkon600-blinkoff400-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:hor30-Cursor/lCursor,r-cr:Block-Cursor/lCursor
+
+
+
+#---------------------------------------------------------------------------------------------
+# Initialize
+
+
+#--------------------------------------------
+# Options
+
+set guioptions=!cd
+# set visualbell t_vb=
+
+
+#--------------------------------------------
+# Window Position
+
+winpos 560 280
+
+#--------------------------------------------
+# Window Size
+
+set lines=100 columns=320
+
+if has('win32')
+  augroup MyGvimrc
+    au!
+
+    #--------------------------------------------
+    # Decoration
+
+    au VimEnter * TitleDisable
+
+    #--------------------------------------------
+    # Transparency
+
+    #au VimEnter * VimTweakSetAlpha 220
+    #au VimEnter * SetTransparency 92  # 235
+    au VimEnter * SetTransparency 87
+  augroup end
+endif
+
+#--------------------------------------------
+# Font Size
+
+# call ResizeFont(0)
