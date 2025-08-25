@@ -1,7 +1,7 @@
 scriptencoding utf-8
 " vim: set ts=8 sts=2 sw=2 tw=0 :
 
-if !has('win32')
+if !has('win32') || !has('gui_running')
   finish
 endif
 
