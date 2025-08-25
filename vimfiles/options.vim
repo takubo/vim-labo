@@ -250,7 +250,7 @@ if has('win32')
   set guifont=BIZ_UDゴシック:h11:cSHIFTJIS:qDRAFT
 endif
 # TODO set guifontwide
-set guioptions=!cd  #TODO
+#set guioptions=!cd  # gvimrc
 if has('win32')
   set renderoptions=type:directx,scrlines:1  # TODO
 endif
@@ -292,6 +292,7 @@ set report=0  # or 1
 #set noerrorbells
 set visualbell
 set belloff=backspace,error,esc,insertmode,term,wildmode
+#set visualbell t_vb=
 #set helplang=ja
 
 # 13 テキスト選択

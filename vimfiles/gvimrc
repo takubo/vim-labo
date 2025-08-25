@@ -49,16 +49,15 @@ nnoremap <A-Down> <Cmd>ResizeFont -0.5<CR>
 #---------------------------------------------------------------------------------------------
 # Window Position
 
+nnoremap <silent> <Left>    <Cmd>exe 'winpos'    getwinposx() - 8 * v:count1    getwinposy()               <CR>
+nnoremap <silent> <Down>    <Cmd>exe 'winpos'    getwinposx()                   getwinposy() + 8 * v:count1<CR>
+nnoremap <silent> <Up>      <Cmd>exe 'winpos'    getwinposx()                   getwinposy() - 8 * v:count1<CR>
+nnoremap <silent> <Right>   <Cmd>exe 'winpos'    getwinposx() + 8 * v:count1    getwinposy()               <CR>
 
-nnoremap <silent> <Left>    :exe 'winpos' getwinposx() - 8 getwinposy()    <CR>
-nnoremap <silent> <Down>    :exe 'winpos' getwinposx()     getwinposy() + 8<CR>
-nnoremap <silent> <Up>      :exe 'winpos' getwinposx()     getwinposy() - 8<CR>
-nnoremap <silent> <Right>   :exe 'winpos' getwinposx() + 8 getwinposy()    <CR>
-
-nnoremap <silent> <S-Left>  :exe 'winpos' getwinposx() - 1 getwinposy()    <CR>
-nnoremap <silent> <S-Down>  :exe 'winpos' getwinposx()     getwinposy() + 1<CR>
-nnoremap <silent> <S-Up>    :exe 'winpos' getwinposx()     getwinposy() - 1<CR>
-nnoremap <silent> <S-Right> :exe 'winpos' getwinposx() + 1 getwinposy()    <CR>
+nnoremap <silent> <S-Left>  <Cmd>exe 'winpos'    getwinposx() - 1 * v:count1    getwinposy()               <CR>
+nnoremap <silent> <S-Down>  <Cmd>exe 'winpos'    getwinposx()                   getwinposy() + 1 * v:count1<CR>
+nnoremap <silent> <S-Up>    <Cmd>exe 'winpos'    getwinposx()                   getwinposy() - 1 * v:count1<CR>
+nnoremap <silent> <S-Right> <Cmd>exe 'winpos'    getwinposx() + 1 * v:count1    getwinposy()               <CR>
 
 
 
@@ -69,15 +68,15 @@ nnoremap <silent> <S-Right> :exe 'winpos' getwinposx() + 1 getwinposy()    <CR>
 #--------------------------------------------
 # Window Size Change
 
-nnoremap <silent> <C-Left>    <Cmd>let &columns -= 3<CR>
-nnoremap <silent> <C-Down>    <Cmd>let &lines   += 2<CR>
-nnoremap <silent> <C-Up>      <Cmd>let &lines   -= 2<CR>
-nnoremap <silent> <C-Right>   <Cmd>let &columns += 3<CR>
+nnoremap <silent> <C-Left>    <Cmd>exe 'let &columns -=' 3 * v:count1<CR>
+nnoremap <silent> <C-Down>    <Cmd>exe 'let &lines   +=' 2 * v:count1<CR>
+nnoremap <silent> <C-Up>      <Cmd>exe 'let &lines   -=' 2 * v:count1<CR>
+nnoremap <silent> <C-Right>   <Cmd>exe 'let &columns +=' 3 * v:count1<CR>
 
-nnoremap <silent> <C-S-Left>  <Cmd>let &columns -= 1<CR>
-nnoremap <silent> <C-S-Down>  <Cmd>let &lines   += 1<CR>
-nnoremap <silent> <C-S-Up>    <Cmd>let &lines   -= 1<CR>
-nnoremap <silent> <C-S-Right> <Cmd>let &columns += 1<CR>
+nnoremap <silent> <C-S-Left>  <Cmd>exe 'let &columns -=' 1 * v:count1<CR>
+nnoremap <silent> <C-S-Down>  <Cmd>exe 'let &lines   +=' 1 * v:count1<CR>
+nnoremap <silent> <C-S-Up>    <Cmd>exe 'let &lines   -=' 1 * v:count1<CR>
+nnoremap <silent> <C-S-Right> <Cmd>exe 'let &columns +=' 1 * v:count1<CR>
 
 
 #--------------------------------------------
@@ -161,8 +160,8 @@ endif
 
 #nnoremap <A-Left>  <ScriptCmd>SetTransparency(-0.5)<CR>
 #nnoremap <A-Right> <ScriptCmd>SetTransparency(+0.5)<CR>
-nnoremap <A-Left>  <ScriptCmd>SetTransparency(-1.5)<CR>
-nnoremap <A-Right> <ScriptCmd>SetTransparency(+1.5)<CR>
+nnoremap <A-Left>  <ScriptCmd>SetTransparency(-1.5 * v:count1)<CR>
+nnoremap <A-Right> <ScriptCmd>SetTransparency(+1.5 * v:count1)<CR>
 
 
 

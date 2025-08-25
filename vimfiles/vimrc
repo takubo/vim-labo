@@ -95,9 +95,9 @@ augroup end
 g:RimpaGold = true
 
 com! Gold {
-  g:RimpaGold = !g:RimpaGold
-  colorscheme rimpa
-}
+            g:RimpaGold = !g:RimpaGold
+            colorscheme rimpa
+          }
 
 def g:IsGold(): bool
   return g:RimpaGold
@@ -111,9 +111,9 @@ enddef
 g:RimpaDark = true
 
 com! Dark {
-  g:RimpaDark = !g:RimpaDark
-  colorscheme rimpa
-}
+            g:RimpaDark = !g:RimpaDark
+            colorscheme rimpa
+          }
 
 # nnoremap @ <Cmd>Dark<CR>
 
