@@ -12,6 +12,9 @@ if !has('osx')
 endif
 
 
+import autoload 'battery.vim' as bat
+
+
 export def Init(): number
   # 一度実行してみる。
   # 出力行数も確認。
@@ -51,14 +54,14 @@ export def Update(battery_info: dict<any>)
   # PrettyPrint cmd_out_array
 
 
-  var ac_status: ACStatus = ACStatus.Unknown
+  var ac_status = bat.ACStatus.Unknown
   {
     if match(cmd_out_array[0], 'Battery Power') >= 0
-      ac_status = ACStatus.NotConnected
+      ac_status = bat.ACStatus.NotConnected
     elseif match(cmd_out_array[1], '\<charging\>') >= 0
-      ac_status = ACStatus.Charging
+      ac_status = bat.ACStatus.Charging
     else
-      ac_status = ACStatus.NotCharging
+      ac_status = bat.ACStatus.NotCharging
     endif
   }
 

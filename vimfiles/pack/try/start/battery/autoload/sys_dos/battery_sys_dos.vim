@@ -8,6 +8,9 @@ if !has('win32')
 endif
 
 
+import autoload 'battery.vim' as bat
+
+
 export def Init(): number
   try
     python3 << EOF
@@ -57,8 +60,8 @@ export def Update(battery_info: dict<any>)
   battery_info.RemainingPercent    = sys_battery_info.percent
   battery_info.RemainingTimeSecond = sys_battery_info.remaining_sec
  #battery_info.FullTimeSecond      = sys_battery_info.full_sec
-  battery_info.ACStatus            = sys_battery_info.ac_line == 255 ? ACStatus.Unknown      :
-                                     sys_battery_info.charging       ? ACStatus.Charging     :
-                                     sys_battery_info.ac_line == 1   ? ACStatus.NotCharging  :
-                                                                       ACStatus.NotConnected
+  battery_info.ACStatus            = sys_battery_info.ac_line == 255 ? bat.ACStatus.Unknown      :
+                                     sys_battery_info.charging       ? bat.ACStatus.Charging     :
+                                     sys_battery_info.ac_line == 1   ? bat.ACStatus.NotCharging  :
+                                                                       bat.ACStatus.NotConnected
 enddef

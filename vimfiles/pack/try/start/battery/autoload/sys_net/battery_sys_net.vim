@@ -3,6 +3,9 @@ vim9script
 scriptencoding utf-8
 
 
+import autoload 'battery.vim' as bat
+
+
 export def Init(): number
   # 未実装
   return -1
@@ -12,5 +15,5 @@ enddef
 export def Update(battery_info: dict<any>)
   battery_info.RemainingPercent    = -1
   battery_info.RemainingTimeSecond = -1
-  battery_info.ACStatus            = ACStatus.Unknown
+  battery_info.ACStatus            = bat.ACStatus.Unknown
 enddef
